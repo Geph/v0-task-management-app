@@ -284,11 +284,28 @@ export function TaskList() {
 
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
 
-  const [appName, setAppName] = useState(localStorage.getItem("appName") || "Geph's Task Management")
-  const [appIcon, setAppIcon] = useState(localStorage.getItem("appIcon") || "")
+  const [appName, setAppName] = useState("Geph's Task Management")
+  const [appIcon, setAppIcon] = useState("")
   const [defaultEmail, setDefaultEmail] = useState("")
-  const [hasPIN, setHasPIN] = useState(localStorage.getItem("userPIN") !== null)
-  const [userPIN, setUserPIN] = useState(localStorage.getItem("userPIN") || "")
+  const [hasPIN, setHasPIN] = useState(false)
+  const [userPIN, setUserPIN] = useState("")
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedAppName = localStorage.getItem("appName")
+      const storedAppIcon = localStorage.getItem("appIcon")
+      const storedDefaultEmail = localStorage.getItem("defaultEmail")
+      const storedUserPIN = localStorage.getItem("userPIN")
+
+      if (storedAppName) setAppName(storedAppName)
+      if (storedAppIcon) setAppIcon(storedAppIcon)
+      if (storedDefaultEmail) setDefaultEmail(storedDefaultEmail)
+      if (storedUserPIN) {
+        setUserPIN(storedUserPIN)
+        setHasPIN(true)
+      }
+    }
+  }, [])
 
   const calculateColumnWidths = () => {
     const baseWidths = {
@@ -811,32 +828,42 @@ export function TaskList() {
 
   const handleUpdateAppName = (name: string) => {
     setAppName(name)
-    localStorage.setItem("appName", name)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("appName", name)
+    }
   }
 
   const handleUpdateAppIcon = (icon: string) => {
     setAppIcon(icon)
-    localStorage.setItem("appIcon", icon)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("appIcon", icon)
+    }
   }
 
   const handleUpdateDefaultEmail = (email: string) => {
     setDefaultEmail(email)
-    localStorage.setItem("defaultEmail", email)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("defaultEmail", email)
+    }
   }
 
   const handleSetPIN = (pin: string) => {
     setUserPIN(pin)
     setHasPIN(true)
-    localStorage.setItem("userPIN", pin)
-    localStorage.removeItem("isAuthenticated") // Force re-authentication
+    if (typeof window !== "undefined") {
+      localStorage.setItem("userPIN", pin)
+      localStorage.removeItem("isAuthenticated") // Force re-authentication
+    }
     alert("PIN set successfully. You will need to enter it on your next visit.")
   }
 
   const handleRemovePIN = () => {
     setUserPIN("")
     setHasPIN(false)
-    localStorage.removeItem("userPIN")
-    localStorage.removeItem("isAuthenticated")
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("userPIN")
+      localStorage.removeItem("isAuthenticated")
+    }
   }
 
   return (
