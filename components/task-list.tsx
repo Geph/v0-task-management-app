@@ -14,10 +14,10 @@ import {
   CheckCircle,
   Edit,
   Copy,
-  Download,
   Mail,
   Bell,
   Merge,
+  Settings,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -32,12 +32,12 @@ import { AddSectionDialog } from "@/components/add-section-dialog"
 import { RemoveSectionDialog } from "@/components/remove-section-dialog"
 import { RocketIcon } from "@/components/rocket-icon"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
-import { ExportImportDialog } from "@/components/export-import-dialog"
 import { MergeTasksDialog } from "@/components/merge-tasks-dialog"
 import { EmailTaskDialog } from "@/components/email-task-dialog"
 import { RemindMeDialog } from "@/components/remind-me-dialog"
-import { EmojiPicker } from "@/components/emoji-picker"
+import { EmojiPicker } from "@/components/enhanced-emoji-picker" // Updated import
 import { FileAttachmentComponent } from "@/components/file-attachment"
+import { SettingsDialog } from "@/components/settings-dialog" // Added import
 
 interface Task {
   id: string
@@ -62,21 +62,21 @@ type SortDirection = "asc" | "desc"
 
 export function TaskList() {
   const [statusOptions, setStatusOptions] = useState([
-    { key: "ongoing", label: "On-going", color: "#3b82f6" },
+    { key: "ongoing", label: "On-going", color: "#81b1ff" },
     { key: "waiting", label: "Waiting / review", color: "#06b6d4" },
-    { key: "not-yet", label: "Not yet", color: "#9ca3af" },
-    { key: "working", label: "Working on it", color: "#eab308" },
-    { key: "delegated", label: "Delegated", color: "#d97706" },
+    { key: "not-yet", label: "Not yet", color: "#b5bcc2" },
+    { key: "working", label: "Working on it", color: "#f9d900" },
+    { key: "delegated", label: "Delegated", color: "#af7e2e" },
     { key: "paused", label: "Paused", color: "#6b7280" },
     { key: "stuck", label: "Stuck", color: "#ec4899" },
-    { key: "someday", label: "Someday", color: "#14b8a6" },
+    { key: "someday", label: "Someday", color: "#1bbc9c" },
   ])
 
   const [priorityOptions, setPriorityOptions] = useState([
     { key: "high", label: "High", color: "#ef4444" },
-    { key: "medium", label: "Medium", color: "#f97316" },
-    { key: "low", label: "Low", color: "#3b82f6" },
-    { key: "someday", label: "Someday", color: "#14b8a6" },
+    { key: "medium", label: "Medium", color: "#ff7800" },
+    { key: "low", label: "Low", color: "#3082b7" },
+    { key: "someday", label: "Someday", color: "#1bbc9c" },
   ])
 
   const [sections, setSections] = useState<TaskSection[]>([
@@ -282,6 +282,14 @@ export function TaskList() {
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState("")
 
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
+
+  const [appName, setAppName] = useState(localStorage.getItem("appName") || "Geph's Task Management")
+  const [appIcon, setAppIcon] = useState(localStorage.getItem("appIcon") || "")
+  const [defaultEmail, setDefaultEmail] = useState("")
+  const [hasPIN, setHasPIN] = useState(localStorage.getItem("userPIN") !== null)
+  const [userPIN, setUserPIN] = useState(localStorage.getItem("userPIN") || "")
+
   const calculateColumnWidths = () => {
     const baseWidths = {
       checkbox: 4,
@@ -289,8 +297,8 @@ export function TaskList() {
       name: 40,
       status: 18,
       priority: 18,
-      attachments: 8,
-      actions: 8,
+      attachments: 6, // Reduced from 8 to 6
+      actions: 4, // Reduced from 6 to 4
     }
 
     let maxNameLength = 4 // "Name"
@@ -314,7 +322,7 @@ export function TaskList() {
     const nameWidth = Math.min(45, Math.max(25, maxNameLength * 0.8 + maxNameLength * 0.3))
     const statusWidth = Math.min(22, Math.max(15, maxStatusLength * 0.6 + maxStatusLength * 0.3))
     const priorityWidth = Math.min(22, Math.max(15, maxPriorityLength * 0.6 + maxPriorityLength * 0.3))
-    const remaining = 100 - nameWidth - statusWidth - priorityWidth - 4 - 4 - 8 - 8 // checkbox, emoji, attachments, actions
+    const remaining = 100 - nameWidth - statusWidth - priorityWidth - 4 - 4 - 6 - 4 // checkbox, emoji, attachments, actions
 
     return {
       checkbox: 4,
@@ -322,8 +330,8 @@ export function TaskList() {
       name: nameWidth,
       status: statusWidth,
       priority: priorityWidth,
-      attachments: 8,
-      actions: Math.max(8, remaining + 8),
+      attachments: 6, // Reduced from 8
+      actions: Math.max(4, remaining + 4), // Reduced minimum from 6 to 4
     }
   }
 
@@ -399,7 +407,7 @@ export function TaskList() {
           ...columnWidths,
           priority: newPriorityWidth,
           attachments: Math.max(6, newAttachmentsWidth),
-          actions: Math.max(6, newActionsWidth),
+          actions: Math.max(4, newActionsWidth),
         })
       } else if (isResizing === "attachments") {
         const fixedColumns =
@@ -411,7 +419,7 @@ export function TaskList() {
         setColumnWidths({
           ...columnWidths,
           attachments: newAttachmentsWidth,
-          actions: Math.max(6, newActionsWidth),
+          actions: Math.max(4, newActionsWidth),
         })
       }
     }
@@ -437,15 +445,47 @@ export function TaskList() {
     )
   }
 
+  const suggestEmoji = (taskName: string): string => {
+    const name = taskName.toLowerCase()
+
+    // Common task-related emojis based on keywords
+    if (name.includes("call") || name.includes("phone")) return "📞"
+    if (name.includes("email") || name.includes("mail")) return "✉️"
+    if (name.includes("meeting") || name.includes("meet")) return "🤝"
+    if (name.includes("research") || name.includes("study")) return "🔍"
+    if (name.includes("write") || name.includes("document")) return "📝"
+    if (name.includes("fix") || name.includes("bug") || name.includes("repair")) return "🛠️"
+    if (name.includes("update") || name.includes("upgrade")) return "⬆️"
+    if (name.includes("website") || name.includes("web")) return "🌐"
+    if (name.includes("server") || name.includes("deploy")) return "💻"
+    if (name.includes("design") || name.includes("ui")) return "🎨"
+    if (name.includes("test") || name.includes("testing")) return "🧪"
+    if (name.includes("plan") || name.includes("planning")) return "📋"
+    if (name.includes("review") || name.includes("check")) return "👀"
+    if (name.includes("data") || name.includes("database")) return "📊"
+    if (name.includes("video") || name.includes("record")) return "🎬"
+    if (name.includes("photo") || name.includes("image")) return "📸"
+    if (name.includes("book") || name.includes("read")) return "📚"
+    if (name.includes("travel") || name.includes("trip")) return "✈️"
+    if (name.includes("money") || name.includes("payment")) return "💰"
+    if (name.includes("security") || name.includes("secure")) return "🔒"
+    if (name.includes("backup") || name.includes("save")) return "💾"
+    if (name.includes("clean") || name.includes("organize")) return "🧹"
+    if (name.includes("launch") || name.includes("start")) return "🚀"
+
+    // Default emoji for new tasks
+    return "📝"
+  }
+
   const addTask = (sectionId: string) => {
     const newTask: Task = {
       id: Date.now().toString(),
       name: "New Task",
-      status: statusOptions[0].key,
-      priority: priorityOptions[0].key,
+      status: "not-yet",
+      priority: "blank",
       completed: false,
       notes: "",
-      emoji: "📝",
+      emoji: "",
       attachments: [],
     }
 
@@ -454,6 +494,8 @@ export function TaskList() {
         section.id === sectionId ? { ...section, tasks: [...section.tasks, newTask] } : section,
       ),
     )
+
+    setEditingTaskId(newTask.id)
   }
 
   const duplicateTask = (sectionId: string, taskId: string) => {
@@ -482,11 +524,21 @@ export function TaskList() {
         section.id === sectionId
           ? {
               ...section,
-              tasks: section.tasks.map((task) => (task.id === taskId ? { ...task, name: newName } : task)),
+              tasks: section.tasks.map((task) => {
+                if (task.id === taskId) {
+                  const updatedTask = { ...task, name: newName }
+                  if (!task.emoji && newName.trim()) {
+                    updatedTask.emoji = suggestEmoji(newName)
+                  }
+                  return updatedTask
+                }
+                return task
+              }),
             }
           : section,
       ),
     )
+    setEditingTaskId(null)
   }
 
   const updateTaskStatus = (sectionId: string, taskId: string, status: StatusType) => {
@@ -757,13 +809,47 @@ export function TaskList() {
     )
   }
 
+  const handleUpdateAppName = (name: string) => {
+    setAppName(name)
+    localStorage.setItem("appName", name)
+  }
+
+  const handleUpdateAppIcon = (icon: string) => {
+    setAppIcon(icon)
+    localStorage.setItem("appIcon", icon)
+  }
+
+  const handleUpdateDefaultEmail = (email: string) => {
+    setDefaultEmail(email)
+    localStorage.setItem("defaultEmail", email)
+  }
+
+  const handleSetPIN = (pin: string) => {
+    setUserPIN(pin)
+    setHasPIN(true)
+    localStorage.setItem("userPIN", pin)
+    localStorage.removeItem("isAuthenticated") // Force re-authentication
+    alert("PIN set successfully. You will need to enter it on your next visit.")
+  }
+
+  const handleRemovePIN = () => {
+    setUserPIN("")
+    setHasPIN(false)
+    localStorage.removeItem("userPIN")
+    localStorage.removeItem("isAuthenticated")
+  }
+
   return (
     <div className="flex-1 bg-background">
       <div className="border-b border-border p-6 bg-purple-900">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <RocketIcon className="w-8 h-8 text-white" />
-            <h1 className="text-2xl font-semibold text-white">Geph's Task Management</h1>
+            {appIcon ? (
+              <img src={appIcon || "/placeholder.svg"} alt="App icon" className="w-8 h-8 object-contain" />
+            ) : (
+              <RocketIcon className="w-8 h-8 text-white" />
+            )}
+            <h1 className="text-2xl font-semibold text-white">{appName}</h1>
           </div>
           <div className="flex items-center gap-3">
             <AddSectionDialog onAddSection={addSection}>
@@ -776,7 +862,16 @@ export function TaskList() {
                 Add Section
               </Button>
             </AddSectionDialog>
-            <ExportImportDialog
+            <SettingsDialog
+              appName={appName}
+              appIcon={appIcon}
+              defaultEmail={defaultEmail}
+              hasPIN={hasPIN}
+              onUpdateAppName={handleUpdateAppName}
+              onUpdateAppIcon={handleUpdateAppIcon}
+              onUpdateDefaultEmail={handleUpdateDefaultEmail}
+              onSetPIN={handleSetPIN}
+              onRemovePIN={handleRemovePIN}
               sections={sections}
               statusOptions={statusOptions}
               priorityOptions={priorityOptions}
@@ -785,12 +880,12 @@ export function TaskList() {
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white hover:text-purple-900 transition-colors"
               >
-                <Download className="w-4 h-4" />
-                Export/Import
+                <Settings className="w-4 h-4" />
+                Settings
               </Button>
-            </ExportImportDialog>
+            </SettingsDialog>
             <div className="relative">
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -908,20 +1003,15 @@ export function TaskList() {
                 >
                   <div style={{ width: `${columnWidths.checkbox}%` }}>☑️</div>
                   <div style={{ width: `${columnWidths.emoji}%` }}>😀</div>
-                  <div
-                    className="flex items-center gap-1 cursor-pointer relative"
-                    style={{ width: `${columnWidths.name}%` }}
-                    onClick={() => handleSort("name")}
-                  >
+                  <div className="flex items-center gap-1 relative" style={{ width: `${columnWidths.name}%` }}>
                     Name
-                    <ArrowUpDown className="w-3 h-3" />
                     <div
                       className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
                       onMouseDown={(e) => handleMouseDown("name", e)}
                     />
                   </div>
                   <div
-                    className="flex items-center gap-1 cursor-pointer relative"
+                    className="flex items-center justify-center gap-1 cursor-pointer relative"
                     style={{ width: `${columnWidths.status}%` }}
                     onClick={() => handleSort("status")}
                   >
@@ -933,7 +1023,7 @@ export function TaskList() {
                     />
                   </div>
                   <div
-                    className="flex items-center gap-1 cursor-pointer relative"
+                    className="flex items-center justify-center gap-1 cursor-pointer relative"
                     style={{ width: `${columnWidths.priority}%` }}
                     onClick={() => handleSort("priority")}
                   >
@@ -944,14 +1034,21 @@ export function TaskList() {
                       onMouseDown={(e) => handleMouseDown("priority", e)}
                     />
                   </div>
-                  <div className="flex items-center gap-1 relative" style={{ width: `${columnWidths.attachments}%` }}>
-                    📎
+                  <div
+                    className="flex items-center justify-center gap-1 relative"
+                    style={{ width: `${columnWidths.attachments}%` }}
+                  >
+                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                      <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+                    </svg>
                     <div
                       className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
                       onMouseDown={(e) => handleMouseDown("attachments", e)}
                     />
                   </div>
-                  <div style={{ width: `${columnWidths.actions}%` }}>Actions</div>
+                  <div className="flex items-center justify-center" style={{ width: `${columnWidths.actions}%` }}>
+                    Actions
+                  </div>
                 </div>
 
                 {section.tasks
@@ -979,19 +1076,54 @@ export function TaskList() {
                       </div>
 
                       <div className="flex items-center" style={{ width: `${columnWidths.name}%` }}>
-                        <TaskDetailsDialog
-                          taskName={task.name}
-                          taskNotes={task.notes}
-                          onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
-                        >
-                          <span
-                            className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
-                              task.completed ? "line-through" : ""
-                            }`}
+                        {editingTaskId === task.id ? (
+                          <Input
+                            value={task.name}
+                            onChange={(e) => {
+                              const newName = e.target.value
+                              setSections(
+                                sections.map((section) =>
+                                  section.id === section.id
+                                    ? {
+                                        ...section,
+                                        tasks: section.tasks.map((t) =>
+                                          t.id === task.id ? { ...t, name: newName } : t,
+                                        ),
+                                      }
+                                    : section,
+                                ),
+                              )
+                            }}
+                            onBlur={() => {
+                              if (task.name.trim()) {
+                                renameTask(section.id, task.id, task.name.trim())
+                              } else {
+                                renameTask(section.id, task.id, "New Task")
+                              }
+                            }}
+                            onKeyDown={(e) => {
+                              if (e.key === "Enter") {
+                                e.currentTarget.blur()
+                              }
+                            }}
+                            autoFocus
+                            className="text-sm h-6 px-1 py-0"
+                          />
+                        ) : (
+                          <TaskDetailsDialog
+                            taskName={task.name}
+                            taskNotes={task.notes}
+                            onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
                           >
-                            {task.name}
-                          </span>
-                        </TaskDetailsDialog>
+                            <span
+                              className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
+                                task.completed ? "line-through" : ""
+                              }`}
+                            >
+                              {task.name}
+                            </span>
+                          </TaskDetailsDialog>
+                        )}
                       </div>
 
                       <div className="flex items-stretch" style={{ width: `${columnWidths.status}%` }}>
@@ -1034,14 +1166,7 @@ export function TaskList() {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                const newName = prompt("Enter new task name:", task.name)
-                                if (newName && newName.trim()) {
-                                  renameTask(section.id, task.id, newName.trim())
-                                }
-                              }}
-                            >
+                            <DropdownMenuItem onClick={() => setEditingTaskId(task.id)}>
                               <Edit className="w-4 h-4 mr-2" />
                               Rename Task
                             </DropdownMenuItem>

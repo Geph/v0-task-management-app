@@ -1,7 +1,7 @@
 "use client"
 
 import type React from "react"
-
+import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
@@ -30,6 +30,8 @@ export function ExportImportDialog({
 }: ExportImportDialogProps) {
   const [importData, setImportData] = useState("")
   const [isOpen, setIsOpen] = useState(false)
+  const [importUrl, setImportUrl] = useState("")
+  const [isLoadingUrl, setIsLoadingUrl] = useState(false)
 
   const exportData = () => {
     const data = {
@@ -90,6 +92,29 @@ export function ExportImportDialog({
     URL.revokeObjectURL(url)
   }
 
+  const handleUrlImport = async () => {
+    if (!importUrl.trim()) {
+      alert("Please enter a valid URL")
+      return
+    }
+
+    setIsLoadingUrl(true)
+    try {
+      const response = await fetch(importUrl)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`)
+      }
+      const data = await response.text()
+      setImportData(data)
+      setImportUrl("")
+      alert("Data loaded from URL successfully. Review and click Import Configuration to apply.")
+    } catch (error) {
+      alert(`Error loading data from URL: ${error.message}`)
+    } finally {
+      setIsLoadingUrl(false)
+    }
+  }
+
   const handleImport = () => {
     try {
       // Parse XML data (simplified parser for our specific format)
@@ -145,15 +170,36 @@ export function ExportImportDialog({
               Import Configuration
             </Label>
             <p className="text-sm text-muted-foreground mb-3">
-              Paste the XML configuration data below to import sections and options.
+              Import configuration from a URL or paste XML data directly.
             </p>
-            <Textarea
-              id="import-data"
-              placeholder="Paste XML configuration data here..."
-              value={importData}
-              onChange={(e) => setImportData(e.target.value)}
-              className="min-h-[200px] font-mono text-sm"
-            />
+
+            <div className="space-y-3 mb-4">
+              <Label htmlFor="import-url">Import from URL</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="import-url"
+                  placeholder="https://example.com/config.xml"
+                  value={importUrl}
+                  onChange={(e) => setImportUrl(e.target.value)}
+                  className="flex-1"
+                />
+                <Button onClick={handleUrlImport} disabled={!importUrl.trim() || isLoadingUrl} variant="outline">
+                  {isLoadingUrl ? "Loading..." : "Load"}
+                </Button>
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <Label htmlFor="import-data">Or paste XML data</Label>
+              <Textarea
+                id="import-data"
+                placeholder="Paste XML configuration data here..."
+                value={importData}
+                onChange={(e) => setImportData(e.target.value)}
+                className="min-h-[200px] font-mono text-sm"
+              />
+            </div>
+
             <div className="flex gap-2 mt-3">
               <Button onClick={handleImport} disabled={!importData.trim()} className="gap-2">
                 <Upload className="w-4 h-4" />
