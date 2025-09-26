@@ -1338,13 +1338,24 @@ export function TaskList() {
                 <span>{section.name}</span>
                 <span className="bg-white/20 px-2 py-0.5 rounded text-xs">{section.tasks.length}</span>
               </div>
-              <DropdownMenu>
+              <DropdownMenu
+                onOpenChange={(open) => {
+                  console.log("[v0] Section actions dropdown open state changed:", open, "for section:", section.name)
+                }}
+              >
                 <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="sm" className="text-muted-foreground">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground cursor-pointer"
+                    onClick={() =>
+                      console.log("[v0] Section actions dropdown trigger clicked for section:", section.name)
+                    }
+                  >
                     <MoreHorizontal className="w-4 h-4" />
                   </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent align="start" className="w-48">
                   <SectionRenameDialog
                     currentName={section.name}
                     onRename={(newName) => renameSection(section.id, newName)}
@@ -1491,16 +1502,27 @@ export function TaskList() {
                       {renderTaskColumns(task, section)}
 
                       <div className="flex items-center justify-end" style={{ width: `${columnWidths.actions}%` }}>
-                        <DropdownMenu>
+                        <DropdownMenu
+                          onOpenChange={(open) => {
+                            console.log("[v0] Task actions dropdown open state changed:", open, "for task:", task.name)
+                          }}
+                        >
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="p-1 cursor-pointer hover:bg-muted">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-1 cursor-pointer hover:bg-muted"
+                              onClick={() =>
+                                console.log("[v0] Task actions dropdown trigger clicked for task:", task.name)
+                              }
+                            >
                               <MoreHorizontal className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent>
+                          <DropdownMenuContent align="end" className="w-48">
                             <DropdownMenuItem
                               onClick={() => {
-                                console.log("[v0] Rename task clicked")
+                                console.log("[v0] Rename task clicked for:", task.name)
                                 setEditingTaskId(task.id)
                               }}
                               className="cursor-pointer"
@@ -1510,7 +1532,7 @@ export function TaskList() {
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
-                                console.log("[v0] Duplicate task clicked")
+                                console.log("[v0] Duplicate task clicked for:", task.name)
                                 duplicateTask(section.id, task.id)
                               }}
                               className="cursor-pointer"

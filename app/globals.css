@@ -325,9 +325,15 @@
     border-color: hsl(var(--primary));
   }
 
-  /* Added popover fixes for table containment issues */
+  /* Enhanced popover and dropdown positioning fixes */
   /* Ensure popovers are not clipped by table containers */
   [data-slot="popover-content"] {
+    z-index: 9999 !important;
+    position: fixed !important;
+  }
+
+  /* Ensure dropdown menus are properly positioned */
+  [data-slot="dropdown-menu-content"] {
     z-index: 9999 !important;
     position: fixed !important;
   }
@@ -336,6 +342,7 @@
   .table-container {
     contain: none !important;
     overflow: visible !important;
+    position: relative;
   }
 
   /* Fix for popover positioning in table cells */
@@ -344,8 +351,49 @@
     z-index: 1;
   }
 
+  /* Fix for dropdown menu positioning in table cells */
+  [data-slot="dropdown-menu-trigger"] {
+    position: relative;
+    z-index: 1;
+  }
+
   /* Ensure popover portal content is always visible */
   [data-radix-popper-content-wrapper] {
     z-index: 9999 !important;
+  }
+
+  /* Ensure dropdown menu portal content is always visible */
+  [data-radix-dropdown-menu-content] {
+    z-index: 9999 !important;
+  }
+
+  /* Additional positioning fixes for Radix components */
+  [data-radix-portal] {
+    z-index: 9999 !important;
+  }
+
+  /* Prevent table overflow from hiding dropdowns */
+  .table-container * {
+    overflow: visible !important;
+  }
+
+  /* Ensure proper stacking context for interactive elements */
+  [role="button"]:has([data-slot="popover-trigger"]),
+  [role="button"]:has([data-slot="dropdown-menu-trigger"]) {
+    position: relative;
+    z-index: 2;
+  }
+
+  /* Debug styles for troubleshooting positioning issues */
+  .debug-popover [data-slot="popover-content"] {
+    border: 2px solid red !important;
+    background: yellow !important;
+    opacity: 0.9 !important;
+  }
+
+  .debug-dropdown [data-slot="dropdown-menu-content"] {
+    border: 2px solid blue !important;
+    background: lightblue !important;
+    opacity: 0.9 !important;
   }
 }

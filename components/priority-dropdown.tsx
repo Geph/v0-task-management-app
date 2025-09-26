@@ -39,12 +39,22 @@ export function PriorityDropdown({
 
   const currentPriority = allOptions.find((option) => option.key === value) || allOptions[0]
 
+  const handlePriorityChange = (priority: PriorityType) => {
+    console.log("[v0] Priority changing to:", priority)
+    onChange(priority)
+  }
+
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        console.log("[v0] Priority dropdown open state changed:", open)
+      }}
+    >
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`h-auto p-0 hover:bg-transparent ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
+          className={`h-auto p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
+          onClick={() => console.log("[v0] Priority dropdown trigger clicked")}
         >
           <Badge
             className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
@@ -63,7 +73,10 @@ export function PriorityDropdown({
         {allOptions.map((option) => (
           <DropdownMenuItem
             key={option.key}
-            onClick={() => onChange(option.key)}
+            onClick={() => {
+              console.log("[v0] Priority option clicked:", option.key)
+              handlePriorityChange(option.key)
+            }}
             className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-2">

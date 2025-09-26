@@ -34,20 +34,24 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
   const currentStatus = allOptions.find((option) => option.key === value) || allOptions[0]
 
   const handleStatusChange = (status: StatusType) => {
-    console.log("[v0] Status changing to:", status) // Added debug logging
+    console.log("[v0] Status changing to:", status)
     onChange(status)
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu
+      onOpenChange={(open) => {
+        console.log("[v0] Status dropdown open state changed:", open)
+      }}
+    >
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`h-auto p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`} // Added cursor-pointer
+          className={`h-auto p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
+          onClick={() => console.log("[v0] Status dropdown trigger clicked")}
         >
           <Badge
             className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
-              // Added cursor-pointer
               fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
             } ${currentStatus.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
             style={{
@@ -63,7 +67,10 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
         {allOptions.map((option) => (
           <DropdownMenuItem
             key={option.key}
-            onClick={() => handleStatusChange(option.key)} // Ensured onClick handler is properly bound
+            onClick={() => {
+              console.log("[v0] Status option clicked:", option.key)
+              handleStatusChange(option.key)
+            }}
             className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-2">
