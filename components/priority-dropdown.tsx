@@ -47,7 +47,7 @@ export function PriorityDropdown({
           className={`h-auto p-0 hover:bg-transparent ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
         >
           <Badge
-            className={`text-xs font-medium hover:opacity-80 ${
+            className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
               fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
             } ${currentPriority.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
             style={{
@@ -64,7 +64,7 @@ export function PriorityDropdown({
           <DropdownMenuItem
             key={option.key}
             onClick={() => onChange(option.key)}
-            className="flex items-center justify-between"
+            className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-2">
               <div
@@ -77,14 +77,14 @@ export function PriorityDropdown({
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <OptionManagerDialog title="Priority" options={options} onUpdateOptions={onUpdateOptions}>
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <div className="flex items-center gap-2">
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <OptionManagerDialog title="Priority" options={options} onUpdateOptions={onUpdateOptions}>
+            <div className="flex items-center gap-2 cursor-pointer">
               <Settings className="w-4 h-4" />
               <span>Manage Options</span>
             </div>
-          </DropdownMenuItem>
-        </OptionManagerDialog>
+          </OptionManagerDialog>
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   )

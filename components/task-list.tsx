@@ -1447,16 +1447,33 @@ export function TaskList() {
                       <div className="flex items-center justify-end" style={{ width: `${columnWidths.actions}%` }}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="sm" className="p-1">
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="p-1 cursor-pointer hover:bg-muted" // Added cursor-pointer and hover effect
+                              onClick={() => console.log("[v0] Task menu clicked for task:", task.id)} // Added debug logging
+                            >
                               <MoreHorizontal className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <DropdownMenuItem onClick={() => setEditingTaskId(task.id)}>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                console.log("[v0] Rename task clicked") // Added debug logging
+                                setEditingTaskId(task.id)
+                              }}
+                              className="cursor-pointer" // Added cursor-pointer
+                            >
                               <Edit className="w-4 h-4 mr-2" />
                               Rename Task
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => duplicateTask(section.id, task.id)}>
+                            <DropdownMenuItem
+                              onClick={() => {
+                                console.log("[v0] Duplicate task clicked") // Added debug logging
+                                duplicateTask(section.id, task.id)
+                              }}
+                              className="cursor-pointer" // Added cursor-pointer
+                            >
                               <Copy className="w-4 h-4 mr-2" />
                               Duplicate Task
                             </DropdownMenuItem>

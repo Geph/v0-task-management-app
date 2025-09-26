@@ -34,12 +34,8 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
   const currentStatus = allOptions.find((option) => option.key === value) || allOptions[0]
 
   const handleStatusChange = (status: StatusType) => {
-    console.log("[v0] Status dropdown clicked:", status)
+    console.log("[v0] Status changing to:", status) // Added debug logging
     onChange(status)
-  }
-
-  const handleTriggerClick = () => {
-    console.log("[v0] Status dropdown trigger clicked")
   }
 
   return (
@@ -47,11 +43,11 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
-          className={`h-auto p-0 hover:bg-transparent ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
-          onClick={handleTriggerClick}
+          className={`h-auto p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`} // Added cursor-pointer
         >
           <Badge
-            className={`text-xs font-medium hover:opacity-80 ${
+            className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
+              // Added cursor-pointer
               fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
             } ${currentStatus.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
             style={{
@@ -67,8 +63,8 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
         {allOptions.map((option) => (
           <DropdownMenuItem
             key={option.key}
-            onClick={() => handleStatusChange(option.key)}
-            className="flex items-center justify-between"
+            onClick={() => handleStatusChange(option.key)} // Ensured onClick handler is properly bound
+            className="flex items-center justify-between cursor-pointer"
           >
             <div className="flex items-center gap-2">
               <div
@@ -83,7 +79,7 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
         <DropdownMenuSeparator />
         <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
           <OptionManagerDialog title="Status" options={options} onUpdateOptions={onUpdateOptions}>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer">
               <Settings className="w-4 h-4" />
               <span>Manage Options</span>
             </div>
