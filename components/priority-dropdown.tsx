@@ -1,6 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { Check, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -36,12 +35,6 @@ export function PriorityDropdown({
   onUpdateOptions,
   fullWidth = false,
 }: PriorityDropdownProps) {
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
   const allOptions = [{ key: "blank", label: "--", color: "#ffffff" }, ...options]
 
   const currentPriority = allOptions.find((option) => option.key === value) || allOptions[0]
@@ -51,31 +44,8 @@ export function PriorityDropdown({
     onChange(priority)
   }
 
-  if (!isMounted) {
-    return (
-      <div className="relative inline-block w-full h-full">
-        <Button
-          variant="ghost"
-          className={`h-auto p-0 hover:bg-transparent cursor-pointer relative ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
-        >
-          <Badge
-            className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
-              fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
-            } ${currentPriority.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
-            style={{
-              backgroundColor: currentPriority.key === "blank" ? "#ffffff" : currentPriority.color,
-              borderColor: currentPriority.key === "blank" ? "#d1d5db" : currentPriority.color,
-            }}
-          >
-            {currentPriority.label}
-          </Badge>
-        </Button>
-      </div>
-    )
-  }
-
   return (
-    <div className="relative inline-block w-full h-full" style={{ contain: "layout" }}>
+    <div className="relative inline-block w-full h-full">
       <DropdownMenu
         onOpenChange={(open) => {
           console.log("[v0] Priority dropdown open state changed:", open)
@@ -107,9 +77,7 @@ export function PriorityDropdown({
           sideOffset={8}
           alignOffset={0}
           avoidCollisions={true}
-          collisionPadding={20}
-          sticky="always"
-          strategy="fixed"
+          collisionPadding={10}
         >
           {allOptions.map((option) => (
             <DropdownMenuItem

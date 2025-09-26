@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -437,11 +437,6 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("Smileys")
   const [open, setOpen] = useState(false)
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
 
   const allEmojis = Object.values(EMOJI_CATEGORIES).flat()
 
@@ -460,7 +455,6 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
 
   const handleOpenChange = (newOpen: boolean) => {
     console.log("[v0] Emoji picker open state changing from", open, "to", newOpen)
-    if (newOpen && !isMounted) return
     setOpen(newOpen)
   }
 
@@ -468,18 +462,8 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
     console.log("[v0] Emoji picker trigger clicked, current open state:", open)
   }
 
-  if (!isMounted) {
-    return (
-      <div className="relative inline-block">
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted relative">
-          {value || "😀"}
-        </Button>
-      </div>
-    )
-  }
-
   return (
-    <div className="relative inline-block" style={{ contain: "layout" }}>
+    <div className="relative inline-block">
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
@@ -493,15 +477,13 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-96 p-3 z-50"
+          className="w-96 p-3"
           side="bottom"
           align="start"
           sideOffset={8}
           alignOffset={0}
           avoidCollisions={true}
-          collisionPadding={20}
-          sticky="always"
-          strategy="fixed"
+          collisionPadding={10}
           onOpenAutoFocus={(e) => {
             console.log("[v0] Emoji picker popover opened and focused")
           }}

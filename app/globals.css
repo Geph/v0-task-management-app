@@ -122,8 +122,8 @@
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.9 0.01 220);
   --border: oklch(0.4 0.01 220);
-  --input: oklch(0.4 0.01 220); /* Improved input border visibility */
-  --ring: oklch(0.7 0.05 220); /* Improved ring visibility */
+  --input: oklch(0.4 0.01 220);
+  --ring: oklch(0.7 0.05 220);
   --sidebar: oklch(0.3 0.01 220);
   --sidebar-foreground: oklch(0.9 0.01 220);
   --sidebar-primary: oklch(0.7 0.05 220);
@@ -153,8 +153,8 @@
   --destructive: oklch(0.577 0.245 27.325);
   --destructive-foreground: oklch(0.9 0.02 250);
   --border: oklch(0.3 0.05 250);
-  --input: oklch(0.3 0.05 250); /* Improved input border visibility */
-  --ring: oklch(0.7 0.1 250); /* Improved ring visibility */
+  --input: oklch(0.3 0.05 250);
+  --ring: oklch(0.7 0.1 250);
   --sidebar: oklch(0.2 0.05 250);
   --sidebar-foreground: oklch(0.9 0.02 250);
   --sidebar-primary: oklch(0.7 0.1 250);
@@ -292,7 +292,6 @@
     background-color: #2196f3;
     color: white;
   }
-  /* Added someday priority styling */
   .priority-someday {
     background-color: #14b8a6;
     color: white;
@@ -325,226 +324,30 @@
     border-color: hsl(var(--primary));
   }
 
-  /* Enhanced production positioning fixes with more aggressive overrides */
-  /* Force proper positioning for all Radix popover and dropdown content */
+  /* Simplified and more reliable positioning fixes for production */
+  /* Basic positioning fixes that work in both dev and production */
   [data-radix-popper-content-wrapper] {
     z-index: 9999 !important;
-    position: fixed !important;
-    /* Force recalculation of position in production */
-    transform-style: flat !important;
-    backface-visibility: hidden !important;
   }
 
   [data-radix-dropdown-menu-content] {
     z-index: 9999 !important;
-    position: fixed !important;
-    transform-style: flat !important;
-    backface-visibility: hidden !important;
   }
 
-  /* Production-specific fixes for positioning calculation failures */
-  [data-radix-popper-content-wrapper][style*="left: 0px"][style*="top: 0px"] {
-    /* Override failed positioning calculations */
-    left: auto !important;
-    top: auto !important;
-    transform: none !important;
-    /* Force repositioning relative to trigger */
-    position: absolute !important;
+  [data-radix-popover-content] {
     z-index: 9999 !important;
   }
 
-  /* Ensure table containers don't interfere with positioning */
-  .table-container {
-    contain: none !important;
-    overflow: visible !important;
-    position: relative;
-    transform: none !important;
-    /* Prevent CSS containment issues in production */
-    isolation: auto !important;
-  }
-
-  /* Prevent any CSS transforms that could affect positioning */
-  .table-container * {
-    transform: none !important;
-    contain: none !important;
-    isolation: auto !important;
-  }
-
-  /* Force proper stacking context for triggers with data attributes */
-  [data-popover-trigger],
-  [data-dropdown-trigger] {
-    position: relative !important;
-    z-index: 10 !important;
-    /* Ensure proper bounds for positioning calculations */
-    display: inline-block !important;
-    isolation: isolate !important;
-  }
-
-  /* Enhanced content positioning with fallback strategies */
-  [data-slot="popover-content"],
-  [data-slot="dropdown-menu-content"] {
-    position: fixed !important;
-    z-index: 9999 !important;
-    transform-origin: var(--radix-popover-content-transform-origin, center) !important;
-    /* Production fallback positioning */
-    min-width: max-content !important;
-    will-change: transform, opacity !important;
-  }
-
-  /* Override any table-specific positioning that might interfere */
-  table [data-slot="popover-content"],
-  table [data-slot="dropdown-menu-content"],
-  tbody [data-slot="popover-content"],
-  tbody [data-slot="dropdown-menu-content"],
-  tr [data-slot="popover-content"],
-  tr [data-slot="dropdown-menu-content"],
-  td [data-slot="popover-content"],
-  td [data-slot="dropdown-menu-content"] {
-    position: fixed !important;
-    z-index: 9999 !important;
-    /* Force proper positioning context */
-    contain: none !important;
-    isolation: auto !important;
-  }
-
-  /* Enhanced table cell positioning fixes for popover triggers */
+  /* Ensure table cells don't interfere with positioning */
   table td {
     position: relative;
     overflow: visible;
-    /* Prevent CSS containment in production */
-    contain: none !important;
-    isolation: auto !important;
   }
 
-  /* Force table cells containing popovers to have proper bounds */
-  table td:has([data-popover-trigger]),
-  table td:has([data-dropdown-trigger]),
-  table td:has([data-radix-popover-trigger]),
-  table td:has([data-radix-dropdown-menu-trigger]) {
-    position: relative !important;
-    overflow: visible !important;
-    contain: none !important;
-    isolation: auto !important;
-    /* Ensure proper positioning context */
-    transform: none !important;
-  }
-
-  /* Ensure popover and dropdown triggers in table cells are properly positioned */
-  table td [data-popover-trigger],
-  table td [data-dropdown-trigger],
-  table td [data-radix-popover-trigger],
-  table td [data-radix-dropdown-menu-trigger] {
-    position: relative !important;
-    z-index: 1 !important;
-    display: inline-block !important;
-    /* Force proper bounds */
-    isolation: isolate !important;
-  }
-
-  /* Fix for table row positioning that might interfere */
-  table tr {
+  /* Ensure proper positioning context for triggers */
+  [data-popover-trigger],
+  [data-dropdown-trigger] {
     position: relative;
-    contain: none !important;
-    isolation: auto !important;
-    transform: none !important;
-  }
-
-  /* Ensure table itself doesn't create problematic stacking context */
-  table {
-    position: relative;
-    contain: none !important;
-    overflow: visible;
-    isolation: auto !important;
-    transform: none !important;
-  }
-
-  /* Force Radix Portal content to always use viewport positioning */
-  [data-radix-portal] {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 9999 !important;
-    pointer-events: none;
-    /* Production-specific portal fixes */
-    contain: none !important;
-    isolation: auto !important;
-  }
-
-  [data-radix-portal] > * {
-    pointer-events: auto;
-    contain: none !important;
-  }
-
-  /* Additional fixes for specific Radix components with production overrides */
-  [data-radix-popover-content] {
-    position: fixed !important;
-    z-index: 9999 !important;
-    will-change: transform, opacity;
-    /* Production positioning fixes */
-    contain: none !important;
-    isolation: auto !important;
-    transform-style: flat !important;
-  }
-
-  [data-radix-dropdown-menu-content] {
-    position: fixed !important;
-    z-index: 9999 !important;
-    will-change: transform, opacity;
-    /* Production positioning fixes */
-    contain: none !important;
-    isolation: auto !important;
-    transform-style: flat !important;
-  }
-
-  /* Production-specific fix for failed positioning calculations */
-  /* When Radix fails to calculate position, force relative positioning to nearest positioned ancestor */
-  [data-radix-popper-content-wrapper][style*="--radix-popper-transform-origin: ;"] {
-    /* This targets elements where transform-origin calculation failed */
-    position: absolute !important;
-    top: 100% !important;
-    left: 0 !important;
-    transform: none !important;
-    z-index: 9999 !important;
-    margin-top: 8px !important;
-  }
-
-  /* Specific fixes for components with contain: layout */
-  [style*="contain: layout"] [data-radix-popper-content-wrapper] {
-    position: fixed !important;
-    contain: none !important;
-  }
-
-  /* Debug styles for troubleshooting positioning issues */
-  .debug-popover [data-slot="popover-content"] {
-    border: 2px solid red !important;
-    background: yellow !important;
-    opacity: 0.9 !important;
-  }
-
-  .debug-dropdown [data-slot="dropdown-menu-content"] {
-    border: 2px solid blue !important;
-    background: lightblue !important;
-    opacity: 0.9 !important;
-  }
-
-  /* Additional production-specific positioning fixes */
-  /* Force proper positioning when hydration causes issues */
-  @media (min-width: 1px) {
-    /* This ensures these rules only apply after CSS is fully loaded */
-    [data-radix-popper-content-wrapper] {
-      /* Force recalculation after hydration */
-      animation: none !important;
-      transition: none !important;
-    }
-
-    /* Ensure triggers maintain proper positioning context */
-    [data-popover-trigger="emoji-picker"],
-    [data-popover-trigger="file-attachment"],
-    [data-dropdown-trigger="status"],
-    [data-dropdown-trigger="priority"] {
-      position: relative !important;
-      display: inline-block !important;
-      z-index: 1 !important;
-    }
+    z-index: 1;
   }
 }

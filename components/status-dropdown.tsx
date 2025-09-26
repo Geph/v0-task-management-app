@@ -1,6 +1,5 @@
 "use client"
 
-import { useState, useEffect } from "react"
 import { Check, Settings } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
@@ -30,12 +29,6 @@ interface StatusDropdownProps {
 }
 
 export function StatusDropdown({ value, onChange, options, onUpdateOptions, fullWidth = false }: StatusDropdownProps) {
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-  }, [])
-
   const allOptions = [{ key: "blank", label: "--", color: "#ffffff" }, ...options]
 
   const currentStatus = allOptions.find((option) => option.key === value) || allOptions[0]
@@ -45,31 +38,8 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
     onChange(status)
   }
 
-  if (!isMounted) {
-    return (
-      <div className="relative inline-block w-full h-full">
-        <Button
-          variant="ghost"
-          className={`h-auto p-0 hover:bg-transparent cursor-pointer relative ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
-        >
-          <Badge
-            className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
-              fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
-            } ${currentStatus.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
-            style={{
-              backgroundColor: currentStatus.key === "blank" ? "#ffffff" : currentStatus.color,
-              borderColor: currentStatus.key === "blank" ? "#d1d5db" : currentStatus.color,
-            }}
-          >
-            {currentStatus.label}
-          </Badge>
-        </Button>
-      </div>
-    )
-  }
-
   return (
-    <div className="relative inline-block w-full h-full" style={{ contain: "layout" }}>
+    <div className="relative inline-block w-full h-full">
       <DropdownMenu
         onOpenChange={(open) => {
           console.log("[v0] Status dropdown open state changed:", open)
@@ -101,9 +71,7 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
           sideOffset={8}
           alignOffset={0}
           avoidCollisions={true}
-          collisionPadding={20}
-          sticky="always"
-          strategy="fixed"
+          collisionPadding={10}
         >
           {allOptions.map((option) => (
             <DropdownMenuItem
