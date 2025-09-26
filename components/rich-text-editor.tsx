@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bold, Italic, Link, List, ListOrdered, Strikethrough, Code } from "lucide-react"
+import { Bold, Italic, Link, List, ListOrdered, Strikethrough, Code, Quote, RotateCcw } from "lucide-react"
 
 interface RichTextEditorProps {
   value: string
@@ -45,6 +45,78 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     execCommand("fontName", fontFamily)
   }
 
+  const formatAsCode = () => {
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0)
+      const selectedText = range.toString()
+
+      if (selectedText) {
+        const codeElement = document.createElement("code")
+        codeElement.textContent = selectedText
+        codeElement.style.backgroundColor = "#f3f4f6"
+        codeElement.style.padding = "4px 6px"
+        codeElement.style.borderRadius = "4px"
+        codeElement.style.fontFamily = "monospace"
+        codeElement.style.fontSize = "0.9em"
+
+        range.deleteContents()
+        range.insertNode(codeElement)
+
+        // Clear selection
+        selection.removeAllRanges()
+        editorRef.current?.focus()
+        handleInput()
+      }
+    }
+  }
+
+  const formatAsQuote = () => {
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0)
+      const selectedText = range.toString()
+
+      if (selectedText) {
+        const quoteElement = document.createElement("blockquote")
+        quoteElement.textContent = selectedText
+        quoteElement.style.borderLeft = "4px solid #d1d5db"
+        quoteElement.style.paddingLeft = "16px"
+        quoteElement.style.margin = "8px 0"
+        quoteElement.style.fontStyle = "italic"
+        quoteElement.style.color = "#6b7280"
+
+        range.deleteContents()
+        range.insertNode(quoteElement)
+
+        // Clear selection
+        selection.removeAllRanges()
+        editorRef.current?.focus()
+        handleInput()
+      }
+    }
+  }
+
+  const clearFormatting = () => {
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0)
+      const selectedText = range.toString()
+
+      if (selectedText) {
+        // Create a plain text node
+        const textNode = document.createTextNode(selectedText)
+        range.deleteContents()
+        range.insertNode(textNode)
+
+        // Clear selection
+        selection.removeAllRanges()
+        editorRef.current?.focus()
+        handleInput()
+      }
+    }
+  }
+
   return (
     <div className={`border border-border rounded-md ${className}`}>
       <div className="flex items-center gap-1 p-2 border-b border-border bg-muted/50 flex-wrap">
@@ -79,14 +151,24 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         >
           <Strikethrough className="w-4 h-4" />
         </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={formatAsCode} className="h-8 w-8 p-0">
+          <Code className="w-4 h-4" />
+        </Button>
+        <Button type="button" variant="ghost" size="sm" onClick={formatAsQuote} className="h-8 w-8 p-0">
+          <Quote className="w-4 h-4" />
+        </Button>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
         <Button
           type="button"
           variant="ghost"
           size="sm"
-          onClick={() => execCommand("formatBlock", "pre")}
+          onClick={clearFormatting}
           className="h-8 w-8 p-0"
+          title="Clear formatting"
         >
-          <Code className="w-4 h-4" />
+          <RotateCcw className="w-4 h-4" />
         </Button>
 
         <div className="w-px h-6 bg-border mx-1" />

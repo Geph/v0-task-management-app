@@ -8,12 +8,15 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { RichTextEditor } from "@/components/rich-text-editor"
+import { EmojiPicker } from "@/components/enhanced-emoji-picker"
 import { Copy, Edit3 } from "lucide-react"
 
 interface TaskDetailsDialogProps {
   taskName: string
   taskNotes: string
+  taskEmoji?: string
   onUpdateNotes: (notes: string) => void
+  onUpdateEmoji?: (emoji: string) => void
   onRenameTask: (newName: string) => void
   onDuplicateTask: () => void
   children: React.ReactNode
@@ -22,18 +25,24 @@ interface TaskDetailsDialogProps {
 export function TaskDetailsDialog({
   taskName,
   taskNotes,
+  taskEmoji = "📝",
   onUpdateNotes,
+  onUpdateEmoji,
   onRenameTask,
   onDuplicateTask,
   children,
 }: TaskDetailsDialogProps) {
   const [notes, setNotes] = useState(taskNotes)
+  const [emoji, setEmoji] = useState(taskEmoji)
   const [isOpen, setIsOpen] = useState(false)
   const [isRenaming, setIsRenaming] = useState(false)
   const [newTaskName, setNewTaskName] = useState(taskName)
 
   const handleSave = () => {
     onUpdateNotes(notes)
+    if (onUpdateEmoji && emoji !== taskEmoji) {
+      onUpdateEmoji(emoji)
+    }
     if (isRenaming && newTaskName.trim() !== taskName) {
       onRenameTask(newTaskName.trim())
     }
@@ -43,6 +52,7 @@ export function TaskDetailsDialog({
 
   const handleCancel = () => {
     setNotes(taskNotes)
+    setEmoji(taskEmoji)
     setNewTaskName(taskName)
     setIsRenaming(false)
     setIsOpen(false)
@@ -53,17 +63,24 @@ export function TaskDetailsDialog({
     setIsOpen(false)
   }
 
+  const handleEmojiChange = (newEmoji: string) => {
+    setEmoji(newEmoji)
+  }
+
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
+            <div className="flex items-center">
+              <EmojiPicker value={emoji} onChange={handleEmojiChange} />
+            </div>
             {isRenaming ? (
               <Input
                 value={newTaskName}
                 onChange={(e) => setNewTaskName(e.target.value)}
-                className="text-lg font-semibold"
+                className="text-lg font-semibold flex-1"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     setIsRenaming(false)
@@ -77,7 +94,7 @@ export function TaskDetailsDialog({
               />
             ) : (
               <>
-                <DialogTitle>{newTaskName}</DialogTitle>
+                <DialogTitle className="flex-1">{newTaskName}</DialogTitle>
                 <Button variant="ghost" size="sm" onClick={() => setIsRenaming(true)} className="h-6 w-6 p-0">
                   <Edit3 className="w-3 h-3" />
                 </Button>

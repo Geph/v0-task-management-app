@@ -397,7 +397,6 @@ export function TaskList() {
       checkbox: 4,
       emoji: 4,
       name: 30,
-      actions: 4,
     }
 
     const dynamicColumns: Record<string, number> = {}
@@ -487,13 +486,7 @@ export function TaskList() {
 
       if (isResizing === "name") {
         const newNameWidth = Math.max(20, Math.min(60, percentage - columnWidths.checkbox - columnWidths.emoji))
-        const remaining =
-          100 -
-          newNameWidth -
-          columnWidths.checkbox -
-          columnWidths.emoji -
-          columnWidths.attachments -
-          columnWidths.actions
+        const remaining = 100 - newNameWidth - columnWidths.checkbox - columnWidths.emoji - columnWidths.attachments
         const statusWidth = (columnWidths.status / (columnWidths.status + columnWidths.priority)) * remaining
         const priorityWidth = remaining - statusWidth
 
@@ -504,12 +497,7 @@ export function TaskList() {
           priority: priorityWidth,
         })
       } else if (isResizing === "status") {
-        const nameAndFixed =
-          columnWidths.checkbox +
-          columnWidths.emoji +
-          columnWidths.name +
-          columnWidths.attachments +
-          columnWidths.actions
+        const nameAndFixed = columnWidths.checkbox + columnWidths.emoji + columnWidths.name + columnWidths.attachments
         const available = 100 - nameAndFixed
         const newStatusWidth = Math.max(
           10,
@@ -525,28 +513,23 @@ export function TaskList() {
       } else if (isResizing === "priority") {
         const fixedColumns = columnWidths.checkbox + columnWidths.emoji + columnWidths.name + columnWidths.status
         const available = 100 - fixedColumns
-        const newPriorityWidth = Math.max(10, Math.min(available - 16, percentage - fixedColumns)) // 16 for attachments + actions minimum
-        const remaining = available - newPriorityWidth
-        const newAttachmentsWidth = Math.min(10, remaining / 2)
-        const newActionsWidth = remaining - newAttachmentsWidth
+        const newPriorityWidth = Math.max(10, Math.min(available - 10, percentage - fixedColumns))
+        const newAttachmentsWidth = available - newPriorityWidth
 
         setColumnWidths({
           ...columnWidths,
           priority: newPriorityWidth,
           attachments: Math.max(6, newAttachmentsWidth),
-          actions: Math.max(4, newActionsWidth),
         })
       } else if (isResizing === "attachments") {
         const fixedColumns =
           columnWidths.checkbox + columnWidths.emoji + columnWidths.name + columnWidths.status + columnWidths.priority
         const available = 100 - fixedColumns
-        const newAttachmentsWidth = Math.max(6, Math.min(available - 6, percentage - fixedColumns))
-        const newActionsWidth = available - newAttachmentsWidth
+        const newAttachmentsWidth = Math.max(6, Math.min(available, percentage - fixedColumns))
 
         setColumnWidths({
           ...columnWidths,
           attachments: newAttachmentsWidth,
-          actions: Math.max(4, newActionsWidth),
         })
       } else if (isResizing === "progress") {
         const fixedColumns =
@@ -555,8 +538,7 @@ export function TaskList() {
           columnWidths.name +
           columnWidths.status +
           columnWidths.priority +
-          columnWidths.attachments +
-          columnWidths.actions
+          columnWidths.attachments
         const available = 100 - fixedColumns
         const newProgressWidth = Math.max(6, Math.min(available - 6, percentage - fixedColumns))
         const remaining = available - newProgressWidth
@@ -577,8 +559,7 @@ export function TaskList() {
           columnWidths.status +
           columnWidths.priority +
           columnWidths.progress +
-          columnWidths.attachments +
-          columnWidths.actions
+          columnWidths.attachments
         const available = 100 - fixedColumns
         const newDueWidth = Math.max(6, Math.min(available - 6, percentage - fixedColumns))
         const newWhoWidth = available - newDueWidth
@@ -597,10 +578,9 @@ export function TaskList() {
           columnWidths.priority +
           columnWidths.progress +
           columnWidths.due +
-          columnWidths.attachments +
-          columnWidths.actions
+          columnWidths.attachments
         const available = 100 - fixedColumns
-        const newWhoWidth = Math.max(6, Math.min(available - 6, percentage - fixedColumns))
+        const newWhoWidth = Math.max(6, Math.min(available, percentage - fixedColumns))
 
         setColumnWidths({
           ...columnWidths,
@@ -699,6 +679,7 @@ export function TaskList() {
         ...task,
         id: Date.now().toString(),
         name: `${task.name} (Copy)`,
+        notes: task.notes, // Copy the task notes
         attachments: [], // Don't duplicate attachments
       }
 
@@ -1083,7 +1064,7 @@ export function TaskList() {
   const renderTaskColumns = (task: Task, section: { id: string }) => {
     const columnComponents: Record<string, React.JSX.Element> = {
       attachments: columnVisibility.attachments ? ( // Added visibility check for attachments
-        <div className="flex items-center" style={{ width: `${columnWidths.attachments}%` }}>
+        <div className="flex items-center justify-center" style={{ width: `${columnWidths.attachments}%` }}>
           <FileAttachmentComponent
             attachments={task.attachments}
             onAddAttachment={(file) => addTaskAttachment(section.id, task.id, file)}
@@ -1150,9 +1131,11 @@ export function TaskList() {
           className="flex items-center justify-center gap-1 relative"
           style={{ width: `${columnWidths.attachments}%` }}
         >
-          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-          </svg>
+          <div className="flex items-center justify-center w-full">
+            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+            </svg>
+          </div>
           <div
             className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
             onMouseDown={(e) => handleMouseDown("attachments", e)}
@@ -1405,7 +1388,7 @@ export function TaskList() {
                           : "",
                       )
                       .filter(Boolean)
-                      .join(" ")} ${columnWidths.actions}%`,
+                      .join(" ")}`,
                   }}
                 >
                   <div style={{ width: `${columnWidths.checkbox}%` }}>☑️</div>
@@ -1418,9 +1401,6 @@ export function TaskList() {
                     />
                   </div>
                   {renderColumnHeaders()}
-                  <div className="flex items-center justify-center" style={{ width: `${columnWidths.actions}%` }}>
-                    {/* Empty - no header label for actions */}
-                  </div>
                 </div>
 
                 {section.tasks
@@ -1507,28 +1487,6 @@ export function TaskList() {
                       </div>
 
                       {renderTaskColumns(task, section)}
-
-                      <div className="flex items-center justify-end" style={{ width: `${columnWidths.actions}%` }}>
-                        <DropdownMenu
-                          onOpenChange={(open) => {
-                            console.log("[v0] Task actions dropdown open state changed:", open, "for task:", task.name)
-                          }}
-                        >
-                          <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="p-1 cursor-pointer hover:bg-muted"
-                              onClick={() =>
-                                console.log("[v0] Task actions dropdown trigger clicked for task:", task.name)
-                              }
-                            >
-                              <MoreHorizontal className="w-4 h-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48"></DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
                     </div>
                   ))}
               </>
@@ -1555,7 +1513,6 @@ export function TaskList() {
               {columnVisibility.progress && <div style={{ width: `${columnWidths.progress}%` }}>Progress</div>}
               {columnVisibility.due && <div style={{ width: `${columnWidths.due}%` }}>Due</div>}
               {columnVisibility.who && <div style={{ width: `${columnWidths.who}%` }}>Who</div>}
-              <div style={{ width: `${columnWidths.actions}%` }}></div>
             </div>
 
             {completedTasks.map((task) => (
@@ -1599,7 +1556,6 @@ export function TaskList() {
                 {columnVisibility.progress && <div style={{ width: `${columnWidths.progress}%` }}></div>}
                 {columnVisibility.due && <div style={{ width: `${columnWidths.due}%` }}></div>}
                 {columnVisibility.who && <div style={{ width: `${columnWidths.who}%` }}></div>}
-                <div style={{ width: `${columnWidths.actions}%` }}></div>
               </div>
             ))}
           </div>
