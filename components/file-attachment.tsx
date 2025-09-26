@@ -65,20 +65,16 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted"
-          onClick={handleTriggerClick}
-        >
-          <Paperclip className="w-4 h-4" />
-          {attachments.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              {attachments.length}
-            </span>
-          )}
-        </Button>
+      <PopoverTrigger
+        className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground"
+        onClick={handleTriggerClick}
+      >
+        <Paperclip className="w-4 h-4" />
+        {attachments.length > 0 && (
+          <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+            {attachments.length}
+          </span>
+        )}
       </PopoverTrigger>
       <PopoverContent
         className="w-80 p-3 z-[60]" // Updated z-index to match other popovers

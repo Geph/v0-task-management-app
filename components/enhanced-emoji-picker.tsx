@@ -503,15 +503,11 @@ export function EmojiPicker({ value, onChange, inline = false }: EmojiPickerProp
 
   return (
     <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted"
-          onClick={handleTriggerClick}
-        >
-          {value || "😀"}
-        </Button>
+      <PopoverTrigger
+        className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 hover:bg-accent hover:text-accent-foreground"
+        onClick={handleTriggerClick}
+      >
+        {value || "😀"}
       </PopoverTrigger>
       <PopoverContent
         className="w-96 p-3 z-50" // improved z-index for better layering
