@@ -456,15 +456,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted"
-          onClick={() => {
-            console.log("[v0] Emoji picker trigger clicked, current open state:", open)
-            setOpen(!open)
-          }}
-        >
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted">
           {value || "😀"}
         </Button>
       </PopoverTrigger>
