@@ -71,7 +71,7 @@ export function PriorityDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className="w-32 z-[9999]"
+        className="w-32 z-[60]" // Updated z-index to match other popovers
         side="bottom"
         sideOffset={4}
         avoidCollisions={true}

@@ -474,21 +474,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
           {value || "😀"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent
-        className="w-96 p-3 z-[9999]"
-        side="bottom"
-        align="start"
-        sideOffset={4}
-        avoidCollisions={true}
-        collisionPadding={20}
-        sticky="always"
-        onOpenAutoFocus={(e) => {
-          console.log("[v0] Emoji picker popover opened and focused")
-        }}
-        onCloseAutoFocus={(e) => {
-          console.log("[v0] Emoji picker popover closed and focus returned")
-        }}
-      >
+      <PopoverContent className="w-96 p-3" side="bottom" align="start" sideOffset={8}>
         <div className="space-y-3">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />

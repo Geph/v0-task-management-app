@@ -2,7 +2,8 @@
 
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
-import { Bold, Italic, Link, List, ListOrdered } from "lucide-react"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { Bold, Italic, Link, List, ListOrdered, Strikethrough, Code } from "lucide-react"
 
 interface RichTextEditorProps {
   value: string
@@ -40,15 +41,56 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
   }
 
+  const handleFontChange = (fontFamily: string) => {
+    execCommand("fontName", fontFamily)
+  }
+
   return (
     <div className={`border border-border rounded-md ${className}`}>
-      <div className="flex items-center gap-1 p-2 border-b border-border bg-muted/50">
+      <div className="flex items-center gap-1 p-2 border-b border-border bg-muted/50 flex-wrap">
+        <Select onValueChange={handleFontChange}>
+          <SelectTrigger className="w-32 h-8">
+            <SelectValue placeholder="Font" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="Arial">Arial</SelectItem>
+            <SelectItem value="Helvetica">Helvetica</SelectItem>
+            <SelectItem value="Times New Roman">Times</SelectItem>
+            <SelectItem value="Georgia">Georgia</SelectItem>
+            <SelectItem value="Verdana">Verdana</SelectItem>
+            <SelectItem value="Courier New">Courier</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
         <Button type="button" variant="ghost" size="sm" onClick={() => execCommand("bold")} className="h-8 w-8 p-0">
           <Bold className="w-4 h-4" />
         </Button>
         <Button type="button" variant="ghost" size="sm" onClick={() => execCommand("italic")} className="h-8 w-8 p-0">
           <Italic className="w-4 h-4" />
         </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => execCommand("strikeThrough")}
+          className="h-8 w-8 p-0"
+        >
+          <Strikethrough className="w-4 h-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => execCommand("formatBlock", "pre")}
+          className="h-8 w-8 p-0"
+        >
+          <Code className="w-4 h-4" />
+        </Button>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
         <Button type="button" variant="ghost" size="sm" onClick={insertLink} className="h-8 w-8 p-0">
           <Link className="w-4 h-4" />
         </Button>

@@ -44,7 +44,7 @@ export function DueDatePicker({ value, onChange }: DueDatePickerProps) {
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-auto p-0 z-[9999]"
+        className="w-auto p-0 z-[60]" // Updated z-index to match other popovers
         align="start"
         side="bottom"
         sideOffset={4}

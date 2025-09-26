@@ -13,7 +13,6 @@ import {
   FolderOpen,
   CheckCircle,
   Edit,
-  Copy,
   Merge,
   Settings,
 } from "lucide-react"
@@ -1223,7 +1222,7 @@ export function TaskList() {
   return (
     <div className="flex-1 bg-background">
       <div className="border-b border-border p-6 bg-purple-900">
-        <div className="flex items-center justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
             {appIcon ? (
               <img src={appIcon || "/placeholder.svg"} alt="App icon" className="w-8 h-8 object-contain" />
@@ -1232,52 +1231,58 @@ export function TaskList() {
             )}
             <h1 className="text-2xl font-semibold text-white">{appName}</h1>
           </div>
-          <div className="flex items-center gap-3">
-            <AddSectionDialog onAddSection={addSection}>
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white hover:text-purple-900 transition-colors cursor-pointer"
-                onClick={() => console.log("[v0] Add section button clicked")} // Added debug logging
-              >
-                <Plus className="w-4 h-4" />
-                Add Section
-              </Button>
-            </AddSectionDialog>
-            <SettingsDialog
-              appName={appName}
-              appIcon={appIcon}
-              hasPIN={hasPIN}
-              onUpdateAppName={handleUpdateAppName}
-              onUpdateAppIcon={handleUpdateAppIcon}
-              onSetPIN={handleSetPIN}
-              onRemovePIN={handleRemovePIN}
-              sections={sections}
-              statusOptions={statusOptions}
-              priorityOptions={priorityOptions}
-              onImport={handleImport}
-              columnVisibility={columnVisibility}
-              onUpdateColumnVisibility={handleUpdateColumnVisibility}
-              columnOrder={columnOrder}
-              onUpdateColumnOrder={handleUpdateColumnOrder}
-            >
-              <Button
-                variant="outline"
-                size="sm"
-                className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white hover:text-purple-900 transition-colors"
-              >
-                <Settings className="w-4 h-4" />
-                Settings
-              </Button>
-            </SettingsDialog>
-            <div className="relative">
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            {/* Search box - always visible */}
+            <div className="relative order-1 sm:order-2">
               <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
               <Input
                 placeholder="Search..."
-                className="pl-10 w-64 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                className="pl-10 w-full sm:w-64 bg-white/10 border-white/20 text-white placeholder:text-white/60"
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
               />
+            </div>
+
+            {/* Buttons container - moves below search on small screens */}
+            <div className="flex items-center gap-3 order-2 sm:order-1">
+              <AddSectionDialog onAddSection={addSection}>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white hover:text-purple-900 transition-colors cursor-pointer"
+                  onClick={() => console.log("[v0] Add section button clicked")} // Added debug logging
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Section
+                </Button>
+              </AddSectionDialog>
+              <SettingsDialog
+                appName={appName}
+                appIcon={appIcon}
+                hasPIN={hasPIN}
+                onUpdateAppName={handleUpdateAppName}
+                onUpdateAppIcon={handleUpdateAppIcon}
+                onSetPIN={handleSetPIN}
+                onRemovePIN={handleRemovePIN}
+                sections={sections}
+                statusOptions={statusOptions}
+                priorityOptions={priorityOptions}
+                onImport={handleImport}
+                columnVisibility={columnVisibility}
+                onUpdateColumnVisibility={handleUpdateColumnVisibility}
+                columnOrder={columnOrder}
+                onUpdateColumnOrder={handleUpdateColumnOrder}
+              >
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white hover:text-purple-900 transition-colors"
+                >
+                  <Settings className="w-4 h-4" />
+                  Settings
+                </Button>
+              </SettingsDialog>
             </div>
           </div>
         </div>
@@ -1487,6 +1492,8 @@ export function TaskList() {
                             taskName={task.name}
                             taskNotes={task.notes}
                             onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                            onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                            onDuplicateTask={() => duplicateTask(section.id, task.id)}
                           >
                             <span
                               className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
@@ -1519,28 +1526,7 @@ export function TaskList() {
                               <MoreHorizontal className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end" className="w-48">
-                            <DropdownMenuItem
-                              onClick={() => {
-                                console.log("[v0] Rename task clicked for:", task.name)
-                                setEditingTaskId(task.id)
-                              }}
-                              className="cursor-pointer"
-                            >
-                              <Edit className="w-4 h-4 mr-2" />
-                              Rename Task
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => {
-                                console.log("[v0] Duplicate task clicked for:", task.name)
-                                duplicateTask(section.id, task.id)
-                              }}
-                              className="cursor-pointer"
-                            >
-                              <Copy className="w-4 h-4 mr-2" />
-                              Duplicate Task
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
+                          <DropdownMenuContent align="end" className="w-48"></DropdownMenuContent>
                         </DropdownMenu>
                       </div>
                     </div>

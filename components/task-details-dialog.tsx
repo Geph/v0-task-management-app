@@ -3,36 +3,53 @@
 import type React from "react"
 
 import { useState } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 import { RichTextEditor } from "@/components/rich-text-editor"
+import { Copy, Edit3 } from "lucide-react"
 
 interface TaskDetailsDialogProps {
   taskName: string
   taskNotes: string
   onUpdateNotes: (notes: string) => void
+  onRenameTask: (newName: string) => void
+  onDuplicateTask: () => void
   children: React.ReactNode
 }
 
-export function TaskDetailsDialog({ taskName, taskNotes, onUpdateNotes, children }: TaskDetailsDialogProps) {
+export function TaskDetailsDialog({
+  taskName,
+  taskNotes,
+  onUpdateNotes,
+  onRenameTask,
+  onDuplicateTask,
+  children,
+}: TaskDetailsDialogProps) {
   const [notes, setNotes] = useState(taskNotes)
   const [isOpen, setIsOpen] = useState(false)
+  const [isRenaming, setIsRenaming] = useState(false)
+  const [newTaskName, setNewTaskName] = useState(taskName)
 
   const handleSave = () => {
     onUpdateNotes(notes)
+    if (isRenaming && newTaskName.trim() !== taskName) {
+      onRenameTask(newTaskName.trim())
+    }
     setIsOpen(false)
+    setIsRenaming(false)
   }
 
   const handleCancel = () => {
     setNotes(taskNotes)
+    setNewTaskName(taskName)
+    setIsRenaming(false)
+    setIsOpen(false)
+  }
+
+  const handleDuplicate = () => {
+    onDuplicateTask()
     setIsOpen(false)
   }
 
@@ -41,10 +58,32 @@ export function TaskDetailsDialog({ taskName, taskNotes, onUpdateNotes, children
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="max-w-2xl">
         <DialogHeader>
-          <DialogTitle>{taskName}</DialogTitle>
-          <DialogDescription>
-            View and edit detailed notes for this task. Use the rich text editor to format your notes.
-          </DialogDescription>
+          <div className="flex items-center gap-2">
+            {isRenaming ? (
+              <Input
+                value={newTaskName}
+                onChange={(e) => setNewTaskName(e.target.value)}
+                className="text-lg font-semibold"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    setIsRenaming(false)
+                  }
+                  if (e.key === "Escape") {
+                    setNewTaskName(taskName)
+                    setIsRenaming(false)
+                  }
+                }}
+                autoFocus
+              />
+            ) : (
+              <>
+                <DialogTitle>{newTaskName}</DialogTitle>
+                <Button variant="ghost" size="sm" onClick={() => setIsRenaming(true)} className="h-6 w-6 p-0">
+                  <Edit3 className="w-3 h-3" />
+                </Button>
+              </>
+            )}
+          </div>
         </DialogHeader>
         <div className="space-y-4">
           <div>
@@ -58,11 +97,17 @@ export function TaskDetailsDialog({ taskName, taskNotes, onUpdateNotes, children
               className="mt-1"
             />
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={handleCancel}>
-              Cancel
+          <div className="flex justify-between">
+            <Button variant="outline" onClick={handleDuplicate} className="flex items-center gap-2 bg-transparent">
+              <Copy className="w-4 h-4" />
+              Duplicate Task
             </Button>
-            <Button onClick={handleSave}>Save</Button>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button onClick={handleSave}>Save</Button>
+            </div>
           </div>
         </div>
       </DialogContent>

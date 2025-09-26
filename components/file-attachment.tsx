@@ -81,7 +81,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-80 p-3 z-[9999]"
+        className="w-80 p-3 z-[60]" // Updated z-index to match other popovers
         side="bottom"
         align="start"
         sideOffset={4}
