@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef, useState } from "react"
+import { useRef, useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Paperclip, X, Download } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -24,6 +24,11 @@ interface FileAttachmentProps {
 export function FileAttachmentComponent({ attachments, onAddAttachment, onRemoveAttachment }: FileAttachmentProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [open, setOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log("[v0] File selected")
@@ -48,6 +53,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
 
   const handleOpenChange = (newOpen: boolean) => {
     console.log("[v0] File attachment popover open state changing from", open, "to", newOpen)
+    if (newOpen && !isMounted) return
     setOpen(newOpen)
   }
 
@@ -63,8 +69,23 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
     return Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
   }
 
+  if (!isMounted) {
+    return (
+      <div className="relative inline-block">
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted">
+          <Paperclip className="w-4 h-4" />
+          {attachments.length > 0 && (
+            <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+              {attachments.length}
+            </span>
+          )}
+        </Button>
+      </div>
+    )
+  }
+
   return (
-    <div className="relative inline-block">
+    <div className="relative inline-block" style={{ contain: "layout" }}>
       <Popover open={open} onOpenChange={handleOpenChange}>
         <PopoverTrigger asChild>
           <Button
@@ -72,6 +93,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
             size="sm"
             className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted"
             onClick={handleTriggerClick}
+            data-popover-trigger="file-attachment"
           >
             <Paperclip className="w-4 h-4" />
             {attachments.length > 0 && (
@@ -85,11 +107,12 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
           className="w-80 p-3 z-50"
           side="bottom"
           align="start"
-          sideOffset={5}
+          sideOffset={8}
           alignOffset={0}
           avoidCollisions={true}
-          collisionPadding={10}
+          collisionPadding={20}
           sticky="always"
+          strategy="fixed"
           onOpenAutoFocus={(e) => {
             console.log("[v0] File attachment popover opened and focused")
           }}

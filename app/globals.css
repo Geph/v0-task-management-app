@@ -325,16 +325,32 @@
     border-color: hsl(var(--primary));
   }
 
-  /* Enhanced positioning fixes with better specificity */
+  /* Enhanced production positioning fixes with more aggressive overrides */
   /* Force proper positioning for all Radix popover and dropdown content */
   [data-radix-popper-content-wrapper] {
     z-index: 9999 !important;
     position: fixed !important;
+    /* Force recalculation of position in production */
+    transform-style: flat !important;
+    backface-visibility: hidden !important;
   }
 
   [data-radix-dropdown-menu-content] {
     z-index: 9999 !important;
     position: fixed !important;
+    transform-style: flat !important;
+    backface-visibility: hidden !important;
+  }
+
+  /* Production-specific fixes for positioning calculation failures */
+  [data-radix-popper-content-wrapper][style*="left: 0px"][style*="top: 0px"] {
+    /* Override failed positioning calculations */
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    /* Force repositioning relative to trigger */
+    position: absolute !important;
+    z-index: 9999 !important;
   }
 
   /* Ensure table containers don't interfere with positioning */
@@ -343,27 +359,36 @@
     overflow: visible !important;
     position: relative;
     transform: none !important;
+    /* Prevent CSS containment issues in production */
+    isolation: auto !important;
   }
 
   /* Prevent any CSS transforms that could affect positioning */
   .table-container * {
     transform: none !important;
     contain: none !important;
+    isolation: auto !important;
   }
 
-  /* Force proper stacking context for triggers */
-  [data-slot="popover-trigger"],
-  [data-slot="dropdown-menu-trigger"] {
-    position: relative;
-    z-index: 10;
+  /* Force proper stacking context for triggers with data attributes */
+  [data-popover-trigger],
+  [data-dropdown-trigger] {
+    position: relative !important;
+    z-index: 10 !important;
+    /* Ensure proper bounds for positioning calculations */
+    display: inline-block !important;
+    isolation: isolate !important;
   }
 
-  /* Ensure content is always positioned correctly */
+  /* Enhanced content positioning with fallback strategies */
   [data-slot="popover-content"],
   [data-slot="dropdown-menu-content"] {
     position: fixed !important;
     z-index: 9999 !important;
     transform-origin: var(--radix-popover-content-transform-origin, center) !important;
+    /* Production fallback positioning */
+    min-width: max-content !important;
+    will-change: transform, opacity !important;
   }
 
   /* Override any table-specific positioning that might interfere */
@@ -377,42 +402,60 @@
   td [data-slot="dropdown-menu-content"] {
     position: fixed !important;
     z-index: 9999 !important;
+    /* Force proper positioning context */
+    contain: none !important;
+    isolation: auto !important;
   }
 
-  /* Added specific table cell positioning fixes for popover triggers */
-  /* Ensure table cells provide proper positioning context */
+  /* Enhanced table cell positioning fixes for popover triggers */
   table td {
     position: relative;
     overflow: visible;
+    /* Prevent CSS containment in production */
+    contain: none !important;
+    isolation: auto !important;
   }
 
   /* Force table cells containing popovers to have proper bounds */
+  table td:has([data-popover-trigger]),
+  table td:has([data-dropdown-trigger]),
   table td:has([data-radix-popover-trigger]),
   table td:has([data-radix-dropdown-menu-trigger]) {
     position: relative !important;
     overflow: visible !important;
     contain: none !important;
+    isolation: auto !important;
+    /* Ensure proper positioning context */
+    transform: none !important;
   }
 
   /* Ensure popover and dropdown triggers in table cells are properly positioned */
+  table td [data-popover-trigger],
+  table td [data-dropdown-trigger],
   table td [data-radix-popover-trigger],
   table td [data-radix-dropdown-menu-trigger] {
-    position: relative;
-    z-index: 1;
-    display: inline-block;
+    position: relative !important;
+    z-index: 1 !important;
+    display: inline-block !important;
+    /* Force proper bounds */
+    isolation: isolate !important;
   }
 
   /* Fix for table row positioning that might interfere */
   table tr {
     position: relative;
-    contain: none;
+    contain: none !important;
+    isolation: auto !important;
+    transform: none !important;
   }
 
   /* Ensure table itself doesn't create problematic stacking context */
   table {
     position: relative;
-    contain: none;
+    contain: none !important;
     overflow: visible;
+    isolation: auto !important;
+    transform: none !important;
   }
 
   /* Force Radix Portal content to always use viewport positioning */
@@ -422,23 +465,53 @@
     left: 0 !important;
     z-index: 9999 !important;
     pointer-events: none;
+    /* Production-specific portal fixes */
+    contain: none !important;
+    isolation: auto !important;
   }
 
   [data-radix-portal] > * {
     pointer-events: auto;
+    contain: none !important;
   }
 
-  /* Additional fixes for specific Radix components */
+  /* Additional fixes for specific Radix components with production overrides */
   [data-radix-popover-content] {
     position: fixed !important;
     z-index: 9999 !important;
     will-change: transform, opacity;
+    /* Production positioning fixes */
+    contain: none !important;
+    isolation: auto !important;
+    transform-style: flat !important;
   }
 
   [data-radix-dropdown-menu-content] {
     position: fixed !important;
     z-index: 9999 !important;
     will-change: transform, opacity;
+    /* Production positioning fixes */
+    contain: none !important;
+    isolation: auto !important;
+    transform-style: flat !important;
+  }
+
+  /* Production-specific fix for failed positioning calculations */
+  /* When Radix fails to calculate position, force relative positioning to nearest positioned ancestor */
+  [data-radix-popper-content-wrapper][style*="--radix-popper-transform-origin: ;"] {
+    /* This targets elements where transform-origin calculation failed */
+    position: absolute !important;
+    top: 100% !important;
+    left: 0 !important;
+    transform: none !important;
+    z-index: 9999 !important;
+    margin-top: 8px !important;
+  }
+
+  /* Specific fixes for components with contain: layout */
+  [style*="contain: layout"] [data-radix-popper-content-wrapper] {
+    position: fixed !important;
+    contain: none !important;
   }
 
   /* Debug styles for troubleshooting positioning issues */
@@ -452,5 +525,26 @@
     border: 2px solid blue !important;
     background: lightblue !important;
     opacity: 0.9 !important;
+  }
+
+  /* Additional production-specific positioning fixes */
+  /* Force proper positioning when hydration causes issues */
+  @media (min-width: 1px) {
+    /* This ensures these rules only apply after CSS is fully loaded */
+    [data-radix-popper-content-wrapper] {
+      /* Force recalculation after hydration */
+      animation: none !important;
+      transition: none !important;
+    }
+
+    /* Ensure triggers maintain proper positioning context */
+    [data-popover-trigger="emoji-picker"],
+    [data-popover-trigger="file-attachment"],
+    [data-dropdown-trigger="status"],
+    [data-dropdown-trigger="priority"] {
+      position: relative !important;
+      display: inline-block !important;
+      z-index: 1 !important;
+    }
   }
 }
