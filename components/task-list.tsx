@@ -1198,7 +1198,8 @@ export function TaskList() {
               <Button
                 variant="outline"
                 size="sm"
-                className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white hover:text-purple-900 transition-colors"
+                className="gap-2 bg-white/10 border-white/20 text-white hover:bg-white hover:text-purple-900 transition-colors cursor-pointer"
+                onClick={() => console.log("[v0] Add section button clicked")} // Added debug logging
               >
                 <Plus className="w-4 h-4" />
                 Add Section
@@ -1447,32 +1448,27 @@ export function TaskList() {
                       <div className="flex items-center justify-end" style={{ width: `${columnWidths.actions}%` }}>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button
-                              variant="ghost"
-                              size="sm"
-                              className="p-1 cursor-pointer hover:bg-muted" // Added cursor-pointer and hover effect
-                              onClick={() => console.log("[v0] Task menu clicked for task:", task.id)} // Added debug logging
-                            >
+                            <Button variant="ghost" size="sm" className="p-1 cursor-pointer hover:bg-muted">
                               <MoreHorizontal className="w-4 h-4" />
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
                             <DropdownMenuItem
                               onClick={() => {
-                                console.log("[v0] Rename task clicked") // Added debug logging
+                                console.log("[v0] Rename task clicked")
                                 setEditingTaskId(task.id)
                               }}
-                              className="cursor-pointer" // Added cursor-pointer
+                              className="cursor-pointer"
                             >
                               <Edit className="w-4 h-4 mr-2" />
                               Rename Task
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => {
-                                console.log("[v0] Duplicate task clicked") // Added debug logging
+                                console.log("[v0] Duplicate task clicked")
                                 duplicateTask(section.id, task.id)
                               }}
-                              className="cursor-pointer" // Added cursor-pointer
+                              className="cursor-pointer"
                             >
                               <Copy className="w-4 h-4 mr-2" />
                               Duplicate Task

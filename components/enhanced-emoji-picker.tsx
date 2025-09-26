@@ -448,7 +448,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
     : EMOJI_CATEGORIES[activeTab as keyof typeof EMOJI_CATEGORIES] || []
 
   const handleEmojiSelect = (emoji: string) => {
-    console.log("[v0] Emoji selected:", emoji) // Added debug logging
+    console.log("[v0] Emoji selected:", emoji)
     onChange(emoji)
     setOpen(false)
   }
@@ -456,15 +456,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted" // Added hover effect and cursor-pointer
-          onClick={() => {
-            console.log("[v0] Emoji picker clicked") // Added debug logging
-            setOpen(!open)
-          }}
-        >
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted">
           {value || "😀"}
         </Button>
       </PopoverTrigger>
@@ -484,38 +476,29 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
             <Tabs value={activeTab} onValueChange={setActiveTab}>
               <TabsList className="grid w-full grid-cols-4">
                 <TabsTrigger value="Smileys" className="text-xs cursor-pointer">
-                  {" "}
-                  {/* Added cursor-pointer */}😀
+                  😀
                 </TabsTrigger>
                 <TabsTrigger value="People" className="text-xs cursor-pointer">
-                  {" "}
-                  {/* Added cursor-pointer */}👤
+                  👤
                 </TabsTrigger>
                 <TabsTrigger value="Animals" className="text-xs cursor-pointer">
-                  {" "}
-                  {/* Added cursor-pointer */}🐶
+                  🐶
                 </TabsTrigger>
                 <TabsTrigger value="Food" className="text-xs cursor-pointer">
-                  {" "}
-                  {/* Added cursor-pointer */}🍎
+                  🍎
                 </TabsTrigger>
               </TabsList>
               <TabsList className="grid w-full grid-cols-4 mt-1">
                 <TabsTrigger value="Activities" className="text-xs cursor-pointer">
-                  {" "}
-                  {/* Added cursor-pointer */}⚽
+                  ⚽
                 </TabsTrigger>
                 <TabsTrigger value="Travel" className="text-xs cursor-pointer">
-                  {" "}
-                  {/* Added cursor-pointer */}🚗
+                  🚗
                 </TabsTrigger>
                 <TabsTrigger value="Objects" className="text-xs cursor-pointer">
-                  {" "}
-                  {/* Added cursor-pointer */}💻
+                  💻
                 </TabsTrigger>
                 <TabsTrigger value="Symbols" className="text-xs cursor-pointer">
-                  {" "}
-                  {/* Added cursor-pointer */}
                   ❤️
                 </TabsTrigger>
               </TabsList>

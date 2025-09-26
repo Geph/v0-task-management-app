@@ -26,7 +26,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    console.log("[v0] File selected") // Added debug logging
+    console.log("[v0] File selected")
     const file = event.target.files?.[0]
     if (file) {
       if (file.size > 5 * 1024 * 1024) {
@@ -42,7 +42,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
   }
 
   const handleAddFileClick = () => {
-    console.log("[v0] Add file clicked") // Added debug logging
+    console.log("[v0] Add file clicked")
     fileInputRef.current?.click()
   }
 
@@ -57,15 +57,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted" // Added hover effect and cursor-pointer
-          onClick={() => {
-            console.log("[v0] File attachment clicked") // Added debug logging
-            setOpen(!open)
-          }}
-        >
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted">
           <Paperclip className="w-4 h-4" />
           {attachments.length > 0 && (
             <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
@@ -79,8 +71,6 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
           <div className="flex items-center justify-between">
             <h4 className="font-medium">File Attachments</h4>
             <Button variant="outline" size="sm" onClick={handleAddFileClick} className="cursor-pointer bg-transparent">
-              {" "}
-              {/* Added cursor-pointer */}
               <Paperclip className="w-4 h-4 mr-1" />
               Add File
             </Button>
@@ -102,7 +92,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="cursor-pointer" // Added cursor-pointer
+                      className="cursor-pointer"
                       onClick={() => {
                         const link = document.createElement("a")
                         link.href = attachment.url
@@ -116,7 +106,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
                       variant="ghost"
                       size="sm"
                       onClick={() => onRemoveAttachment(attachment.id)}
-                      className="cursor-pointer" // Added cursor-pointer
+                      className="cursor-pointer"
                     >
                       <X className="w-3 h-3" />
                     </Button>
