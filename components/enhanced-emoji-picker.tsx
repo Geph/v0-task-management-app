@@ -434,7 +434,6 @@ const EMOJI_CATEGORIES = {
 }
 
 export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
-  const [open, setOpen] = useState(false)
   const [searchTerm, setSearchTerm] = useState("")
   const [activeTab, setActiveTab] = useState("Smileys")
 
@@ -450,13 +449,17 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
   const handleEmojiSelect = (emoji: string) => {
     console.log("[v0] Emoji selected:", emoji)
     onChange(emoji)
-    setOpen(false)
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted"
+          onClick={() => console.log("[v0] Emoji picker trigger clicked")}
+        >
           {value || "😀"}
         </Button>
       </PopoverTrigger>
