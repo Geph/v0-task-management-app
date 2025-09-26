@@ -69,16 +69,7 @@ export function PriorityDropdown({
           </Badge>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        className="w-32 z-50" // improved z-index and positioning
-        side="bottom"
-        sideOffset={8}
-        avoidCollisions={true}
-        collisionPadding={10}
-        sticky="always"
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
+      <DropdownMenuContent className="w-32" sideOffset={4} onCloseAutoFocus={(e) => e.preventDefault()}>
         {allOptions.map((option) => (
           <DropdownMenuItem
             key={option.key}

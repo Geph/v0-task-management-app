@@ -325,70 +325,63 @@
     border-color: hsl(var(--primary));
   }
 
-  /* Enhanced positioning fixes with better specificity */
-  /* Force proper positioning for all Radix popover and dropdown content */
-  [data-radix-popper-content-wrapper] {
-    z-index: 9999 !important;
-    position: fixed !important;
-  }
-
-  [data-radix-dropdown-menu-content] {
-    z-index: 9999 !important;
-    position: fixed !important;
-  }
-
-  /* Ensure table containers don't interfere with positioning */
-  .table-container {
-    contain: none !important;
-    overflow: visible !important;
-    position: relative;
-    transform: none !important;
-  }
-
-  /* Prevent any CSS transforms that could affect positioning */
+  /* Complete rewrite of popover positioning strategy */
+  /* Reset all positioning contexts that might interfere */
+  .table-container,
   .table-container * {
-    transform: none !important;
     contain: none !important;
+    transform: none !important;
+    will-change: auto !important;
   }
 
-  /* Force proper stacking context for triggers */
-  [data-slot="popover-trigger"],
-  [data-slot="dropdown-menu-trigger"] {
-    position: relative;
-    z-index: 10;
-  }
-
-  /* Ensure content is always positioned correctly */
-  [data-slot="popover-content"],
-  [data-slot="dropdown-menu-content"] {
+  /* Force Radix popovers to use viewport positioning */
+  [data-radix-popper-content-wrapper] {
     position: fixed !important;
-    z-index: 9999 !important;
-    transform-origin: var(--radix-popover-content-transform-origin, center) !important;
+    z-index: 50 !important;
+    pointer-events: auto !important;
   }
 
-  /* Override any table-specific positioning that might interfere */
-  table [data-slot="popover-content"],
-  table [data-slot="dropdown-menu-content"],
-  tbody [data-slot="popover-content"],
-  tbody [data-slot="dropdown-menu-content"],
-  tr [data-slot="popover-content"],
-  tr [data-slot="dropdown-menu-content"],
-  td [data-slot="popover-content"],
-  td [data-slot="dropdown-menu-content"] {
+  /* Ensure dropdown menus are properly positioned */
+  [data-radix-dropdown-menu-content] {
     position: fixed !important;
-    z-index: 9999 !important;
+    z-index: 50 !important;
+    pointer-events: auto !important;
   }
 
-  /* Debug styles for troubleshooting positioning issues */
-  .debug-popover [data-slot="popover-content"] {
-    border: 2px solid red !important;
-    background: yellow !important;
-    opacity: 0.9 !important;
+  /* Force all popover content to use fixed positioning */
+  [data-radix-popover-content] {
+    position: fixed !important;
+    z-index: 50 !important;
+    pointer-events: auto !important;
   }
 
-  .debug-dropdown [data-slot="dropdown-menu-content"] {
-    border: 2px solid blue !important;
-    background: lightblue !important;
-    opacity: 0.9 !important;
+  /* Override any table-specific styles that might interfere */
+  table,
+  tbody,
+  tr,
+  td {
+    contain: none !important;
+    transform: none !important;
+    position: static !important;
+  }
+
+  /* Ensure triggers are properly positioned for calculation */
+  [data-radix-dropdown-menu-trigger],
+  [data-radix-popover-trigger] {
+    position: relative !important;
+    z-index: 1 !important;
+  }
+
+  /* Force proper stacking and positioning for all Radix components */
+  [data-radix-portal] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 50 !important;
+    pointer-events: none !important;
+  }
+
+  [data-radix-portal] > * {
+    pointer-events: auto !important;
   }
 }

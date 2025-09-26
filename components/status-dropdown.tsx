@@ -63,16 +63,7 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
           </Badge>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent
-        align="start"
-        className="w-48 z-50"
-        side="bottom"
-        sideOffset={8}
-        avoidCollisions={true}
-        collisionPadding={10}
-        sticky="always"
-        onCloseAutoFocus={(e) => e.preventDefault()}
-      >
+      <DropdownMenuContent className="w-48" sideOffset={4} onCloseAutoFocus={(e) => e.preventDefault()}>
         {allOptions.map((option) => (
           <DropdownMenuItem
             key={option.key}
