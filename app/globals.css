@@ -325,63 +325,58 @@
     border-color: hsl(var(--primary));
   }
 
-  /* Enhanced popover and dropdown positioning fixes */
-  /* Ensure popovers are not clipped by table containers */
-  [data-slot="popover-content"] {
+  /* Enhanced positioning fixes with better specificity */
+  /* Force proper positioning for all Radix popover and dropdown content */
+  [data-radix-popper-content-wrapper] {
     z-index: 9999 !important;
     position: fixed !important;
   }
 
-  /* Ensure dropdown menus are properly positioned */
-  [data-slot="dropdown-menu-content"] {
+  [data-radix-dropdown-menu-content] {
     z-index: 9999 !important;
     position: fixed !important;
   }
 
-  /* Ensure table containers don't create stacking contexts that interfere with popovers */
+  /* Ensure table containers don't interfere with positioning */
   .table-container {
     contain: none !important;
     overflow: visible !important;
     position: relative;
+    transform: none !important;
   }
 
-  /* Fix for popover positioning in table cells */
-  [data-slot="popover-trigger"] {
-    position: relative;
-    z-index: 1;
+  /* Prevent any CSS transforms that could affect positioning */
+  .table-container * {
+    transform: none !important;
+    contain: none !important;
   }
 
-  /* Fix for dropdown menu positioning in table cells */
+  /* Force proper stacking context for triggers */
+  [data-slot="popover-trigger"],
   [data-slot="dropdown-menu-trigger"] {
     position: relative;
-    z-index: 1;
+    z-index: 10;
   }
 
-  /* Ensure popover portal content is always visible */
-  [data-radix-popper-content-wrapper] {
+  /* Ensure content is always positioned correctly */
+  [data-slot="popover-content"],
+  [data-slot="dropdown-menu-content"] {
+    position: fixed !important;
     z-index: 9999 !important;
+    transform-origin: var(--radix-popover-content-transform-origin, center) !important;
   }
 
-  /* Ensure dropdown menu portal content is always visible */
-  [data-radix-dropdown-menu-content] {
+  /* Override any table-specific positioning that might interfere */
+  table [data-slot="popover-content"],
+  table [data-slot="dropdown-menu-content"],
+  tbody [data-slot="popover-content"],
+  tbody [data-slot="dropdown-menu-content"],
+  tr [data-slot="popover-content"],
+  tr [data-slot="dropdown-menu-content"],
+  td [data-slot="popover-content"],
+  td [data-slot="dropdown-menu-content"] {
+    position: fixed !important;
     z-index: 9999 !important;
-  }
-
-  /* Additional positioning fixes for Radix components */
-  [data-radix-portal] {
-    z-index: 9999 !important;
-  }
-
-  /* Prevent table overflow from hiding dropdowns */
-  .table-container * {
-    overflow: visible !important;
-  }
-
-  /* Ensure proper stacking context for interactive elements */
-  [role="button"]:has([data-slot="popover-trigger"]),
-  [role="button"]:has([data-slot="dropdown-menu-trigger"]) {
-    position: relative;
-    z-index: 2;
   }
 
   /* Debug styles for troubleshooting positioning issues */
