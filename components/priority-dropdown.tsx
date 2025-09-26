@@ -45,60 +45,70 @@ export function PriorityDropdown({
   }
 
   return (
-    <DropdownMenu
-      onOpenChange={(open) => {
-        console.log("[v0] Priority dropdown open state changed:", open)
-      }}
-    >
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className={`h-auto p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
-          onClick={() => console.log("[v0] Priority dropdown trigger clicked")}
+    <div className="relative inline-block w-full h-full">
+      <DropdownMenu
+        onOpenChange={(open) => {
+          console.log("[v0] Priority dropdown open state changed:", open)
+        }}
+      >
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className={`h-auto p-0 hover:bg-transparent cursor-pointer relative ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
+            onClick={() => console.log("[v0] Priority dropdown trigger clicked")}
+          >
+            <Badge
+              className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
+                fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
+              } ${currentPriority.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
+              style={{
+                backgroundColor: currentPriority.key === "blank" ? "#ffffff" : currentPriority.color,
+                borderColor: currentPriority.key === "blank" ? "#d1d5db" : currentPriority.color,
+              }}
+            >
+              {currentPriority.label}
+            </Badge>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="start"
+          className="w-32"
+          sideOffset={5}
+          alignOffset={0}
+          avoidCollisions={true}
+          collisionPadding={10}
+          sticky="always"
         >
-          <Badge
-            className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
-              fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
-            } ${currentPriority.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
-            style={{
-              backgroundColor: currentPriority.key === "blank" ? "#ffffff" : currentPriority.color,
-              borderColor: currentPriority.key === "blank" ? "#d1d5db" : currentPriority.color,
-            }}
-          >
-            {currentPriority.label}
-          </Badge>
-        </Button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent align="start" className="w-32">
-        {allOptions.map((option) => (
-          <DropdownMenuItem
-            key={option.key}
-            onClick={() => {
-              console.log("[v0] Priority option clicked:", option.key)
-              handlePriorityChange(option.key)
-            }}
-            className="flex items-center justify-between cursor-pointer"
-          >
-            <div className="flex items-center gap-2">
-              <div
-                className={`w-3 h-3 rounded-full ${option.key === "blank" ? "border border-gray-300" : ""}`}
-                style={{ backgroundColor: option.key === "blank" ? "#ffffff" : option.color }}
-              />
-              <span>{option.label}</span>
-            </div>
-            {value === option.key && <Check className="w-4 h-4" />}
+          {allOptions.map((option) => (
+            <DropdownMenuItem
+              key={option.key}
+              onClick={() => {
+                console.log("[v0] Priority option clicked:", option.key)
+                handlePriorityChange(option.key)
+              }}
+              className="flex items-center justify-between cursor-pointer"
+            >
+              <div className="flex items-center gap-2">
+                <div
+                  className={`w-3 h-3 rounded-full ${option.key === "blank" ? "border border-gray-300" : ""}`}
+                  style={{ backgroundColor: option.key === "blank" ? "#ffffff" : option.color }}
+                />
+                <span>{option.label}</span>
+              </div>
+              {value === option.key && <Check className="w-4 h-4" />}
+            </DropdownMenuItem>
+          ))}
+          <DropdownMenuSeparator />
+          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+            <OptionManagerDialog title="Priority" options={options} onUpdateOptions={onUpdateOptions}>
+              <div className="flex items-center gap-2 cursor-pointer">
+                <Settings className="w-4 h-4" />
+                <span>Manage Options</span>
+              </div>
+            </OptionManagerDialog>
           </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator />
-        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-          <OptionManagerDialog title="Priority" options={options} onUpdateOptions={onUpdateOptions}>
-            <div className="flex items-center gap-2 cursor-pointer">
-              <Settings className="w-4 h-4" />
-              <span>Manage Options</span>
-            </div>
-          </OptionManagerDialog>
-        </DropdownMenuItem>
-      </DropdownMenuContent>
-    </DropdownMenu>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
   )
 }

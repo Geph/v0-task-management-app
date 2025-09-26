@@ -64,85 +64,97 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
   }
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="ghost"
-          size="sm"
-          className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted"
-          onClick={handleTriggerClick}
+    <div className="relative inline-block">
+      <Popover open={open} onOpenChange={handleOpenChange}>
+        <PopoverTrigger asChild>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted"
+            onClick={handleTriggerClick}
+          >
+            <Paperclip className="w-4 h-4" />
+            {attachments.length > 0 && (
+              <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
+                {attachments.length}
+              </span>
+            )}
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent
+          className="w-80 p-3 z-50"
+          side="bottom"
+          align="start"
+          sideOffset={5}
+          alignOffset={0}
+          avoidCollisions={true}
+          collisionPadding={10}
+          sticky="always"
+          onOpenAutoFocus={(e) => {
+            console.log("[v0] File attachment popover opened and focused")
+          }}
+          onCloseAutoFocus={(e) => {
+            console.log("[v0] File attachment popover closed and focus returned")
+          }}
         >
-          <Paperclip className="w-4 h-4" />
-          {attachments.length > 0 && (
-            <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
-              {attachments.length}
-            </span>
-          )}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent
-        className="w-80 p-3 z-50"
-        side="bottom"
-        align="start"
-        onOpenAutoFocus={(e) => {
-          console.log("[v0] File attachment popover opened and focused")
-        }}
-        onCloseAutoFocus={(e) => {
-          console.log("[v0] File attachment popover closed and focus returned")
-        }}
-      >
-        <div className="space-y-3">
-          <div className="flex items-center justify-between">
-            <h4 className="font-medium">File Attachments</h4>
-            <Button variant="outline" size="sm" onClick={handleAddFileClick} className="cursor-pointer bg-transparent">
-              <Paperclip className="w-4 h-4 mr-1" />
-              Add File
-            </Button>
-          </div>
-
-          <input ref={fileInputRef} type="file" onChange={handleFileSelect} className="hidden" accept="*/*" />
-
-          {attachments.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No files attached</p>
-          ) : (
-            <div className="space-y-2">
-              {attachments.map((attachment) => (
-                <div key={attachment.id} className="flex items-center justify-between p-2 border rounded">
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium truncate">{attachment.name}</p>
-                    <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="cursor-pointer"
-                      onClick={() => {
-                        const link = document.createElement("a")
-                        link.href = attachment.url
-                        link.download = attachment.name
-                        link.click()
-                      }}
-                    >
-                      <Download className="w-3 h-3" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={() => onRemoveAttachment(attachment.id)}
-                      className="cursor-pointer"
-                    >
-                      <X className="w-3 h-3" />
-                    </Button>
-                  </div>
-                </div>
-              ))}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <h4 className="font-medium">File Attachments</h4>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleAddFileClick}
+                className="cursor-pointer bg-transparent"
+              >
+                <Paperclip className="w-4 h-4 mr-1" />
+                Add File
+              </Button>
             </div>
-          )}
 
-          <p className="text-xs text-muted-foreground">Maximum file size: 5MB</p>
-        </div>
-      </PopoverContent>
-    </Popover>
+            <input ref={fileInputRef} type="file" onChange={handleFileSelect} className="hidden" accept="*/*" />
+
+            {attachments.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No files attached</p>
+            ) : (
+              <div className="space-y-2">
+                {attachments.map((attachment) => (
+                  <div key={attachment.id} className="flex items-center justify-between p-2 border rounded">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{attachment.name}</p>
+                      <p className="text-xs text-muted-foreground">{formatFileSize(attachment.size)}</p>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="cursor-pointer"
+                        onClick={() => {
+                          const link = document.createElement("a")
+                          link.href = attachment.url
+                          link.download = attachment.name
+                          link.click()
+                        }}
+                      >
+                        <Download className="w-3 h-3" />
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => onRemoveAttachment(attachment.id)}
+                        className="cursor-pointer"
+                      >
+                        <X className="w-3 h-3" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <p className="text-xs text-muted-foreground">Maximum file size: 5MB</p>
+          </div>
+        </PopoverContent>
+      </Popover>
+    </div>
   )
 }

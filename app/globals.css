@@ -379,6 +379,68 @@
     z-index: 9999 !important;
   }
 
+  /* Added specific table cell positioning fixes for popover triggers */
+  /* Ensure table cells provide proper positioning context */
+  table td {
+    position: relative;
+    overflow: visible;
+  }
+
+  /* Force table cells containing popovers to have proper bounds */
+  table td:has([data-radix-popover-trigger]),
+  table td:has([data-radix-dropdown-menu-trigger]) {
+    position: relative !important;
+    overflow: visible !important;
+    contain: none !important;
+  }
+
+  /* Ensure popover and dropdown triggers in table cells are properly positioned */
+  table td [data-radix-popover-trigger],
+  table td [data-radix-dropdown-menu-trigger] {
+    position: relative;
+    z-index: 1;
+    display: inline-block;
+  }
+
+  /* Fix for table row positioning that might interfere */
+  table tr {
+    position: relative;
+    contain: none;
+  }
+
+  /* Ensure table itself doesn't create problematic stacking context */
+  table {
+    position: relative;
+    contain: none;
+    overflow: visible;
+  }
+
+  /* Force Radix Portal content to always use viewport positioning */
+  [data-radix-portal] {
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    z-index: 9999 !important;
+    pointer-events: none;
+  }
+
+  [data-radix-portal] > * {
+    pointer-events: auto;
+  }
+
+  /* Additional fixes for specific Radix components */
+  [data-radix-popover-content] {
+    position: fixed !important;
+    z-index: 9999 !important;
+    will-change: transform, opacity;
+  }
+
+  [data-radix-dropdown-menu-content] {
+    position: fixed !important;
+    z-index: 9999 !important;
+    will-change: transform, opacity;
+  }
+
   /* Debug styles for troubleshooting positioning issues */
   .debug-popover [data-slot="popover-content"] {
     border: 2px solid red !important;
