@@ -63,6 +63,9 @@ type SortField = "name" | "status" | "priority"
 type SortDirection = "asc" | "desc"
 
 interface ColumnVisibility {
+  attachments: boolean // Added attachments visibility
+  status: boolean // Added status visibility
+  priority: boolean // Added priority visibility
   progress: boolean
   due: boolean
   who: boolean
@@ -351,6 +354,9 @@ export function TaskList() {
   const [hasPIN, setHasPIN] = useState(false)
   const [userPIN, setUserPIN] = useState("")
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
+    attachments: true, // Added default visibility for attachments
+    status: true, // Added default visibility for status
+    priority: true, // Added default visibility for priority
     progress: false,
     due: false,
     who: false,
@@ -397,20 +403,19 @@ export function TaskList() {
 
     const dynamicColumns: Record<string, number> = {}
 
-    // Add columns based on order and visibility
     columnOrder.forEach((columnId) => {
       switch (columnId) {
         case "attachments":
-          dynamicColumns.attachments = 6
+          if (columnVisibility.attachments) dynamicColumns.attachments = 6
           break
         case "status":
-          dynamicColumns.status = 15
+          if (columnVisibility.status) dynamicColumns.status = 15
           break
         case "priority":
-          dynamicColumns.priority = 15
+          if (columnVisibility.priority) dynamicColumns.priority = 15
           break
         case "progress":
-          if (columnVisibility.progress) dynamicColumns.progress = 12
+          if (columnVisibility.progress) dynamicColumns.progress = 15
           break
         case "due":
           if (columnVisibility.due) dynamicColumns.due = 10
@@ -440,6 +445,36 @@ export function TaskList() {
   const handleSort = (field: SortField) => {
     setSortField(field)
     setSortDirection((prevDirection) => (prevDirection === "asc" ? "desc" : "asc"))
+  }
+
+  const sortTasks = (tasks: Task[]) => {
+    return [...tasks].sort((a, b) => {
+      let aValue: string | number
+      let bValue: string | number
+
+      switch (sortField) {
+        case "name":
+          aValue = a.name.toLowerCase()
+          bValue = b.name.toLowerCase()
+          break
+        case "status":
+          aValue = a.status
+          bValue = b.status
+          break
+        case "priority":
+          // Define priority order
+          const priorityOrder = { high: 3, medium: 2, low: 1, someday: 0, blank: -1 }
+          aValue = priorityOrder[a.priority as keyof typeof priorityOrder] || 0
+          bValue = priorityOrder[b.priority as keyof typeof priorityOrder] || 0
+          break
+        default:
+          return 0
+      }
+
+      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1
+      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1
+      return 0
+    })
   }
 
   useEffect(() => {
@@ -589,6 +624,10 @@ export function TaskList() {
       document.removeEventListener("mouseup", handleMouseUp)
     }
   }, [isResizing, columnWidths])
+
+  useEffect(() => {
+    setColumnWidths(calculateColumnWidths())
+  }, [columnVisibility, columnOrder])
 
   const toggleSection = (sectionId: string) => {
     setSections(
@@ -1044,7 +1083,7 @@ export function TaskList() {
 
   const renderTaskColumns = (task: Task, section: { id: string }) => {
     const columnComponents: Record<string, React.JSX.Element> = {
-      attachments: (
+      attachments: columnVisibility.attachments ? ( // Added visibility check for attachments
         <div className="flex items-center" style={{ width: `${columnWidths.attachments}%` }}>
           <FileAttachmentComponent
             attachments={task.attachments}
@@ -1052,8 +1091,8 @@ export function TaskList() {
             onRemoveAttachment={(attachmentId) => removeTaskAttachment(section.id, task.id, attachmentId)}
           />
         </div>
-      ),
-      status: (
+      ) : null,
+      status: columnVisibility.status ? ( // Added visibility check for status
         <div className="flex items-stretch" style={{ width: `${columnWidths.status}%` }}>
           <div className="w-full">
             <StatusDropdown
@@ -1065,8 +1104,8 @@ export function TaskList() {
             />
           </div>
         </div>
-      ),
-      priority: (
+      ) : null,
+      priority: columnVisibility.priority ? ( // Added visibility check for priority
         <div className="flex items-stretch" style={{ width: `${columnWidths.priority}%` }}>
           <div className="w-full">
             <PriorityDropdown
@@ -1078,7 +1117,7 @@ export function TaskList() {
             />
           </div>
         </div>
-      ),
+      ) : null,
       progress: columnVisibility.progress ? (
         <div className="flex items-center" style={{ width: `${columnWidths.progress}%` }}>
           <ProgressBar
@@ -1107,7 +1146,7 @@ export function TaskList() {
 
   const renderColumnHeaders = () => {
     const headerComponents: Record<string, React.JSX.Element> = {
-      attachments: (
+      attachments: columnVisibility.attachments ? ( // Added visibility check for attachments header
         <div
           className="flex items-center justify-center gap-1 relative"
           style={{ width: `${columnWidths.attachments}%` }}
@@ -1120,8 +1159,8 @@ export function TaskList() {
             onMouseDown={(e) => handleMouseDown("attachments", e)}
           />
         </div>
-      ),
-      status: (
+      ) : null,
+      status: columnVisibility.status ? ( // Added visibility check for status header
         <div
           className="flex items-center justify-center gap-1 cursor-pointer relative"
           style={{ width: `${columnWidths.status}%` }}
@@ -1134,8 +1173,8 @@ export function TaskList() {
             onMouseDown={(e) => handleMouseDown("status", e)}
           />
         </div>
-      ),
-      priority: (
+      ) : null,
+      priority: columnVisibility.priority ? ( // Added visibility check for priority header
         <div
           className="flex items-center justify-center gap-1 cursor-pointer relative"
           style={{ width: `${columnWidths.priority}%` }}
@@ -1148,7 +1187,7 @@ export function TaskList() {
             onMouseDown={(e) => handleMouseDown("priority", e)}
           />
         </div>
-      ),
+      ) : null,
       progress: columnVisibility.progress ? (
         <div className="flex items-center justify-center gap-1 relative" style={{ width: `${columnWidths.progress}%` }}>
           Progress
@@ -1370,6 +1409,7 @@ export function TaskList() {
 
                 {section.tasks
                   .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                  .sort((a, b) => (sortTasks([a, b])[0] === a ? -1 : 1))
                   .map((task) => (
                     <div
                       key={task.id}

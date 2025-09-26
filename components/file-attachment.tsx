@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useRef } from "react"
+import { useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Paperclip, X, Download } from "lucide-react"
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover"
@@ -23,6 +23,7 @@ interface FileAttachmentProps {
 
 export function FileAttachmentComponent({ attachments, onAddAttachment, onRemoveAttachment }: FileAttachmentProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const [open, setOpen] = useState(false)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
     console.log("[v0] File selected")
@@ -54,13 +55,16 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
   }
 
   return (
-    <Popover>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
           variant="ghost"
           size="sm"
           className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted"
-          onClick={() => console.log("[v0] File attachment trigger clicked")}
+          onClick={() => {
+            console.log("[v0] File attachment trigger clicked, current open state:", open)
+            setOpen(!open)
+          }}
         >
           <Paperclip className="w-4 h-4" />
           {attachments.length > 0 && (

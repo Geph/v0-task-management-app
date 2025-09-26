@@ -20,6 +20,9 @@ import { ColumnOrderSettings } from "@/components/column-order-settings"
 import { ThemeSettings } from "@/components/theme-settings"
 
 interface ColumnVisibility {
+  attachments: boolean
+  status: boolean
+  priority: boolean
   progress: boolean
   due: boolean
   who: boolean

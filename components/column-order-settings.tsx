@@ -16,12 +16,22 @@ interface ColumnConfig {
 
 interface ColumnOrderSettingsProps {
   columnVisibility: {
+    attachments: boolean
+    status: boolean
+    priority: boolean
     progress: boolean
     due: boolean
     who: boolean
   }
   columnOrder: string[]
-  onUpdateColumnVisibility: (visibility: { progress: boolean; due: boolean; who: boolean }) => void
+  onUpdateColumnVisibility: (visibility: {
+    attachments: boolean
+    status: boolean
+    priority: boolean
+    progress: boolean
+    due: boolean
+    who: boolean
+  }) => void
   onUpdateColumnOrder: (order: string[]) => void
 }
 
@@ -34,11 +44,15 @@ export function ColumnOrderSettings({
   const [columns, setColumns] = useState<ColumnConfig[]>([])
 
   useEffect(() => {
-    // Initialize columns based on current order and visibility
     const defaultColumns = [
-      { id: "attachments", label: "Attachments", description: "File attachments", visible: true },
-      { id: "status", label: "Status", description: "Task status dropdown", visible: true },
-      { id: "priority", label: "Priority", description: "Task priority dropdown", visible: true },
+      {
+        id: "attachments",
+        label: "Attachments",
+        description: "File attachments",
+        visible: columnVisibility.attachments,
+      },
+      { id: "status", label: "Status", description: "Task status dropdown", visible: columnVisibility.status },
+      { id: "priority", label: "Priority", description: "Task priority dropdown", visible: columnVisibility.priority },
       { id: "progress", label: "Progress", description: "Progress bar (0-100%)", visible: columnVisibility.progress },
       { id: "due", label: "Due Date", description: "Task due date picker", visible: columnVisibility.due },
       { id: "who", label: "Assigned To", description: "Person assigned to task", visible: columnVisibility.who },
@@ -65,16 +79,24 @@ export function ColumnOrderSettings({
   }
 
   const handleVisibilityChange = (columnId: string, visible: boolean) => {
+    console.log(`[v0] Column visibility changed: ${columnId} = ${visible}`)
     setColumns(columns.map((col) => (col.id === columnId ? { ...col, visible } : col)))
 
-    // Update the parent component's column visibility state
-    if (columnId === "progress") {
-      onUpdateColumnVisibility({ ...columnVisibility, progress: visible })
+    const newVisibility = { ...columnVisibility }
+    if (columnId === "attachments") {
+      newVisibility.attachments = visible
+    } else if (columnId === "status") {
+      newVisibility.status = visible
+    } else if (columnId === "priority") {
+      newVisibility.priority = visible
+    } else if (columnId === "progress") {
+      newVisibility.progress = visible
     } else if (columnId === "due") {
-      onUpdateColumnVisibility({ ...columnVisibility, due: visible })
+      newVisibility.due = visible
     } else if (columnId === "who") {
-      onUpdateColumnVisibility({ ...columnVisibility, who: visible })
+      newVisibility.who = visible
     }
+    onUpdateColumnVisibility(newVisibility)
   }
 
   return (
