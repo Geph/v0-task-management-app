@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import type React from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,46 +9,56 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Settings, Upload, Download, Lock, RotateCcw } from "lucide-react"
 import { ExportImportDialog } from "@/components/export-import-dialog"
+import { ColumnOrderSettings } from "@/components/column-order-settings"
+import { ThemeSettings } from "@/components/theme-settings"
+
+interface ColumnVisibility {
+  progress: boolean
+  due: boolean
+  who: boolean
+}
 
 interface SettingsDialogProps {
   children: React.ReactNode
   appName: string
   appIcon: string
-  defaultEmail: string
   hasPIN: boolean
   onUpdateAppName: (name: string) => void
   onUpdateAppIcon: (icon: string) => void
-  onUpdateDefaultEmail: (email: string) => void
   onSetPIN: (pin: string) => void
   onRemovePIN: () => void
   sections: any[]
   statusOptions: any[]
   priorityOptions: any[]
   onImport: (data: any) => void
+  columnVisibility: ColumnVisibility
+  onUpdateColumnVisibility: (visibility: ColumnVisibility) => void
+  columnOrder: string[]
+  onUpdateColumnOrder: (order: string[]) => void
 }
 
 export function SettingsDialog({
   children,
   appName,
   appIcon,
-  defaultEmail,
   hasPIN,
   onUpdateAppName,
   onUpdateAppIcon,
-  onUpdateDefaultEmail,
   onSetPIN,
   onRemovePIN,
   sections,
   statusOptions,
   priorityOptions,
   onImport,
+  columnVisibility,
+  onUpdateColumnVisibility,
+  columnOrder,
+  onUpdateColumnOrder,
 }: SettingsDialogProps) {
   const [open, setOpen] = useState(false)
   const [tempAppName, setTempAppName] = useState(appName)
-  const [tempDefaultEmail, setTempDefaultEmail] = useState(defaultEmail)
   const [newPIN, setNewPIN] = useState("")
   const [confirmPIN, setConfirmPIN] = useState("")
-  const [recoveryEmail, setRecoveryEmail] = useState(defaultEmail)
 
   const handleIconUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
@@ -84,11 +94,6 @@ export function SettingsDialog({
       return
     }
 
-    if (!recoveryEmail.trim()) {
-      alert("Recovery email is required for PIN setup")
-      return
-    }
-
     onSetPIN(newPIN)
     setNewPIN("")
     setConfirmPIN("")
@@ -97,15 +102,8 @@ export function SettingsDialog({
 
   const handleSaveSettings = () => {
     onUpdateAppName(tempAppName)
-    onUpdateDefaultEmail(tempDefaultEmail)
     setOpen(false)
   }
-
-  useEffect(() => {
-    if (defaultEmail && !recoveryEmail) {
-      setRecoveryEmail(defaultEmail)
-    }
-  }, [defaultEmail, recoveryEmail])
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -121,9 +119,9 @@ export function SettingsDialog({
         <Tabs defaultValue="general" className="w-full">
           <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="columns">Columns</TabsTrigger>
             <TabsTrigger value="security">Security</TabsTrigger>
             <TabsTrigger value="data">Data</TabsTrigger>
-            <TabsTrigger value="email">Email</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="space-y-4">
@@ -150,6 +148,17 @@ export function SettingsDialog({
                 <Input id="app-icon" type="file" accept=".png,.svg" onChange={handleIconUpload} className="flex-1" />
               </div>
             </div>
+
+            <ThemeSettings />
+          </TabsContent>
+
+          <TabsContent value="columns" className="space-y-4">
+            <ColumnOrderSettings
+              columnVisibility={columnVisibility}
+              columnOrder={columnOrder}
+              onUpdateColumnVisibility={onUpdateColumnVisibility}
+              onUpdateColumnOrder={onUpdateColumnOrder}
+            />
           </TabsContent>
 
           <TabsContent value="security" className="space-y-4">
@@ -169,19 +178,6 @@ export function SettingsDialog({
 
               {!hasPIN && (
                 <div className="space-y-3">
-                  <div className="space-y-2">
-                    <Label htmlFor="recovery-email">Recovery Email (Required)</Label>
-                    <Input
-                      id="recovery-email"
-                      type="email"
-                      value={recoveryEmail}
-                      onChange={(e) => setRecoveryEmail(e.target.value)}
-                      placeholder="your@email.com"
-                    />
-                    <p className="text-xs text-muted-foreground">
-                      This email will be used to reset your PIN if you forget it.
-                    </p>
-                  </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label htmlFor="new-pin">New PIN (4 digits)</Label>
@@ -234,22 +230,6 @@ export function SettingsDialog({
                   </Button>
                 </ExportImportDialog>
               </div>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="email" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="default-email">Default Email Address</Label>
-              <Input
-                id="default-email"
-                type="email"
-                value={tempDefaultEmail}
-                onChange={(e) => setTempDefaultEmail(e.target.value)}
-                placeholder="your@email.com"
-              />
-              <p className="text-xs text-muted-foreground">
-                This email will be used as the default for email functions and PIN recovery.
-              </p>
             </div>
           </TabsContent>
         </Tabs>

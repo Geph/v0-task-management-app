@@ -14,8 +14,6 @@ import {
   CheckCircle,
   Edit,
   Copy,
-  Mail,
-  Bell,
   Merge,
   Settings,
 } from "lucide-react"
@@ -33,11 +31,12 @@ import { RemoveSectionDialog } from "@/components/remove-section-dialog"
 import { RocketIcon } from "@/components/rocket-icon"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { MergeTasksDialog } from "@/components/merge-tasks-dialog"
-import { EmailTaskDialog } from "@/components/email-task-dialog"
-import { RemindMeDialog } from "@/components/remind-me-dialog"
 import { EmojiPicker } from "@/components/enhanced-emoji-picker" // Updated import
 import { FileAttachmentComponent } from "@/components/file-attachment"
 import { SettingsDialog } from "@/components/settings-dialog" // Added import
+import { ProgressBar } from "@/components/progress-bar"
+import { DueDatePicker } from "@/components/due-date-picker"
+import { WhoField } from "@/components/who-field"
 
 interface Task {
   id: string
@@ -48,6 +47,9 @@ interface Task {
   notes: string
   emoji: string
   attachments: any[]
+  progress: number
+  dueDate: Date | null
+  assignedTo: string
 }
 
 interface TaskSection {
@@ -59,6 +61,12 @@ interface TaskSection {
 
 type SortField = "name" | "status" | "priority"
 type SortDirection = "asc" | "desc"
+
+interface ColumnVisibility {
+  progress: boolean
+  due: boolean
+  who: boolean
+}
 
 export function TaskList() {
   const [statusOptions, setStatusOptions] = useState([
@@ -94,6 +102,9 @@ export function TaskList() {
           notes: "",
           emoji: "🚀",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "2",
@@ -104,6 +115,9 @@ export function TaskList() {
           notes: "",
           emoji: "📞",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "3",
@@ -114,6 +128,9 @@ export function TaskList() {
           notes: "",
           emoji: "✅",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "4",
@@ -124,6 +141,9 @@ export function TaskList() {
           notes: "",
           emoji: "🌐",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "5",
@@ -134,6 +154,9 @@ export function TaskList() {
           notes: "",
           emoji: "✉️",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "6",
@@ -144,6 +167,9 @@ export function TaskList() {
           notes: "",
           emoji: "📊",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "7",
@@ -154,6 +180,9 @@ export function TaskList() {
           notes: "",
           emoji: "⚠️",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "8",
@@ -164,6 +193,9 @@ export function TaskList() {
           notes: "",
           emoji: "🧑‍🏫",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "9",
@@ -174,6 +206,9 @@ export function TaskList() {
           notes: "",
           emoji: "📚",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "10",
@@ -184,6 +219,9 @@ export function TaskList() {
           notes: "",
           emoji: "✨",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "11",
@@ -194,6 +232,9 @@ export function TaskList() {
           notes: "",
           emoji: "🗺️",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "12",
@@ -204,6 +245,9 @@ export function TaskList() {
           notes: "",
           emoji: "📍",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "13",
@@ -214,6 +258,9 @@ export function TaskList() {
           notes: "",
           emoji: "🛠️",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "14",
@@ -224,6 +271,9 @@ export function TaskList() {
           notes: "",
           emoji: "⬆️",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
       ],
     },
@@ -241,6 +291,9 @@ export function TaskList() {
           notes: "",
           emoji: "📄",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "16",
@@ -251,6 +304,9 @@ export function TaskList() {
           notes: "",
           emoji: "💻",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "17",
@@ -261,6 +317,9 @@ export function TaskList() {
           notes: "",
           emoji: "🎮",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
         {
           id: "18",
@@ -271,6 +330,9 @@ export function TaskList() {
           notes: "",
           emoji: "🎬",
           attachments: [],
+          progress: 0,
+          dueDate: null,
+          assignedTo: "",
         },
       ],
     },
@@ -286,70 +348,84 @@ export function TaskList() {
 
   const [appName, setAppName] = useState("Geph's Task Management")
   const [appIcon, setAppIcon] = useState("")
-  const [defaultEmail, setDefaultEmail] = useState("")
   const [hasPIN, setHasPIN] = useState(false)
   const [userPIN, setUserPIN] = useState("")
+  const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
+    progress: false,
+    due: false,
+    who: false,
+  })
+  const [columnOrder, setColumnOrder] = useState<string[]>([
+    "attachments",
+    "status",
+    "priority",
+    "progress",
+    "due",
+    "who",
+  ])
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedAppName = localStorage.getItem("appName")
       const storedAppIcon = localStorage.getItem("appIcon")
-      const storedDefaultEmail = localStorage.getItem("defaultEmail")
       const storedUserPIN = localStorage.getItem("userPIN")
+      const storedColumnVisibility = localStorage.getItem("columnVisibility")
+      const storedColumnOrder = localStorage.getItem("columnOrder")
 
       if (storedAppName) setAppName(storedAppName)
       if (storedAppIcon) setAppIcon(storedAppIcon)
-      if (storedDefaultEmail) setDefaultEmail(storedDefaultEmail)
       if (storedUserPIN) {
         setUserPIN(storedUserPIN)
         setHasPIN(true)
+      }
+      if (storedColumnVisibility) {
+        setColumnVisibility(JSON.parse(storedColumnVisibility))
+      }
+      if (storedColumnOrder) {
+        setColumnOrder(JSON.parse(storedColumnOrder))
       }
     }
   }, [])
 
   const calculateColumnWidths = () => {
-    const baseWidths = {
+    const baseColumns = {
       checkbox: 4,
       emoji: 4,
-      name: 40,
-      status: 18,
-      priority: 18,
-      attachments: 6, // Reduced from 8 to 6
-      actions: 4, // Reduced from 6 to 4
+      name: 30,
+      actions: 4,
     }
 
-    let maxNameLength = 4 // "Name"
-    let maxStatusLength = 6 // "Status"
-    let maxPriorityLength = 8 // "Priority"
+    const dynamicColumns: Record<string, number> = {}
 
-    sections.forEach((section) => {
-      section.tasks.forEach((task) => {
-        maxNameLength = Math.max(maxNameLength, task.name.length)
-        const statusOption = statusOptions.find((opt) => opt.key === task.status)
-        if (statusOption) {
-          maxStatusLength = Math.max(maxStatusLength, statusOption.label.length)
-        }
-        const priorityOption = priorityOptions.find((opt) => opt.key === task.priority)
-        if (priorityOption) {
-          maxPriorityLength = Math.max(maxPriorityLength, priorityOption.label.length)
-        }
-      })
+    // Add columns based on order and visibility
+    columnOrder.forEach((columnId) => {
+      switch (columnId) {
+        case "attachments":
+          dynamicColumns.attachments = 6
+          break
+        case "status":
+          dynamicColumns.status = 15
+          break
+        case "priority":
+          dynamicColumns.priority = 15
+          break
+        case "progress":
+          if (columnVisibility.progress) dynamicColumns.progress = 12
+          break
+        case "due":
+          if (columnVisibility.due) dynamicColumns.due = 10
+          break
+        case "who":
+          if (columnVisibility.who) dynamicColumns.who = 12
+          break
+      }
     })
 
-    const nameWidth = Math.min(45, Math.max(25, maxNameLength * 0.8 + maxNameLength * 0.3))
-    const statusWidth = Math.min(22, Math.max(15, maxStatusLength * 0.6 + maxStatusLength * 0.3))
-    const priorityWidth = Math.min(22, Math.max(15, maxPriorityLength * 0.6 + maxPriorityLength * 0.3))
-    const remaining = 100 - nameWidth - statusWidth - priorityWidth - 4 - 4 - 6 - 4 // checkbox, emoji, attachments, actions
+    const allColumns = { ...baseColumns, ...dynamicColumns }
+    const totalVisible = Object.values(allColumns).reduce((sum, width) => sum + width, 0)
+    const scale = 100 / totalVisible
 
-    return {
-      checkbox: 4,
-      emoji: 4,
-      name: nameWidth,
-      status: statusWidth,
-      priority: priorityWidth,
-      attachments: 6, // Reduced from 8
-      actions: Math.max(4, remaining + 4), // Reduced minimum from 6 to 4
-    }
+    return Object.fromEntries(Object.entries(allColumns).map(([key, width]) => [key, width * scale]))
   }
 
   const [columnWidths, setColumnWidths] = useState(calculateColumnWidths())
@@ -438,6 +514,64 @@ export function TaskList() {
           attachments: newAttachmentsWidth,
           actions: Math.max(4, newActionsWidth),
         })
+      } else if (isResizing === "progress") {
+        const fixedColumns =
+          columnWidths.checkbox +
+          columnWidths.emoji +
+          columnWidths.name +
+          columnWidths.status +
+          columnWidths.priority +
+          columnWidths.attachments +
+          columnWidths.actions
+        const available = 100 - fixedColumns
+        const newProgressWidth = Math.max(6, Math.min(available - 6, percentage - fixedColumns))
+        const remaining = available - newProgressWidth
+        const newDueWidth = Math.min(10, remaining / 2)
+        const newWhoWidth = remaining - newDueWidth
+
+        setColumnWidths({
+          ...columnWidths,
+          progress: newProgressWidth,
+          due: Math.max(6, newDueWidth),
+          who: Math.max(6, newWhoWidth),
+        })
+      } else if (isResizing === "due") {
+        const fixedColumns =
+          columnWidths.checkbox +
+          columnWidths.emoji +
+          columnWidths.name +
+          columnWidths.status +
+          columnWidths.priority +
+          columnWidths.progress +
+          columnWidths.attachments +
+          columnWidths.actions
+        const available = 100 - fixedColumns
+        const newDueWidth = Math.max(6, Math.min(available - 6, percentage - fixedColumns))
+        const newWhoWidth = available - newDueWidth
+
+        setColumnWidths({
+          ...columnWidths,
+          due: newDueWidth,
+          who: Math.max(6, newWhoWidth),
+        })
+      } else if (isResizing === "who") {
+        const fixedColumns =
+          columnWidths.checkbox +
+          columnWidths.emoji +
+          columnWidths.name +
+          columnWidths.status +
+          columnWidths.priority +
+          columnWidths.progress +
+          columnWidths.due +
+          columnWidths.attachments +
+          columnWidths.actions
+        const available = 100 - fixedColumns
+        const newWhoWidth = Math.max(6, Math.min(available - 6, percentage - fixedColumns))
+
+        setColumnWidths({
+          ...columnWidths,
+          who: newWhoWidth,
+        })
       }
     }
 
@@ -504,6 +638,9 @@ export function TaskList() {
       notes: "",
       emoji: "",
       attachments: [],
+      progress: 0,
+      dueDate: null,
+      assignedTo: "",
     }
 
     setSections(
@@ -591,6 +728,45 @@ export function TaskList() {
           ? {
               ...section,
               tasks: section.tasks.map((task) => (task.id === taskId ? { ...task, notes } : task)),
+            }
+          : section,
+      ),
+    )
+  }
+
+  const updateTaskProgress = (sectionId: string, taskId: string, progress: number) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              tasks: section.tasks.map((task) => (task.id === taskId ? { ...task, progress } : task)),
+            }
+          : section,
+      ),
+    )
+  }
+
+  const updateTaskDueDate = (sectionId: string, taskId: string, dueDate: Date | null) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              tasks: section.tasks.map((task) => (task.id === taskId ? { ...task, dueDate } : task)),
+            }
+          : section,
+      ),
+    )
+  }
+
+  const updateTaskAssignedTo = (sectionId: string, taskId: string, assignedTo: string) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              tasks: section.tasks.map((task) => (task.id === taskId ? { ...task, assignedTo } : task)),
             }
           : section,
       ),
@@ -740,6 +916,9 @@ export function TaskList() {
           .join("\n\n"),
         emoji: tasksToMerge[0].emoji,
         attachments: tasksToMerge.flatMap((t) => t.attachments),
+        progress: 0, // Default values for new fields
+        dueDate: null,
+        assignedTo: "",
       }
 
       setSections(
@@ -761,17 +940,7 @@ export function TaskList() {
     }
   }
 
-  const sendTaskEmail = (email: string, subject: string, message: string) => {
-    // In a real app, this would send an actual email
-    console.log("Sending email:", { email, subject, message })
-    alert(`Email would be sent to: ${email}\nSubject: ${subject}`)
-  }
-
-  const setTaskReminder = (email: string, date: string, time: string, message: string) => {
-    // In a real app, this would set up an actual reminder
-    console.log("Setting reminder:", { email, date, time, message })
-    alert(`Reminder set for ${date} at ${time}\nEmail: ${email}`)
-  }
+  // Removed sendTaskEmail and setTaskReminder functions
 
   const updateTaskEmoji = (sectionId: string, taskId: string, emoji: string) => {
     setSections(
@@ -840,13 +1009,6 @@ export function TaskList() {
     }
   }
 
-  const handleUpdateDefaultEmail = (email: string) => {
-    setDefaultEmail(email)
-    if (typeof window !== "undefined") {
-      localStorage.setItem("defaultEmail", email)
-    }
-  }
-
   const handleSetPIN = (pin: string) => {
     setUserPIN(pin)
     setHasPIN(true)
@@ -864,6 +1026,159 @@ export function TaskList() {
       localStorage.removeItem("userPIN")
       localStorage.removeItem("isAuthenticated")
     }
+  }
+
+  const handleUpdateColumnVisibility = (visibility: ColumnVisibility) => {
+    setColumnVisibility(visibility)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("columnVisibility", JSON.stringify(visibility))
+    }
+  }
+
+  const handleUpdateColumnOrder = (order: string[]) => {
+    setColumnOrder(order)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("columnOrder", JSON.stringify(order))
+    }
+  }
+
+  const renderTaskColumns = (task: Task, section: { id: string }) => {
+    const columnComponents: Record<string, React.JSX.Element> = {
+      attachments: (
+        <div className="flex items-center" style={{ width: `${columnWidths.attachments}%` }}>
+          <FileAttachmentComponent
+            attachments={task.attachments}
+            onAddAttachment={(file) => addTaskAttachment(section.id, task.id, file)}
+            onRemoveAttachment={(attachmentId) => removeTaskAttachment(section.id, task.id, attachmentId)}
+          />
+        </div>
+      ),
+      status: (
+        <div className="flex items-stretch" style={{ width: `${columnWidths.status}%` }}>
+          <div className="w-full">
+            <StatusDropdown
+              value={task.status}
+              onChange={(status) => updateTaskStatus(section.id, task.id, status)}
+              options={statusOptions}
+              onUpdateOptions={setStatusOptions}
+              fullWidth
+            />
+          </div>
+        </div>
+      ),
+      priority: (
+        <div className="flex items-stretch" style={{ width: `${columnWidths.priority}%` }}>
+          <div className="w-full">
+            <PriorityDropdown
+              value={task.priority}
+              onChange={(priority) => updateTaskPriority(section.id, task.id, priority)}
+              options={priorityOptions}
+              onUpdateOptions={setPriorityOptions}
+              fullWidth
+            />
+          </div>
+        </div>
+      ),
+      progress: columnVisibility.progress ? (
+        <div className="flex items-center" style={{ width: `${columnWidths.progress}%` }}>
+          <ProgressBar
+            value={task.progress}
+            onChange={(progress) => updateTaskProgress(section.id, task.id, progress)}
+          />
+        </div>
+      ) : null,
+      due: columnVisibility.due ? (
+        <div className="flex items-center" style={{ width: `${columnWidths.due}%` }}>
+          <DueDatePicker value={task.dueDate} onChange={(dueDate) => updateTaskDueDate(section.id, task.id, dueDate)} />
+        </div>
+      ) : null,
+      who: columnVisibility.who ? (
+        <div className="flex items-center" style={{ width: `${columnWidths.who}%` }}>
+          <WhoField
+            value={task.assignedTo}
+            onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
+          />
+        </div>
+      ) : null,
+    }
+
+    return columnOrder.map((columnId) => columnComponents[columnId]).filter(Boolean)
+  }
+
+  const renderColumnHeaders = () => {
+    const headerComponents: Record<string, React.JSX.Element> = {
+      attachments: (
+        <div
+          className="flex items-center justify-center gap-1 relative"
+          style={{ width: `${columnWidths.attachments}%` }}
+        >
+          <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+            <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
+          </svg>
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
+            onMouseDown={(e) => handleMouseDown("attachments", e)}
+          />
+        </div>
+      ),
+      status: (
+        <div
+          className="flex items-center justify-center gap-1 cursor-pointer relative"
+          style={{ width: `${columnWidths.status}%` }}
+          onClick={() => handleSort("status")}
+        >
+          Status
+          <ArrowUpDown className="w-3 h-3" />
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
+            onMouseDown={(e) => handleMouseDown("status", e)}
+          />
+        </div>
+      ),
+      priority: (
+        <div
+          className="flex items-center justify-center gap-1 cursor-pointer relative"
+          style={{ width: `${columnWidths.priority}%` }}
+          onClick={() => handleSort("priority")}
+        >
+          Priority
+          <ArrowUpDown className="w-3 h-3" />
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
+            onMouseDown={(e) => handleMouseDown("priority", e)}
+          />
+        </div>
+      ),
+      progress: columnVisibility.progress ? (
+        <div className="flex items-center justify-center gap-1 relative" style={{ width: `${columnWidths.progress}%` }}>
+          Progress
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
+            onMouseDown={(e) => handleMouseDown("progress", e)}
+          />
+        </div>
+      ) : null,
+      due: columnVisibility.due ? (
+        <div className="flex items-center justify-center gap-1 relative" style={{ width: `${columnWidths.due}%` }}>
+          Due
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
+            onMouseDown={(e) => handleMouseDown("due", e)}
+          />
+        </div>
+      ) : null,
+      who: columnVisibility.who ? (
+        <div className="flex items-center justify-center gap-1 relative" style={{ width: `${columnWidths.who}%` }}>
+          Who
+          <div
+            className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
+            onMouseDown={(e) => handleMouseDown("who", e)}
+          />
+        </div>
+      ) : null,
+    }
+
+    return columnOrder.map((columnId) => headerComponents[columnId]).filter(Boolean)
   }
 
   return (
@@ -892,17 +1207,19 @@ export function TaskList() {
             <SettingsDialog
               appName={appName}
               appIcon={appIcon}
-              defaultEmail={defaultEmail}
               hasPIN={hasPIN}
               onUpdateAppName={handleUpdateAppName}
               onUpdateAppIcon={handleUpdateAppIcon}
-              onUpdateDefaultEmail={handleUpdateDefaultEmail}
               onSetPIN={handleSetPIN}
               onRemovePIN={handleRemovePIN}
               sections={sections}
               statusOptions={statusOptions}
               priorityOptions={priorityOptions}
               onImport={handleImport}
+              columnVisibility={columnVisibility}
+              onUpdateColumnVisibility={handleUpdateColumnVisibility}
+              columnOrder={columnOrder}
+              onUpdateColumnOrder={handleUpdateColumnOrder}
             >
               <Button
                 variant="outline"
@@ -1025,7 +1342,14 @@ export function TaskList() {
                 <div
                   className="flex gap-1 px-4 py-2 text-sm text-muted-foreground border-b border-border"
                   style={{
-                    gridTemplateColumns: `${columnWidths.checkbox}% ${columnWidths.emoji}% ${columnWidths.name}% ${columnWidths.status}% ${columnWidths.priority}% ${columnWidths.attachments}% ${columnWidths.actions}%`,
+                    gridTemplateColumns: `${columnWidths.checkbox}% ${columnWidths.emoji}% ${columnWidths.name}% ${columnOrder
+                      .map((id) =>
+                        columnVisibility[id as keyof ColumnVisibility] !== false
+                          ? `${columnWidths[id as keyof typeof columnWidths]}%`
+                          : "",
+                      )
+                      .filter(Boolean)
+                      .join(" ")} ${columnWidths.actions}%`,
                   }}
                 >
                   <div style={{ width: `${columnWidths.checkbox}%` }}>☑️</div>
@@ -1037,44 +1361,9 @@ export function TaskList() {
                       onMouseDown={(e) => handleMouseDown("name", e)}
                     />
                   </div>
-                  <div
-                    className="flex items-center justify-center gap-1 cursor-pointer relative"
-                    style={{ width: `${columnWidths.status}%` }}
-                    onClick={() => handleSort("status")}
-                  >
-                    Status
-                    <ArrowUpDown className="w-3 h-3" />
-                    <div
-                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
-                      onMouseDown={(e) => handleMouseDown("status", e)}
-                    />
-                  </div>
-                  <div
-                    className="flex items-center justify-center gap-1 cursor-pointer relative"
-                    style={{ width: `${columnWidths.priority}%` }}
-                    onClick={() => handleSort("priority")}
-                  >
-                    Priority
-                    <ArrowUpDown className="w-3 h-3" />
-                    <div
-                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
-                      onMouseDown={(e) => handleMouseDown("priority", e)}
-                    />
-                  </div>
-                  <div
-                    className="flex items-center justify-center gap-1 relative"
-                    style={{ width: `${columnWidths.attachments}%` }}
-                  >
-                    <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
-                    </svg>
-                    <div
-                      className="absolute right-0 top-0 bottom-0 w-1 cursor-col-resize hover:bg-blue-500"
-                      onMouseDown={(e) => handleMouseDown("attachments", e)}
-                    />
-                  </div>
+                  {renderColumnHeaders()}
                   <div className="flex items-center justify-center" style={{ width: `${columnWidths.actions}%` }}>
-                    Actions
+                    {/* Empty - no header label for actions */}
                   </div>
                 </div>
 
@@ -1153,37 +1442,7 @@ export function TaskList() {
                         )}
                       </div>
 
-                      <div className="flex items-stretch" style={{ width: `${columnWidths.status}%` }}>
-                        <div className="w-full">
-                          <StatusDropdown
-                            value={task.status}
-                            onChange={(status) => updateTaskStatus(section.id, task.id, status)}
-                            options={statusOptions}
-                            onUpdateOptions={setStatusOptions}
-                            fullWidth
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex items-stretch" style={{ width: `${columnWidths.priority}%` }}>
-                        <div className="w-full">
-                          <PriorityDropdown
-                            value={task.priority}
-                            onChange={(priority) => updateTaskPriority(section.id, task.id, priority)}
-                            options={priorityOptions}
-                            onUpdateOptions={setPriorityOptions}
-                            fullWidth
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex items-center" style={{ width: `${columnWidths.attachments}%` }}>
-                        <FileAttachmentComponent
-                          attachments={task.attachments}
-                          onAddAttachment={(file) => addTaskAttachment(section.id, task.id, file)}
-                          onRemoveAttachment={(attachmentId) => removeTaskAttachment(section.id, task.id, attachmentId)}
-                        />
-                      </div>
+                      {renderTaskColumns(task, section)}
 
                       <div className="flex items-center justify-end" style={{ width: `${columnWidths.actions}%` }}>
                         <DropdownMenu>
@@ -1201,18 +1460,6 @@ export function TaskList() {
                               <Copy className="w-4 h-4 mr-2" />
                               Duplicate Task
                             </DropdownMenuItem>
-                            <EmailTaskDialog taskName={task.name} taskNotes={task.notes} onSendEmail={sendTaskEmail}>
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <Mail className="w-4 h-4 mr-2" />
-                                Send to Email
-                              </DropdownMenuItem>
-                            </EmailTaskDialog>
-                            <RemindMeDialog taskName={task.name} onSetReminder={setTaskReminder}>
-                              <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-                                <Bell className="w-4 h-4 mr-2" />
-                                Remind Me
-                              </DropdownMenuItem>
-                            </RemindMeDialog>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </div>
@@ -1236,10 +1483,13 @@ export function TaskList() {
               <div style={{ width: `${columnWidths.checkbox}%` }}>☑️</div>
               <div style={{ width: `${columnWidths.emoji}%` }}>😀</div>
               <div style={{ width: `${columnWidths.name}%` }}>Name</div>
+              <div style={{ width: `${columnWidths.attachments}%` }}>📎</div>
               <div style={{ width: `${columnWidths.status}%` }}>Status</div>
               <div style={{ width: `${columnWidths.priority}%` }}>Priority</div>
-              <div style={{ width: `${columnWidths.attachments}%` }}>📎</div>
-              <div style={{ width: `${columnWidths.actions}%` }}>Actions</div>
+              {columnVisibility.progress && <div style={{ width: `${columnWidths.progress}%` }}>Progress</div>}
+              {columnVisibility.due && <div style={{ width: `${columnWidths.due}%` }}>Due</div>}
+              {columnVisibility.who && <div style={{ width: `${columnWidths.who}%` }}>Who</div>}
+              <div style={{ width: `${columnWidths.actions}%` }}></div>
             </div>
 
             {completedTasks.map((task) => (
@@ -1257,6 +1507,7 @@ export function TaskList() {
                 <div className="flex items-center" style={{ width: `${columnWidths.name}%` }}>
                   <span className="text-sm line-through">{task.name}</span>
                 </div>
+                <div style={{ width: `${columnWidths.attachments}%` }}></div>
                 <div className="flex items-stretch" style={{ width: `${columnWidths.status}%` }}>
                   <div className="w-full">
                     <StatusDropdown
@@ -1279,7 +1530,9 @@ export function TaskList() {
                     />
                   </div>
                 </div>
-                <div style={{ width: `${columnWidths.attachments}%` }}></div>
+                {columnVisibility.progress && <div style={{ width: `${columnWidths.progress}%` }}></div>}
+                {columnVisibility.due && <div style={{ width: `${columnWidths.due}%` }}></div>}
+                {columnVisibility.who && <div style={{ width: `${columnWidths.who}%` }}></div>}
                 <div style={{ width: `${columnWidths.actions}%` }}></div>
               </div>
             ))}
