@@ -43,7 +43,15 @@ export function DueDatePicker({ value, onChange }: DueDatePickerProps) {
           {value ? format(value, "MMM dd") : "No date"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-auto p-0" align="start">
+      <PopoverContent
+        className="w-auto p-0 z-[9999]"
+        align="start"
+        side="bottom"
+        sideOffset={4}
+        avoidCollisions={true}
+        collisionPadding={20}
+        sticky="always"
+      >
         <Calendar
           mode="single"
           selected={value || undefined}

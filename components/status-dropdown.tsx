@@ -39,70 +39,68 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
   }
 
   return (
-    <div className="relative inline-block w-full h-full">
-      <DropdownMenu
-        onOpenChange={(open) => {
-          console.log("[v0] Status dropdown open state changed:", open)
-        }}
-      >
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant="ghost"
-            className={`h-auto p-0 hover:bg-transparent cursor-pointer relative ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
-            onClick={() => console.log("[v0] Status dropdown trigger clicked")}
-            data-dropdown-trigger="status"
-          >
-            <Badge
-              className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
-                fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
-              } ${currentStatus.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
-              style={{
-                backgroundColor: currentStatus.key === "blank" ? "#ffffff" : currentStatus.color,
-                borderColor: currentStatus.key === "blank" ? "#d1d5db" : currentStatus.color,
-              }}
-            >
-              {currentStatus.label}
-            </Badge>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent
-          align="start"
-          className="w-48"
-          sideOffset={8}
-          alignOffset={0}
-          avoidCollisions={true}
-          collisionPadding={10}
+    <DropdownMenu
+      onOpenChange={(open) => {
+        console.log("[v0] Status dropdown open state changed:", open)
+      }}
+    >
+      <DropdownMenuTrigger asChild>
+        <Button
+          variant="ghost"
+          className={`h-auto p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
+          onClick={() => console.log("[v0] Status dropdown trigger clicked")}
         >
-          {allOptions.map((option) => (
-            <DropdownMenuItem
-              key={option.key}
-              onClick={() => {
-                console.log("[v0] Status option clicked:", option.key)
-                handleStatusChange(option.key)
-              }}
-              className="flex items-center justify-between cursor-pointer"
-            >
-              <div className="flex items-center gap-2">
-                <div
-                  className={`w-3 h-3 rounded-full ${option.key === "blank" ? "border border-gray-300" : ""}`}
-                  style={{ backgroundColor: option.key === "blank" ? "#ffffff" : option.color }}
-                />
-                <span>{option.label}</span>
-              </div>
-              {value === option.key && <Check className="w-4 h-4" />}
-            </DropdownMenuItem>
-          ))}
-          <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
-            <OptionManagerDialog title="Status" options={options} onUpdateOptions={onUpdateOptions}>
-              <div className="flex items-center gap-2 cursor-pointer">
-                <Settings className="w-4 h-4" />
-                <span>Manage Options</span>
-              </div>
-            </OptionManagerDialog>
+          <Badge
+            className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
+              fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
+            } ${currentStatus.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
+            style={{
+              backgroundColor: currentStatus.key === "blank" ? "#ffffff" : currentStatus.color,
+              borderColor: currentStatus.key === "blank" ? "#d1d5db" : currentStatus.color,
+            }}
+          >
+            {currentStatus.label}
+          </Badge>
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent
+        align="start"
+        className="w-48 z-[9999]"
+        side="bottom"
+        sideOffset={4}
+        avoidCollisions={true}
+        collisionPadding={20}
+        sticky="always"
+      >
+        {allOptions.map((option) => (
+          <DropdownMenuItem
+            key={option.key}
+            onClick={() => {
+              console.log("[v0] Status option clicked:", option.key)
+              handleStatusChange(option.key)
+            }}
+            className="flex items-center justify-between cursor-pointer"
+          >
+            <div className="flex items-center gap-2">
+              <div
+                className={`w-3 h-3 rounded-full ${option.key === "blank" ? "border border-gray-300" : ""}`}
+                style={{ backgroundColor: option.key === "blank" ? "#ffffff" : option.color }}
+              />
+              <span>{option.label}</span>
+            </div>
+            {value === option.key && <Check className="w-4 h-4" />}
           </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+        ))}
+        <DropdownMenuSeparator />
+        <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+          <OptionManagerDialog title="Status" options={options} onUpdateOptions={onUpdateOptions}>
+            <div className="flex items-center gap-2 cursor-pointer">
+              <Settings className="w-4 h-4" />
+              <span>Manage Options</span>
+            </div>
+          </OptionManagerDialog>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   )
 }
