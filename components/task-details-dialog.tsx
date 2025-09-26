@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -73,9 +74,7 @@ export function TaskDetailsDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="w-12">
-              <EmojiPicker value={emoji} onChange={handleEmojiChange} inline />
-            </div>
+            <div className="text-2xl">{emoji}</div>
             {isRenaming ? (
               <Input
                 value={newTaskName}
@@ -103,17 +102,32 @@ export function TaskDetailsDialog({
           </div>
         </DialogHeader>
         <div className="space-y-4">
-          <div>
-            <Label htmlFor="notes" className="text-sm font-medium">
-              Notes
-            </Label>
-            <RichTextEditor
-              value={notes}
-              onChange={setNotes}
-              placeholder="Add notes for this task..."
-              className="mt-1"
-            />
-          </div>
+          <Tabs defaultValue="notes" className="w-full">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="notes">Notes</TabsTrigger>
+              <TabsTrigger value="emoji">Emoji</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="notes" className="space-y-2">
+              <Label htmlFor="notes" className="text-sm font-medium">
+                Notes
+              </Label>
+              <RichTextEditor
+                value={notes}
+                onChange={setNotes}
+                placeholder="Add notes for this task..."
+                className="mt-1"
+              />
+            </TabsContent>
+
+            <TabsContent value="emoji" className="space-y-2">
+              <Label className="text-sm font-medium">Choose Emoji</Label>
+              <div className="mt-2">
+                <EmojiPicker value={emoji} onChange={handleEmojiChange} />
+              </div>
+            </TabsContent>
+          </Tabs>
+
           <div className="flex justify-between">
             <Button variant="outline" onClick={handleDuplicate} className="flex items-center gap-2 bg-transparent">
               <Copy className="w-4 h-4" />

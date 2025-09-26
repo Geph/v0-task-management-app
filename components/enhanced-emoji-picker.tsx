@@ -465,69 +465,13 @@ export function EmojiPicker({ value, onChange, inline = false }: EmojiPickerProp
 
   if (inline) {
     return (
-      <div className="space-y-3 w-full">
-        <div className="relative">
-          <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-          <Input
-            placeholder="Search emojis..."
-            className="pl-8 h-8"
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
-        </div>
-
-        {!searchTerm ? (
-          <Tabs value={activeTab} onValueChange={setActiveTab}>
-            <TabsList className="grid w-full grid-cols-4">
-              <TabsTrigger value="Smileys" className="text-xs cursor-pointer">
-                😀
-              </TabsTrigger>
-              <TabsTrigger value="People" className="text-xs cursor-pointer">
-                👤
-              </TabsTrigger>
-              <TabsTrigger value="Animals" className="text-xs cursor-pointer">
-                🐶
-              </TabsTrigger>
-              <TabsTrigger value="Food" className="text-xs cursor-pointer">
-                🍎
-              </TabsTrigger>
-            </TabsList>
-            <TabsList className="grid w-full grid-cols-4 mt-1">
-              <TabsTrigger value="Activities" className="text-xs cursor-pointer">
-                ⚽
-              </TabsTrigger>
-              <TabsTrigger value="Travel" className="text-xs cursor-pointer">
-                🚗
-              </TabsTrigger>
-              <TabsTrigger value="Objects" className="text-xs cursor-pointer">
-                💻
-              </TabsTrigger>
-              <TabsTrigger value="Symbols" className="text-xs cursor-pointer">
-                ❤️
-              </TabsTrigger>
-            </TabsList>
-
-            {Object.entries(EMOJI_CATEGORIES).map(([category, emojis]) => (
-              <TabsContent key={category} value={category} className="mt-2">
-                <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-                  {emojis.map((emoji) => (
-                    <Button
-                      key={emoji}
-                      variant="ghost"
-                      size="sm"
-                      className="w-8 h-8 p-0 text-lg hover:bg-muted cursor-pointer"
-                      onClick={() => handleEmojiSelect(emoji)}
-                    >
-                      {emoji}
-                    </Button>
-                  ))}
-                </div>
-              </TabsContent>
-            ))}
-          </Tabs>
-        ) : (
-          <div className="grid grid-cols-8 gap-1 max-h-48 overflow-y-auto">
-            {allEmojis.map((emoji) => (
+      <div className="space-y-2 w-full">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="sm" className="w-10 h-10 p-0 text-xl cursor-pointer hover:bg-muted border">
+            {value || "😀"}
+          </Button>
+          <div className="grid grid-cols-6 gap-1 flex-1">
+            {EMOJI_CATEGORIES.Smileys.slice(0, 6).map((emoji) => (
               <Button
                 key={emoji}
                 variant="ghost"
@@ -539,7 +483,20 @@ export function EmojiPicker({ value, onChange, inline = false }: EmojiPickerProp
               </Button>
             ))}
           </div>
-        )}
+        </div>
+        <div className="grid grid-cols-8 gap-1">
+          {EMOJI_CATEGORIES.Objects.slice(0, 16).map((emoji) => (
+            <Button
+              key={emoji}
+              variant="ghost"
+              size="sm"
+              className="w-8 h-8 p-0 text-lg hover:bg-muted cursor-pointer"
+              onClick={() => handleEmojiSelect(emoji)}
+            >
+              {emoji}
+            </Button>
+          ))}
+        </div>
       </div>
     )
   }
@@ -557,12 +514,14 @@ export function EmojiPicker({ value, onChange, inline = false }: EmojiPickerProp
         </Button>
       </PopoverTrigger>
       <PopoverContent
-        className="w-96 p-3 z-[60]"
+        className="w-96 p-3 z-50" // improved z-index for better layering
         side="bottom"
         align="start"
         sideOffset={8}
         collisionPadding={10}
         avoidCollisions={true}
+        sticky="always"
+        onCloseAutoFocus={(e) => e.preventDefault()}
       >
         <div className="space-y-3">
           <div className="relative">

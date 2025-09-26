@@ -71,12 +71,13 @@ export function PriorityDropdown({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         align="start"
-        className="w-32 z-[60]" // Updated z-index to match other popovers
+        className="w-32 z-50" // improved z-index and positioning
         side="bottom"
-        sideOffset={4}
+        sideOffset={8}
         avoidCollisions={true}
-        collisionPadding={20}
+        collisionPadding={10}
         sticky="always"
+        onCloseAutoFocus={(e) => e.preventDefault()}
       >
         {allOptions.map((option) => (
           <DropdownMenuItem
