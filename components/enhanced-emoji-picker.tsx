@@ -556,7 +556,14 @@ export function EmojiPicker({ value, onChange, inline = false }: EmojiPickerProp
           {value || "😀"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96 p-3" side="bottom" align="start" sideOffset={8}>
+      <PopoverContent
+        className="w-96 p-3 z-[60]"
+        side="bottom"
+        align="start"
+        sideOffset={8}
+        collisionPadding={10}
+        avoidCollisions={true}
+      >
         <div className="space-y-3">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />

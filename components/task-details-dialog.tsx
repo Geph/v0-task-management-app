@@ -73,8 +73,8 @@ export function TaskDetailsDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <div className="flex items-center gap-3">
-            <div className="flex items-center">
-              <EmojiPicker value={emoji} onChange={handleEmojiChange} />
+            <div className="w-12">
+              <EmojiPicker value={emoji} onChange={handleEmojiChange} inline />
             </div>
             {isRenaming ? (
               <Input
