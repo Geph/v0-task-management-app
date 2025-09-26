@@ -1,7 +1,6 @@
 "use client"
 
 import { Check, Settings } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -50,24 +49,21 @@ export function PriorityDropdown({
         console.log("[v0] Priority dropdown open state changed:", open)
       }}
     >
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className={`h-auto p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
-          onClick={() => console.log("[v0] Priority dropdown trigger clicked")}
+      <DropdownMenuTrigger
+        className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:text-accent-foreground dark:hover:bg-accent/50 has-[>svg]:px-3 p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
+        onClick={() => console.log("[v0] Priority dropdown trigger clicked")}
+      >
+        <Badge
+          className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
+            fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
+          } ${currentPriority.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
+          style={{
+            backgroundColor: currentPriority.key === "blank" ? "#ffffff" : currentPriority.color,
+            borderColor: currentPriority.key === "blank" ? "#d1d5db" : currentPriority.color,
+          }}
         >
-          <Badge
-            className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
-              fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
-            } ${currentPriority.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
-            style={{
-              backgroundColor: currentPriority.key === "blank" ? "#ffffff" : currentPriority.color,
-              borderColor: currentPriority.key === "blank" ? "#d1d5db" : currentPriority.color,
-            }}
-          >
-            {currentPriority.label}
-          </Badge>
-        </Button>
+          {currentPriority.label}
+        </Badge>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-32" sideOffset={4} onCloseAutoFocus={(e) => e.preventDefault()}>
         {allOptions.map((option) => (

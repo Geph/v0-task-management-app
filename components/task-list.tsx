@@ -1,5 +1,7 @@
 "use client"
 
+import { DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+
 import type React from "react"
 
 import {
@@ -28,7 +30,7 @@ import { TaskDetailsDialog } from "@/components/task-details-dialog"
 import { AddSectionDialog } from "@/components/add-section-dialog"
 import { RemoveSectionDialog } from "@/components/remove-section-dialog"
 import { RocketIcon } from "@/components/rocket-icon"
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem } from "@/components/ui/dropdown-menu"
 import { MergeTasksDialog } from "@/components/merge-tasks-dialog"
 import { EmojiPicker } from "@/components/enhanced-emoji-picker" // Updated import
 import { FileAttachmentComponent } from "@/components/file-attachment"
@@ -1197,17 +1199,13 @@ export function TaskList() {
                   console.log("[v0] Section actions dropdown open state changed:", open, "for section:", section.name)
                 }}
               >
-                <DropdownMenuTrigger asChild>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-muted-foreground cursor-pointer"
-                    onClick={() =>
-                      console.log("[v0] Section actions dropdown trigger clicked for section:", section.name)
-                    }
-                  >
-                    <MoreHorizontal className="w-4 h-4" />
-                  </Button>
+                <DropdownMenuTrigger
+                  className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:text-accent-foreground dark:hover:bg-accent/50 h-9 px-3 text-muted-foreground cursor-pointer"
+                  onClick={() =>
+                    console.log("[v0] Section actions dropdown trigger clicked for section:", section.name)
+                  }
+                >
+                  <MoreHorizontal className="w-4 h-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48">
                   <SectionRenameDialog

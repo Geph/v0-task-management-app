@@ -1,7 +1,6 @@
 "use client"
 
 import { Check, Settings } from "lucide-react"
-import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -44,24 +43,21 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
         console.log("[v0] Status dropdown open state changed:", open)
       }}
     >
-      <DropdownMenuTrigger asChild>
-        <Button
-          variant="ghost"
-          className={`h-auto p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
-          onClick={() => console.log("[v0] Status dropdown trigger clicked")}
+      <DropdownMenuTrigger
+        className={`inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive hover:text-accent-foreground dark:hover:bg-accent/50 has-[>svg]:px-3 p-0 hover:bg-transparent cursor-pointer ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
+        onClick={() => console.log("[v0] Status dropdown trigger clicked")}
+      >
+        <Badge
+          className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
+            fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
+          } ${currentStatus.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
+          style={{
+            backgroundColor: currentStatus.key === "blank" ? "#ffffff" : currentStatus.color,
+            borderColor: currentStatus.key === "blank" ? "#d1d5db" : currentStatus.color,
+          }}
         >
-          <Badge
-            className={`text-xs font-medium hover:opacity-80 cursor-pointer ${
-              fullWidth ? "w-full h-full flex items-center justify-center rounded-none border" : "rounded-full"
-            } ${currentStatus.key === "blank" ? "text-gray-500 border-gray-300" : "text-white"}`}
-            style={{
-              backgroundColor: currentStatus.key === "blank" ? "#ffffff" : currentStatus.color,
-              borderColor: currentStatus.key === "blank" ? "#d1d5db" : currentStatus.color,
-            }}
-          >
-            {currentStatus.label}
-          </Badge>
-        </Button>
+          {currentStatus.label}
+        </Badge>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-48" sideOffset={4} onCloseAutoFocus={(e) => e.preventDefault()}>
         {allOptions.map((option) => (
