@@ -453,14 +453,38 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
     setOpen(false)
   }
 
+  const handleOpenChange = (newOpen: boolean) => {
+    console.log("[v0] Emoji picker open state changing from", open, "to", newOpen)
+    setOpen(newOpen)
+  }
+
+  const handleTriggerClick = () => {
+    console.log("[v0] Emoji picker trigger clicked, current open state:", open)
+  }
+
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-8 h-8 p-0 text-lg cursor-pointer hover:bg-muted"
+          onClick={handleTriggerClick}
+        >
           {value || "😀"}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-96 p-3">
+      <PopoverContent
+        className="w-96 p-3 z-50"
+        side="bottom"
+        align="start"
+        onOpenAutoFocus={(e) => {
+          console.log("[v0] Emoji picker popover opened and focused")
+        }}
+        onCloseAutoFocus={(e) => {
+          console.log("[v0] Emoji picker popover closed and focus returned")
+        }}
+      >
         <div className="space-y-3">
           <div className="relative">
             <Search className="w-4 h-4 absolute left-2 top-1/2 transform -translate-y-1/2 text-muted-foreground" />

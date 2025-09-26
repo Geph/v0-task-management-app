@@ -324,4 +324,28 @@
     background-color: hsl(var(--primary));
     border-color: hsl(var(--primary));
   }
+
+  /* Added popover fixes for table containment issues */
+  /* Ensure popovers are not clipped by table containers */
+  [data-slot="popover-content"] {
+    z-index: 9999 !important;
+    position: fixed !important;
+  }
+
+  /* Ensure table containers don't create stacking contexts that interfere with popovers */
+  .table-container {
+    contain: none !important;
+    overflow: visible !important;
+  }
+
+  /* Fix for popover positioning in table cells */
+  [data-slot="popover-trigger"] {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* Ensure popover portal content is always visible */
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+  }
 }

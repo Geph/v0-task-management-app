@@ -46,6 +46,15 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
     fileInputRef.current?.click()
   }
 
+  const handleOpenChange = (newOpen: boolean) => {
+    console.log("[v0] File attachment popover open state changing from", open, "to", newOpen)
+    setOpen(newOpen)
+  }
+
+  const handleTriggerClick = () => {
+    console.log("[v0] File attachment trigger clicked, current open state:", open)
+  }
+
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return "0 Bytes"
     const k = 1024
@@ -55,9 +64,14 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
   }
 
   return (
-    <Popover open={open} onOpenChange={setOpen}>
+    <Popover open={open} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted">
+        <Button
+          variant="ghost"
+          size="sm"
+          className="w-8 h-8 p-0 relative cursor-pointer hover:bg-muted"
+          onClick={handleTriggerClick}
+        >
           <Paperclip className="w-4 h-4" />
           {attachments.length > 0 && (
             <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
@@ -66,7 +80,17 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
           )}
         </Button>
       </PopoverTrigger>
-      <PopoverContent className="w-80 p-3">
+      <PopoverContent
+        className="w-80 p-3 z-50"
+        side="bottom"
+        align="start"
+        onOpenAutoFocus={(e) => {
+          console.log("[v0] File attachment popover opened and focused")
+        }}
+        onCloseAutoFocus={(e) => {
+          console.log("[v0] File attachment popover closed and focus returned")
+        }}
+      >
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="font-medium">File Attachments</h4>

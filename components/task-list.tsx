@@ -1327,7 +1327,7 @@ export function TaskList() {
         </div>
       </div>
 
-      <div className="p-4" ref={tableRef}>
+      <div className="p-4 table-container" ref={tableRef}>
         {sections.map((section) => (
           <div key={section.id} className="mb-6">
             <div className="flex items-center gap-2 mb-4">
@@ -1426,10 +1426,15 @@ export function TaskList() {
                       </div>
 
                       <div className="flex items-center" style={{ width: `${columnWidths.emoji}%` }}>
-                        <EmojiPicker
-                          value={task.emoji}
-                          onChange={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
-                        />
+                        <div onClick={() => console.log("[v0] Emoji picker container clicked in table row")}>
+                          <EmojiPicker
+                            value={task.emoji}
+                            onChange={(emoji) => {
+                              console.log("[v0] Emoji changed in table row:", emoji)
+                              updateTaskEmoji(section.id, task.id, emoji)
+                            }}
+                          />
+                        </div>
                       </div>
 
                       <div className="flex items-center" style={{ width: `${columnWidths.name}%` }}>
