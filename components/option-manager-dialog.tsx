@@ -3,7 +3,14 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -112,6 +119,9 @@ export function OptionManagerDialog({ title, options, onUpdateOptions, children 
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle>Manage {title} Options</DialogTitle>
+          <DialogDescription>
+            Add, edit, remove, and reorder {title.toLowerCase()} options. Drag items to reorder them.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div className="relative">

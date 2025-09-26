@@ -3,7 +3,14 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -32,6 +39,9 @@ export function MergeTasksDialog({ children, selectedTaskNames, onMerge }: Merge
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Merge Tasks</DialogTitle>
+          <DialogDescription>
+            Combine multiple selected tasks into a single task. Enter a name for the merged task below.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>

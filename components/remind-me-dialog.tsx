@@ -3,7 +3,14 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -39,6 +46,9 @@ export function RemindMeDialog({ children, taskName, onSetReminder }: RemindMeDi
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Set Reminder</DialogTitle>
+          <DialogDescription>
+            Set up an email reminder for this task. You'll receive a notification at the specified date and time.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>

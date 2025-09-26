@@ -447,10 +447,20 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
       })
     : EMOJI_CATEGORIES[activeTab as keyof typeof EMOJI_CATEGORIES] || []
 
+  const handleEmojiSelect = (emoji: string) => {
+    console.log("[v0] Emoji selected:", emoji)
+    onChange(emoji)
+    setOpen(false)
+  }
+
+  const handleTriggerClick = () => {
+    console.log("[v0] Emoji picker trigger clicked, current open state:", open)
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 text-lg">
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 text-lg" onClick={handleTriggerClick}>
           {value || "😀"}
         </Button>
       </PopoverTrigger>
@@ -506,10 +516,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
                         variant="ghost"
                         size="sm"
                         className="w-8 h-8 p-0 text-lg hover:bg-muted"
-                        onClick={() => {
-                          onChange(emoji)
-                          setOpen(false)
-                        }}
+                        onClick={() => handleEmojiSelect(emoji)}
                       >
                         {emoji}
                       </Button>
@@ -526,10 +533,7 @@ export function EmojiPicker({ value, onChange }: EmojiPickerProps) {
                   variant="ghost"
                   size="sm"
                   className="w-8 h-8 p-0 text-lg hover:bg-muted"
-                  onClick={() => {
-                    onChange(emoji)
-                    setOpen(false)
-                  }}
+                  onClick={() => handleEmojiSelect(emoji)}
                 >
                   {emoji}
                 </Button>

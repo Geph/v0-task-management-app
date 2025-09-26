@@ -6,7 +6,14 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Settings, Upload, Download, Lock, RotateCcw } from "lucide-react"
 import { ExportImportDialog } from "@/components/export-import-dialog"
 import { ColumnOrderSettings } from "@/components/column-order-settings"
@@ -114,6 +121,9 @@ export function SettingsDialog({
             <Settings className="w-5 h-5" />
             Settings
           </DialogTitle>
+          <DialogDescription>
+            Configure your app settings including appearance, columns, security, and data management.
+          </DialogDescription>
         </DialogHeader>
 
         <Tabs defaultValue="general" className="w-full">

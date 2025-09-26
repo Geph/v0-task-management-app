@@ -4,7 +4,14 @@ import type React from "react"
 import { Input } from "@/components/ui/input"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Download, Upload } from "lucide-react"
@@ -152,6 +159,9 @@ export function ExportImportDialog({
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>Export / Import Configuration</DialogTitle>
+          <DialogDescription>
+            Export your current configuration to share with others or import a configuration from XML data or URL.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-6">
           <div>

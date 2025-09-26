@@ -3,7 +3,14 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -31,6 +38,9 @@ export function SectionRenameDialog({ currentName, onRename, children }: Section
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>Rename Section</DialogTitle>
+          <DialogDescription>
+            Change the name of this section. The new name will be displayed in the task list.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>

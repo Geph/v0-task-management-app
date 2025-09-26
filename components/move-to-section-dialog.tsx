@@ -2,7 +2,14 @@
 
 import type React from "react"
 
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 
 interface Section {
@@ -23,6 +30,9 @@ export function MoveToSectionDialog({ sections, onMove, children }: MoveToSectio
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>Move to Section</DialogTitle>
+          <DialogDescription>
+            Select a section to move this task to. Choose from the available sections below.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-2">
           {sections.map((section) => (

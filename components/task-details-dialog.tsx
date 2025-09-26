@@ -3,7 +3,14 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { RichTextEditor } from "@/components/rich-text-editor"
@@ -35,6 +42,9 @@ export function TaskDetailsDialog({ taskName, taskNotes, onUpdateNotes, children
       <DialogContent className="max-w-2xl">
         <DialogHeader>
           <DialogTitle>{taskName}</DialogTitle>
+          <DialogDescription>
+            View and edit detailed notes for this task. Use the rich text editor to format your notes.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>

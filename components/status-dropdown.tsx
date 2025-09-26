@@ -33,12 +33,22 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
 
   const currentStatus = allOptions.find((option) => option.key === value) || allOptions[0]
 
+  const handleStatusChange = (status: StatusType) => {
+    console.log("[v0] Status dropdown clicked:", status)
+    onChange(status)
+  }
+
+  const handleTriggerClick = () => {
+    console.log("[v0] Status dropdown trigger clicked")
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button
           variant="ghost"
           className={`h-auto p-0 hover:bg-transparent ${fullWidth ? "w-full h-full min-h-[32px]" : ""}`}
+          onClick={handleTriggerClick}
         >
           <Badge
             className={`text-xs font-medium hover:opacity-80 ${
@@ -57,7 +67,7 @@ export function StatusDropdown({ value, onChange, options, onUpdateOptions, full
         {allOptions.map((option) => (
           <DropdownMenuItem
             key={option.key}
-            onClick={() => onChange(option.key)}
+            onClick={() => handleStatusChange(option.key)}
             className="flex items-center justify-between"
           >
             <div className="flex items-center gap-2">

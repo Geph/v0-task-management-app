@@ -3,7 +3,14 @@
 import type React from "react"
 
 import { useState } from "react"
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+} from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -52,6 +59,9 @@ export function EmailTaskDialog({ children, taskName, taskNotes, onSendEmail }: 
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>Send Task via Email</DialogTitle>
+          <DialogDescription>
+            Share this task with others via email. Select a recipient, customize the subject and message, then send.
+          </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
           <div>

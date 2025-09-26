@@ -26,8 +26,10 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("[v0] File input changed")
     const file = event.target.files?.[0]
     if (file) {
+      console.log("[v0] File selected:", file.name, file.size)
       if (file.size > 5 * 1024 * 1024) {
         // 5MB limit
         alert("File size must be under 5MB")
@@ -38,6 +40,15 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
     if (fileInputRef.current) {
       fileInputRef.current.value = ""
     }
+  }
+
+  const handleTriggerClick = () => {
+    console.log("[v0] File attachment trigger clicked, current open state:", open)
+  }
+
+  const handleAddFileClick = () => {
+    console.log("[v0] Add file button clicked")
+    fileInputRef.current?.click()
   }
 
   const formatFileSize = (bytes: number) => {
@@ -51,7 +62,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 relative">
+        <Button variant="ghost" size="sm" className="w-8 h-8 p-0 relative" onClick={handleTriggerClick}>
           <Paperclip className="w-4 h-4" />
           {attachments.length > 0 && (
             <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-4 h-4 flex items-center justify-center">
@@ -64,7 +75,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
         <div className="space-y-3">
           <div className="flex items-center justify-between">
             <h4 className="font-medium">File Attachments</h4>
-            <Button variant="outline" size="sm" onClick={() => fileInputRef.current?.click()}>
+            <Button variant="outline" size="sm" onClick={handleAddFileClick}>
               <Paperclip className="w-4 h-4 mr-1" />
               Add File
             </Button>
