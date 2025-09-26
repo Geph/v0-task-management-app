@@ -325,63 +325,10 @@
     border-color: hsl(var(--primary));
   }
 
-  /* Complete rewrite of popover positioning strategy */
-  /* Reset all positioning contexts that might interfere */
-  .table-container,
-  .table-container * {
-    contain: none !important;
-    transform: none !important;
-    will-change: auto !important;
-  }
-
-  /* Force Radix popovers to use viewport positioning */
-  [data-radix-popper-content-wrapper] {
-    position: fixed !important;
-    z-index: 50 !important;
-    pointer-events: auto !important;
-  }
-
-  /* Ensure dropdown menus are properly positioned */
-  [data-radix-dropdown-menu-content] {
-    position: fixed !important;
-    z-index: 50 !important;
-    pointer-events: auto !important;
-  }
-
-  /* Force all popover content to use fixed positioning */
+  /* Removed aggressive CSS overrides that were causing popovers to disappear */
+  /* Simplified approach - let Radix UI handle positioning naturally */
+  [data-radix-dropdown-menu-content],
   [data-radix-popover-content] {
-    position: fixed !important;
-    z-index: 50 !important;
-    pointer-events: auto !important;
-  }
-
-  /* Override any table-specific styles that might interfere */
-  table,
-  tbody,
-  tr,
-  td {
-    contain: none !important;
-    transform: none !important;
-    position: static !important;
-  }
-
-  /* Ensure triggers are properly positioned for calculation */
-  [data-radix-dropdown-menu-trigger],
-  [data-radix-popover-trigger] {
-    position: relative !important;
-    z-index: 1 !important;
-  }
-
-  /* Force proper stacking and positioning for all Radix components */
-  [data-radix-portal] {
-    position: fixed !important;
-    top: 0 !important;
-    left: 0 !important;
-    z-index: 50 !important;
-    pointer-events: none !important;
-  }
-
-  [data-radix-portal] > * {
-    pointer-events: auto !important;
+    z-index: 50;
   }
 }
