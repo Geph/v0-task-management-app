@@ -402,7 +402,8 @@ export function TaskList() {
       return {
         checkbox: "8%",
         emoji: "10%",
-        name: "82%", // Take up most of the width on mobile
+        name: "60%", // Reduced to make room for files column inline
+        attachments: "22%", // Added files column for mobile inline display
       }
     }
 
@@ -438,7 +439,7 @@ export function TaskList() {
     columnOrder.forEach((columnId) => {
       switch (columnId) {
         case "attachments":
-          if (columnVisibility.attachments) dynamicColumns.attachments = `${Math.max(columnWidth, 8)}%`
+          if (columnVisibility.attachments) dynamicColumns.attachments = "6%"
           break
         case "status":
           if (columnVisibility.status) dynamicColumns.status = `${Math.max(columnWidth, 15)}%`
@@ -1097,6 +1098,25 @@ export function TaskList() {
   }
 
   const renderMobileTaskRow = (task: Task, section: { id: string }) => {
+    const mobileColumns = columnOrder.filter((columnId) => {
+      switch (columnId) {
+        case "attachments":
+          return columnVisibility.attachments
+        case "status":
+          return columnVisibility.status
+        case "priority":
+          return columnVisibility.priority
+        case "progress":
+          return columnVisibility.progress
+        case "due":
+          return columnVisibility.due
+        case "who":
+          return columnVisibility.who
+        default:
+          return false
+      }
+    })
+
     return (
       <div
         key={task.id}
@@ -1104,7 +1124,7 @@ export function TaskList() {
           task.completed ? "opacity-60" : ""
         } ${selectedTasks.has(task.id) ? "bg-blue-50" : ""}`}
       >
-        {/* Main row with checkbox, emoji, and name */}
+        {/* Main row with checkbox, emoji, name, and files */}
         <div className="flex items-center gap-3 mb-2">
           <Checkbox checked={selectedTasks.has(task.id)} onCheckedChange={() => toggleTaskSelection(task.id)} />
 
@@ -1170,13 +1190,9 @@ export function TaskList() {
               </TaskDetailsDialog>
             )}
           </div>
-        </div>
 
-        {/* Stacked columns below the name */}
-        <div className="grid grid-cols-2 gap-2 ml-12 text-xs">
           {columnVisibility.attachments && (
-            <div className="flex items-center gap-1">
-              <span className="text-muted-foreground font-medium">Files:</span>
+            <div className="flex items-center">
               <FileAttachmentComponent
                 attachments={task.attachments}
                 onAddAttachment={(file) => addTaskAttachment(section.id, task.id, file)}
@@ -1184,71 +1200,89 @@ export function TaskList() {
               />
             </div>
           )}
-
-          {columnVisibility.status && (
-            <div className="flex items-center gap-1">
-              <span className="text-muted-foreground font-medium">Status:</span>
-              <div className="flex-1">
-                <StatusDropdown
-                  value={task.status}
-                  onChange={(status) => updateTaskStatus(section.id, task.id, status)}
-                  options={statusOptions}
-                  onUpdateOptions={setStatusOptions}
-                  fullWidth
-                />
-              </div>
-            </div>
-          )}
-
-          {columnVisibility.priority && (
-            <div className="flex items-center gap-1">
-              <span className="text-muted-foreground font-medium">Priority:</span>
-              <div className="flex-1">
-                <PriorityDropdown
-                  value={task.priority}
-                  onChange={(priority) => updateTaskPriority(section.id, task.id, priority)}
-                  options={priorityOptions}
-                  onUpdateOptions={setPriorityOptions}
-                  fullWidth
-                />
-              </div>
-            </div>
-          )}
-
-          {columnVisibility.progress && (
-            <div className="flex items-center gap-1">
-              <span className="text-muted-foreground font-medium">Progress:</span>
-              <div className="flex-1">
-                <ProgressBar
-                  value={task.progress}
-                  onChange={(progress) => updateTaskProgress(section.id, task.id, progress)}
-                />
-              </div>
-            </div>
-          )}
-
-          {columnVisibility.due && (
-            <div className="flex items-center gap-1">
-              <span className="text-muted-foreground font-medium">Due:</span>
-              <DueDatePicker
-                value={task.dueDate}
-                onChange={(dueDate) => updateTaskDueDate(section.id, task.id, dueDate)}
-              />
-            </div>
-          )}
-
-          {columnVisibility.who && (
-            <div className="flex items-center gap-1">
-              <span className="text-muted-foreground font-medium">Who:</span>
-              <div className="flex-1">
-                <WhoField
-                  value={task.assignedTo}
-                  onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
-                />
-              </div>
-            </div>
-          )}
         </div>
+
+        {mobileColumns.filter((col) => col !== "attachments").length > 0 && (
+          <div className="grid grid-cols-2 gap-2 ml-12 text-xs">
+            {mobileColumns
+              .map((columnId) => {
+                switch (columnId) {
+                  case "status":
+                    return columnVisibility.status ? (
+                      <div key="status" className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium">Status:</span>
+                        <div className="flex-1">
+                          <StatusDropdown
+                            value={task.status}
+                            onChange={(status) => updateTaskStatus(section.id, task.id, status)}
+                            options={statusOptions}
+                            onUpdateOptions={setStatusOptions}
+                            fullWidth
+                          />
+                        </div>
+                      </div>
+                    ) : null
+
+                  case "priority":
+                    return columnVisibility.priority ? (
+                      <div key="priority" className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium">Priority:</span>
+                        <div className="flex-1">
+                          <PriorityDropdown
+                            value={task.priority}
+                            onChange={(priority) => updateTaskPriority(section.id, task.id, priority)}
+                            options={priorityOptions}
+                            onUpdateOptions={setPriorityOptions}
+                            fullWidth
+                          />
+                        </div>
+                      </div>
+                    ) : null
+
+                  case "progress":
+                    return columnVisibility.progress ? (
+                      <div key="progress" className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium">Progress:</span>
+                        <div className="flex-1">
+                          <ProgressBar
+                            value={task.progress}
+                            onChange={(progress) => updateTaskProgress(section.id, task.id, progress)}
+                          />
+                        </div>
+                      </div>
+                    ) : null
+
+                  case "due":
+                    return columnVisibility.due ? (
+                      <div key="due" className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium">Due:</span>
+                        <DueDatePicker
+                          value={task.dueDate}
+                          onChange={(dueDate) => updateTaskDueDate(section.id, task.id, dueDate)}
+                        />
+                      </div>
+                    ) : null
+
+                  case "who":
+                    return columnVisibility.who ? (
+                      <div key="who" className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium">Who:</span>
+                        <div className="flex-1">
+                          <WhoField
+                            value={task.assignedTo}
+                            onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
+                          />
+                        </div>
+                      </div>
+                    ) : null
+
+                  default:
+                    return null
+                }
+              })
+              .filter(Boolean)}
+          </div>
+        )}
       </div>
     )
   }
