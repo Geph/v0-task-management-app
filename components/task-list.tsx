@@ -38,6 +38,7 @@ import { SettingsDialog } from "@/components/settings-dialog" // Added import
 import { ProgressBar } from "@/components/progress-bar"
 import { DueDatePicker } from "@/components/due-date-picker"
 import { WhoField } from "@/components/who-field"
+import { useIsMobile } from "@/hooks/use-mobile" // Added mobile hook import
 
 interface Task {
   id: string
@@ -394,34 +395,66 @@ export function TaskList() {
     }
   }, [])
 
+  const isMobile = useIsMobile()
+
   const calculateColumnWidths = () => {
-    const baseColumns = {
-      checkbox: 40,
-      emoji: 40,
-      name: 300,
+    if (isMobile) {
+      return {
+        checkbox: "8%",
+        emoji: "10%",
+        name: "60%", // Reduced to make room for files column inline
+        attachments: "22%", // Added files column for mobile inline display
+      }
     }
 
-    const dynamicColumns: Record<string, number> = {}
+    const baseColumns = {
+      checkbox: "5%",
+      emoji: "8%",
+      name: "35%",
+    }
+
+    const dynamicColumns: Record<string, string> = {}
+    const visibleColumns = columnOrder.filter((columnId) => {
+      switch (columnId) {
+        case "attachments":
+          return columnVisibility.attachments
+        case "status":
+          return columnVisibility.status
+        case "priority":
+          return columnVisibility.priority
+        case "progress":
+          return columnVisibility.progress
+        case "due":
+          return columnVisibility.due
+        case "who":
+          return columnVisibility.who
+        default:
+          return false
+      }
+    })
+
+    const remainingWidth = 52 // 100% - 5% - 8% - 35%
+    const columnWidth = remainingWidth / visibleColumns.length
 
     columnOrder.forEach((columnId) => {
       switch (columnId) {
         case "attachments":
-          if (columnVisibility.attachments) dynamicColumns.attachments = 60
+          if (columnVisibility.attachments) dynamicColumns.attachments = "6%"
           break
         case "status":
-          if (columnVisibility.status) dynamicColumns.status = 150
+          if (columnVisibility.status) dynamicColumns.status = `${Math.max(columnWidth, 15)}%`
           break
         case "priority":
-          if (columnVisibility.priority) dynamicColumns.priority = 150
+          if (columnVisibility.priority) dynamicColumns.priority = `${Math.max(columnWidth, 15)}%`
           break
         case "progress":
-          if (columnVisibility.progress) dynamicColumns.progress = 120
+          if (columnVisibility.progress) dynamicColumns.progress = `${Math.max(columnWidth, 12)}%`
           break
         case "due":
-          if (columnVisibility.due) dynamicColumns.due = 100
+          if (columnVisibility.due) dynamicColumns.due = `${Math.max(columnWidth, 10)}%`
           break
         case "who":
-          if (columnVisibility.who) dynamicColumns.who = 120
+          if (columnVisibility.who) dynamicColumns.who = `${Math.max(columnWidth, 12)}%`
           break
       }
     })
@@ -495,7 +528,7 @@ export function TaskList() {
 
   useEffect(() => {
     setColumnWidths(calculateColumnWidths())
-  }, [columnVisibility, columnOrder])
+  }, [columnVisibility, columnOrder, isMobile]) // Added isMobile to dependency array
 
   const toggleSection = (sectionId: string) => {
     setSections(
@@ -953,7 +986,7 @@ export function TaskList() {
   const renderTaskColumns = (task: Task, section: { id: string }) => {
     const columnComponents: Record<string, React.JSX.Element> = {
       attachments: columnVisibility.attachments ? ( // Added visibility check for attachments
-        <div className="flex items-center justify-center" style={{ width: `${columnWidths.attachments}px` }}>
+        <div className="flex items-center justify-center" style={{ width: columnWidths.attachments }}>
           <FileAttachmentComponent
             attachments={task.attachments}
             onAddAttachment={(file) => addTaskAttachment(section.id, task.id, file)}
@@ -962,7 +995,7 @@ export function TaskList() {
         </div>
       ) : null,
       status: columnVisibility.status ? ( // Added visibility check for status
-        <div className="flex items-stretch" style={{ width: `${columnWidths.status}px` }}>
+        <div className="flex items-stretch" style={{ width: columnWidths.status }}>
           <div className="w-full">
             <StatusDropdown
               value={task.status}
@@ -975,7 +1008,7 @@ export function TaskList() {
         </div>
       ) : null,
       priority: columnVisibility.priority ? ( // Added visibility check for priority
-        <div className="flex items-stretch" style={{ width: `${columnWidths.priority}px` }}>
+        <div className="flex items-stretch" style={{ width: columnWidths.priority }}>
           <div className="w-full">
             <PriorityDropdown
               value={task.priority}
@@ -988,7 +1021,7 @@ export function TaskList() {
         </div>
       ) : null,
       progress: columnVisibility.progress ? (
-        <div className="flex items-center" style={{ width: `${columnWidths.progress}px` }}>
+        <div className="flex items-center" style={{ width: columnWidths.progress }}>
           <ProgressBar
             value={task.progress}
             onChange={(progress) => updateTaskProgress(section.id, task.id, progress)}
@@ -996,12 +1029,12 @@ export function TaskList() {
         </div>
       ) : null,
       due: columnVisibility.due ? (
-        <div className="flex items-center" style={{ width: `${columnWidths.due}px` }}>
+        <div className="flex items-center" style={{ width: columnWidths.due }}>
           <DueDatePicker value={task.dueDate} onChange={(dueDate) => updateTaskDueDate(section.id, task.id, dueDate)} />
         </div>
       ) : null,
       who: columnVisibility.who ? (
-        <div className="flex items-center" style={{ width: `${columnWidths.who}px` }}>
+        <div className="flex items-center" style={{ width: columnWidths.who }}>
           <WhoField
             value={task.assignedTo}
             onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
@@ -1016,10 +1049,7 @@ export function TaskList() {
   const renderColumnHeaders = () => {
     const headerComponents: Record<string, React.JSX.Element> = {
       attachments: columnVisibility.attachments ? ( // Added visibility check for attachments header
-        <div
-          className="flex items-center justify-center gap-1 relative"
-          style={{ width: `${columnWidths.attachments}px` }}
-        >
+        <div className="flex items-center justify-center gap-1 relative" style={{ width: columnWidths.attachments }}>
           <div className="flex items-center justify-center w-full">
             <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
               <path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48" />
@@ -1030,7 +1060,7 @@ export function TaskList() {
       status: columnVisibility.status ? ( // Added visibility check for status header
         <div
           className="flex items-center justify-center gap-1 cursor-pointer relative"
-          style={{ width: `${columnWidths.status}px` }}
+          style={{ width: columnWidths.status }}
           onClick={() => handleSort("status")}
         >
           Status
@@ -1040,7 +1070,7 @@ export function TaskList() {
       priority: columnVisibility.priority ? ( // Added visibility check for priority header
         <div
           className="flex items-center justify-center gap-1 cursor-pointer relative"
-          style={{ width: `${columnWidths.priority}px` }}
+          style={{ width: columnWidths.priority }}
           onClick={() => handleSort("priority")}
         >
           Priority
@@ -1048,26 +1078,219 @@ export function TaskList() {
         </div>
       ) : null,
       progress: columnVisibility.progress ? (
-        <div
-          className="flex items-center justify-center gap-1 relative"
-          style={{ width: `${columnWidths.progress}px` }}
-        >
+        <div className="flex items-center justify-center gap-1 relative" style={{ width: columnWidths.progress }}>
           Progress
         </div>
       ) : null,
       due: columnVisibility.due ? (
-        <div className="flex items-center justify-center gap-1 relative" style={{ width: `${columnWidths.due}px` }}>
+        <div className="flex items-center justify-center gap-1 relative" style={{ width: columnWidths.due }}>
           Due
         </div>
       ) : null,
       who: columnVisibility.who ? (
-        <div className="flex items-center justify-center gap-1 relative" style={{ width: `${columnWidths.who}px` }}>
+        <div className="flex items-center justify-center gap-1 relative" style={{ width: columnWidths.who }}>
           Who
         </div>
       ) : null,
     }
 
     return columnOrder.map((columnId) => headerComponents[columnId]).filter(Boolean)
+  }
+
+  const renderMobileTaskRow = (task: Task, section: { id: string }) => {
+    const mobileColumns = columnOrder.filter((columnId) => {
+      switch (columnId) {
+        case "attachments":
+          return columnVisibility.attachments
+        case "status":
+          return columnVisibility.status
+        case "priority":
+          return columnVisibility.priority
+        case "progress":
+          return columnVisibility.progress
+        case "due":
+          return columnVisibility.due
+        case "who":
+          return columnVisibility.who
+        default:
+          return false
+      }
+    })
+
+    return (
+      <div
+        key={task.id}
+        className={`p-2 hover:bg-muted/50 border-b border-border/50 ${
+          // reduced padding from p-3 to p-2
+          task.completed ? "opacity-60" : ""
+        } ${selectedTasks.has(task.id) ? "bg-blue-50" : ""}`}
+      >
+        {/* Main row with checkbox, emoji, name, and files */}
+        <div className="flex items-center gap-3 mb-1">
+          {" "}
+          {/* reduced margin bottom from mb-2 to mb-1 */}
+          <Checkbox checked={selectedTasks.has(task.id)} onCheckedChange={() => toggleTaskSelection(task.id)} />
+          <div onClick={() => console.log("[v0] Emoji picker container clicked in mobile row")}>
+            <EmojiPicker
+              value={task.emoji}
+              onChange={(emoji) => {
+                console.log("[v0] Emoji changed in mobile row:", emoji)
+                updateTaskEmoji(section.id, task.id, emoji)
+              }}
+            />
+          </div>
+          <div className="flex-1">
+            {editingTaskId === task.id ? (
+              <Input
+                value={task.name}
+                onChange={(e) => {
+                  const newName = e.target.value
+                  setSections(
+                    sections.map((section) =>
+                      section.id === section.id
+                        ? {
+                            ...section,
+                            tasks: section.tasks.map((t) => (t.id === task.id ? { ...t, name: newName } : t)),
+                          }
+                        : section,
+                    ),
+                  )
+                }}
+                onBlur={() => {
+                  if (task.name.trim()) {
+                    renameTask(section.id, task.id, task.name.trim())
+                  } else {
+                    renameTask(section.id, task.id, "New Task")
+                  }
+                }}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.currentTarget.blur()
+                  }
+                }}
+                autoFocus
+                className="text-sm h-8"
+              />
+            ) : (
+              <TaskDetailsDialog
+                taskName={task.name}
+                taskNotes={task.notes}
+                taskEmoji={task.emoji}
+                onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
+                onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                onDuplicateTask={() => duplicateTask(section.id, task.id)}
+              >
+                <span
+                  className={`text-sm cursor-pointer hover:bg-muted/50 px-2 py-1 rounded flex-1 block ${
+                    task.completed ? "line-through" : ""
+                  }`}
+                >
+                  {task.name}
+                </span>
+              </TaskDetailsDialog>
+            )}
+          </div>
+          {columnVisibility.attachments && (
+            <div className="flex items-center">
+              <FileAttachmentComponent
+                attachments={task.attachments}
+                onAddAttachment={(file) => addTaskAttachment(section.id, task.id, file)}
+                onRemoveAttachment={(attachmentId) => removeTaskAttachment(section.id, task.id, attachmentId)}
+              />
+            </div>
+          )}
+        </div>
+
+        {mobileColumns.filter((col) => col !== "attachments").length > 0 && (
+          <div className="grid grid-cols-2 gap-1 ml-12 text-xs">
+            {" "}
+            {/* reduced gap from gap-2 to gap-1 */}
+            {mobileColumns
+              .map((columnId) => {
+                switch (columnId) {
+                  case "status":
+                    return columnVisibility.status ? (
+                      <div key="status" className="flex items-center">
+                        {" "}
+                        {/* removed label and gap-1 */}
+                        <div className="flex-1">
+                          <StatusDropdown
+                            value={task.status}
+                            onChange={(status) => updateTaskStatus(section.id, task.id, status)}
+                            options={statusOptions}
+                            onUpdateOptions={setStatusOptions}
+                            fullWidth
+                            mobileHeight // added mobile height prop
+                          />
+                        </div>
+                      </div>
+                    ) : null
+
+                  case "priority":
+                    return columnVisibility.priority ? (
+                      <div key="priority" className="flex items-center">
+                        {" "}
+                        {/* removed label and gap-1 */}
+                        <div className="flex-1">
+                          <PriorityDropdown
+                            value={task.priority}
+                            onChange={(priority) => updateTaskPriority(section.id, task.id, priority)}
+                            options={priorityOptions}
+                            onUpdateOptions={setPriorityOptions}
+                            fullWidth
+                            mobileHeight // added mobile height prop
+                          />
+                        </div>
+                      </div>
+                    ) : null
+
+                  case "progress":
+                    return columnVisibility.progress ? (
+                      <div key="progress" className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium">Progress:</span>
+                        <div className="flex-1">
+                          <ProgressBar
+                            value={task.progress}
+                            onChange={(progress) => updateTaskProgress(section.id, task.id, progress)}
+                          />
+                        </div>
+                      </div>
+                    ) : null
+
+                  case "due":
+                    return columnVisibility.due ? (
+                      <div key="due" className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium">Due:</span>
+                        <DueDatePicker
+                          value={task.dueDate}
+                          onChange={(dueDate) => updateTaskDueDate(section.id, task.id, dueDate)}
+                        />
+                      </div>
+                    ) : null
+
+                  case "who":
+                    return columnVisibility.who ? (
+                      <div key="who" className="flex items-center gap-1">
+                        <span className="text-muted-foreground font-medium">Who:</span>
+                        <div className="flex-1">
+                          <WhoField
+                            value={task.assignedTo}
+                            onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
+                          />
+                        </div>
+                      </div>
+                    ) : null
+
+                  default:
+                    return null
+                }
+              })
+              .filter(Boolean)}
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -1143,7 +1366,7 @@ export function TaskList() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {selectedTasks.size > 0 && (
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <Button variant="outline" size="sm" onClick={deleteSelectedTasks} className="gap-1 bg-transparent">
                   <Trash2 className="w-4 h-4" />
                   Delete ({selectedTasks.size})
@@ -1242,111 +1465,120 @@ export function TaskList() {
 
             {section.expanded && (
               <>
-                <div
-                  className="flex gap-1 px-4 py-2 text-sm text-muted-foreground border-b border-border"
-                  style={{
-                    minWidth: `${Object.values(columnWidths).reduce((sum, width) => sum + width, 0)}px`,
-                  }}
-                >
-                  <div style={{ width: `${columnWidths.checkbox}px` }}>☑️</div>
-                  <div style={{ width: `${columnWidths.emoji}px` }}>😀</div>
-                  <div className="flex items-center gap-1 relative" style={{ width: `${columnWidths.name}px` }}>
-                    Name
+                {isMobile ? (
+                  // Mobile layout - stacked cards
+                  <div className="space-y-0.5">
+                    {" "}
+                    {/* reduced spacing from space-y-1 to space-y-0.5 */}
+                    {section.tasks
+                      .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                      .sort((a, b) => (sortTasks([a, b])[0] === a ? -1 : 1))
+                      .map((task) => renderMobileTaskRow(task, section))}
                   </div>
-                  {renderColumnHeaders()}
-                </div>
-
-                {section.tasks
-                  .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                  .sort((a, b) => (sortTasks([a, b])[0] === a ? -1 : 1))
-                  .map((task) => (
-                    <div
-                      key={task.id}
-                      className={`flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 ${
-                        task.completed ? "opacity-60" : ""
-                      } ${selectedTasks.has(task.id) ? "bg-blue-50" : ""}`}
-                      style={{
-                        minHeight: "32px",
-                        minWidth: `${Object.values(columnWidths).reduce((sum, width) => sum + width, 0)}px`,
-                      }}
-                    >
-                      <div className="flex items-center" style={{ width: `${columnWidths.checkbox}px` }}>
-                        <Checkbox
-                          checked={selectedTasks.has(task.id)}
-                          onCheckedChange={() => toggleTaskSelection(task.id)}
-                        />
+                ) : (
+                  // Desktop layout - table
+                  <>
+                    <div className="flex gap-1 px-4 py-2 text-sm text-muted-foreground border-b border-border overflow-x-auto">
+                      <div style={{ width: columnWidths.checkbox }}>☑️</div>
+                      <div style={{ width: columnWidths.emoji }}>😀</div>
+                      <div className="flex items-center gap-1 relative" style={{ width: columnWidths.name }}>
+                        Name
                       </div>
-
-                      <div className="flex items-center" style={{ width: `${columnWidths.emoji}px` }}>
-                        <div onClick={() => console.log("[v0] Emoji picker container clicked in table row")}>
-                          <EmojiPicker
-                            value={task.emoji}
-                            onChange={(emoji) => {
-                              console.log("[v0] Emoji changed in table row:", emoji)
-                              updateTaskEmoji(section.id, task.id, emoji)
-                            }}
-                          />
-                        </div>
-                      </div>
-
-                      <div className="flex items-center" style={{ width: `${columnWidths.name}px` }}>
-                        {editingTaskId === task.id ? (
-                          <Input
-                            value={task.name}
-                            onChange={(e) => {
-                              const newName = e.target.value
-                              setSections(
-                                sections.map((section) =>
-                                  section.id === section.id
-                                    ? {
-                                        ...section,
-                                        tasks: section.tasks.map((t) =>
-                                          t.id === task.id ? { ...t, name: newName } : t,
-                                        ),
-                                      }
-                                    : section,
-                                ),
-                              )
-                            }}
-                            onBlur={() => {
-                              if (task.name.trim()) {
-                                renameTask(section.id, task.id, task.name.trim())
-                              } else {
-                                renameTask(section.id, task.id, "New Task")
-                              }
-                            }}
-                            onKeyDown={(e) => {
-                              if (e.key === "Enter") {
-                                e.currentTarget.blur()
-                              }
-                            }}
-                            autoFocus
-                            className="text-sm h-6 px-1 py-0"
-                          />
-                        ) : (
-                          <TaskDetailsDialog
-                            taskName={task.name}
-                            taskNotes={task.notes}
-                            taskEmoji={task.emoji}
-                            onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
-                            onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
-                            onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
-                            onDuplicateTask={() => duplicateTask(section.id, task.id)}
-                          >
-                            <span
-                              className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
-                                task.completed ? "line-through" : ""
-                              }`}
-                            >
-                              {task.name}
-                            </span>
-                          </TaskDetailsDialog>
-                        )}
-                      </div>
-
-                      {renderTaskColumns(task, section)}
+                      {renderColumnHeaders()}
                     </div>
-                  ))}
+
+                    {section.tasks
+                      .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                      .sort((a, b) => (sortTasks([a, b])[0] === a ? -1 : 1))
+                      .map((task) => (
+                        <div
+                          key={task.id}
+                          className={`flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 overflow-x-auto ${
+                            task.completed ? "opacity-60" : ""
+                          } ${selectedTasks.has(task.id) ? "bg-blue-50" : ""}`}
+                          style={{
+                            minHeight: "32px",
+                          }}
+                        >
+                          <div className="flex items-center" style={{ width: columnWidths.checkbox }}>
+                            <Checkbox
+                              checked={selectedTasks.has(task.id)}
+                              onCheckedChange={() => toggleTaskSelection(task.id)}
+                            />
+                          </div>
+
+                          <div className="flex items-center" style={{ width: columnWidths.emoji }}>
+                            <div onClick={() => console.log("[v0] Emoji picker container clicked in table row")}>
+                              <EmojiPicker
+                                value={task.emoji}
+                                onChange={(emoji) => {
+                                  console.log("[v0] Emoji changed in table row:", emoji)
+                                  updateTaskEmoji(section.id, task.id, emoji)
+                                }}
+                              />
+                            </div>
+                          </div>
+
+                          <div className="flex items-center" style={{ width: columnWidths.name }}>
+                            {editingTaskId === task.id ? (
+                              <Input
+                                value={task.name}
+                                onChange={(e) => {
+                                  const newName = e.target.value
+                                  setSections(
+                                    sections.map((section) =>
+                                      section.id === section.id
+                                        ? {
+                                            ...section,
+                                            tasks: section.tasks.map((t) =>
+                                              t.id === task.id ? { ...t, name: newName } : t,
+                                            ),
+                                          }
+                                        : section,
+                                    ),
+                                  )
+                                }}
+                                onBlur={() => {
+                                  if (task.name.trim()) {
+                                    renameTask(section.id, task.id, task.name.trim())
+                                  } else {
+                                    renameTask(section.id, task.id, "New Task")
+                                  }
+                                }}
+                                onKeyDown={(e) => {
+                                  if (e.key === "Enter") {
+                                    e.currentTarget.blur()
+                                  }
+                                }}
+                                autoFocus
+                                className="text-sm h-6 px-1 py-0"
+                              />
+                            ) : (
+                              <TaskDetailsDialog
+                                taskName={task.name}
+                                taskNotes={task.notes}
+                                taskEmoji={task.emoji}
+                                onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                                onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
+                                onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                                onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                              >
+                                <span
+                                  className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
+                                    task.completed ? "line-through" : ""
+                                  }`}
+                                >
+                                  {task.name}
+                                </span>
+                              </TaskDetailsDialog>
+                            )}
+                          </div>
+
+                          {renderTaskColumns(task, section)}
+                        </div>
+                      ))}
+                  </>
+                )}
               </>
             )}
           </div>
@@ -1361,61 +1593,79 @@ export function TaskList() {
               </div>
             </div>
 
-            <div className="flex gap-1 px-4 py-2 text-sm text-muted-foreground border-b border-border">
-              <div style={{ width: `${columnWidths.checkbox}px` }}>☑️</div>
-              <div style={{ width: `${columnWidths.emoji}px` }}>😀</div>
-              <div style={{ width: `${columnWidths.name}px` }}>Name</div>
-              <div style={{ width: `${columnWidths.attachments}px` }}>📎</div>
-              <div style={{ width: `${columnWidths.status}px` }}>Status</div>
-              <div style={{ width: `${columnWidths.priority}px` }}>Priority</div>
-              {columnVisibility.progress && <div style={{ width: `${columnWidths.progress}px` }}>Progress</div>}
-              {columnVisibility.due && <div style={{ width: `${columnWidths.due}px` }}>Due</div>}
-              {columnVisibility.who && <div style={{ width: `${columnWidths.who}px` }}>Who</div>}
-            </div>
-
-            {completedTasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 opacity-60"
-                style={{ minHeight: "32px" }}
-              >
-                <div className="flex items-center" style={{ width: `${columnWidths.checkbox}px` }}>
-                  <Checkbox checked={true} disabled />
-                </div>
-                <div className="flex items-center" style={{ width: `${columnWidths.emoji}px` }}>
-                  <span>{task.emoji}</span>
-                </div>
-                <div className="flex items-center" style={{ width: `${columnWidths.name}px` }}>
-                  <span className="text-sm line-through">{task.name}</span>
-                </div>
-                <div style={{ width: `${columnWidths.attachments}px` }}></div>
-                <div className="flex items-stretch" style={{ width: `${columnWidths.status}px` }}>
-                  <div className="w-full">
-                    <StatusDropdown
-                      value={task.status}
-                      onChange={() => {}}
-                      options={statusOptions}
-                      onUpdateOptions={setStatusOptions}
-                      fullWidth
-                    />
+            {isMobile ? (
+              // Mobile completed tasks
+              <div className="space-y-1">
+                {completedTasks.map((task) => (
+                  <div key={task.id} className="p-3 hover:bg-muted/50 border-b border-border/50 opacity-60">
+                    <div className="flex items-center gap-3">
+                      <Checkbox checked={true} disabled />
+                      <span className="text-2xl">{task.emoji}</span>
+                      <span className="text-sm line-through flex-1">{task.name}</span>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-stretch" style={{ width: `${columnWidths.priority}px` }}>
-                  <div className="w-full">
-                    <PriorityDropdown
-                      value={task.priority}
-                      onChange={() => {}}
-                      options={priorityOptions}
-                      onUpdateOptions={setPriorityOptions}
-                      fullWidth
-                    />
-                  </div>
-                </div>
-                {columnVisibility.progress && <div style={{ width: `${columnWidths.progress}px` }}></div>}
-                {columnVisibility.due && <div style={{ width: `${columnWidths.due}px` }}></div>}
-                {columnVisibility.who && <div style={{ width: `${columnWidths.who}px` }}></div>}
+                ))}
               </div>
-            ))}
+            ) : (
+              // Desktop completed tasks
+              <>
+                <div className="flex gap-1 px-4 py-2 text-sm text-muted-foreground border-b border-border overflow-x-auto">
+                  <div style={{ width: columnWidths.checkbox }}>☑️</div>
+                  <div style={{ width: columnWidths.emoji }}>😀</div>
+                  <div style={{ width: columnWidths.name }}>Name</div>
+                  <div style={{ width: columnWidths.attachments }}>📎</div>
+                  <div style={{ width: columnWidths.status }}>Status</div>
+                  <div style={{ width: columnWidths.priority }}>Priority</div>
+                  {columnVisibility.progress && <div style={{ width: columnWidths.progress }}>Progress</div>}
+                  {columnVisibility.due && <div style={{ width: columnWidths.due }}>Due</div>}
+                  {columnVisibility.who && <div style={{ width: columnWidths.who }}>Who</div>}
+                </div>
+
+                {completedTasks.map((task) => (
+                  <div
+                    key={task.id}
+                    className="flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 opacity-60 overflow-x-auto"
+                    style={{ minHeight: "32px" }}
+                  >
+                    <div className="flex items-center" style={{ width: columnWidths.checkbox }}>
+                      <Checkbox checked={true} disabled />
+                    </div>
+                    <div className="flex items-center" style={{ width: columnWidths.emoji }}>
+                      <span>{task.emoji}</span>
+                    </div>
+                    <div className="flex items-center" style={{ width: columnWidths.name }}>
+                      <span className="text-sm line-through">{task.name}</span>
+                    </div>
+                    <div style={{ width: columnWidths.attachments }}></div>
+                    <div className="flex items-stretch" style={{ width: columnWidths.status }}>
+                      <div className="w-full">
+                        <StatusDropdown
+                          value={task.status}
+                          onChange={() => {}}
+                          options={statusOptions}
+                          onUpdateOptions={setStatusOptions}
+                          fullWidth
+                        />
+                      </div>
+                    </div>
+                    <div className="flex items-stretch" style={{ width: columnWidths.priority }}>
+                      <div className="w-full">
+                        <PriorityDropdown
+                          value={task.priority}
+                          onChange={() => {}}
+                          options={priorityOptions}
+                          onUpdateOptions={setPriorityOptions}
+                          fullWidth
+                        />
+                      </div>
+                    </div>
+                    {columnVisibility.progress && <div style={{ width: columnWidths.progress }}></div>}
+                    {columnVisibility.due && <div style={{ width: columnWidths.due }}></div>}
+                    {columnVisibility.who && <div style={{ width: columnWidths.who }}></div>}
+                  </div>
+                ))}
+              </>
+            )}
           </div>
         )}
       </div>
