@@ -18,7 +18,6 @@ import { Settings, Upload, Download, Lock, RotateCcw } from "lucide-react"
 import { ExportImportDialog } from "@/components/export-import-dialog"
 import { ColumnOrderSettings } from "@/components/column-order-settings"
 import { ThemeSettings } from "@/components/theme-settings"
-import { useIsMobile } from "@/hooks/use-mobile" // Added mobile hook import
 
 interface ColumnVisibility {
   attachments: boolean
@@ -71,8 +70,6 @@ export function SettingsDialog({
   const [newPIN, setNewPIN] = useState("")
   const [confirmPIN, setConfirmPIN] = useState("")
 
-  const isMobile = useIsMobile()
-
   const handleIconUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0]
     if (file) {
@@ -121,7 +118,7 @@ export function SettingsDialog({
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className={`${isMobile ? "max-w-[95vw] w-full mx-2" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}>
+      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="w-5 h-5" />
@@ -133,19 +130,11 @@ export function SettingsDialog({
         </DialogHeader>
 
         <Tabs defaultValue="general" className="w-full">
-          <TabsList className={`${isMobile ? "grid grid-cols-2 h-auto" : "grid grid-cols-4"} w-full`}>
-            <TabsTrigger value="general" className={isMobile ? "text-xs py-2" : ""}>
-              General
-            </TabsTrigger>
-            <TabsTrigger value="columns" className={isMobile ? "text-xs py-2" : ""}>
-              Columns
-            </TabsTrigger>
-            <TabsTrigger value="security" className={isMobile ? "text-xs py-2" : ""}>
-              Security
-            </TabsTrigger>
-            <TabsTrigger value="data" className={isMobile ? "text-xs py-2" : ""}>
-              Data
-            </TabsTrigger>
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="general">General</TabsTrigger>
+            <TabsTrigger value="columns">Columns</TabsTrigger>
+            <TabsTrigger value="security">Security</TabsTrigger>
+            <TabsTrigger value="data">Data</TabsTrigger>
           </TabsList>
 
           <TabsContent value="general" className="space-y-4">
@@ -161,7 +150,7 @@ export function SettingsDialog({
 
             <div className="space-y-2">
               <Label htmlFor="app-icon">App Icon (PNG/SVG, max 1MB)</Label>
-              <div className={`flex items-center gap-3 ${isMobile ? "flex-col" : ""}`}>
+              <div className="flex items-center gap-3">
                 <div className="w-12 h-12 border rounded flex items-center justify-center bg-muted">
                   {appIcon ? (
                     <img src={appIcon || "/placeholder.svg"} alt="App icon" className="w-8 h-8 object-contain" />
@@ -169,13 +158,7 @@ export function SettingsDialog({
                     <Upload className="w-6 h-6 text-muted-foreground" />
                   )}
                 </div>
-                <Input
-                  id="app-icon"
-                  type="file"
-                  accept=".png,.svg"
-                  onChange={handleIconUpload}
-                  className={`${isMobile ? "w-full" : "flex-1"}`}
-                />
+                <Input id="app-icon" type="file" accept=".png,.svg" onChange={handleIconUpload} className="flex-1" />
               </div>
             </div>
 
@@ -208,7 +191,7 @@ export function SettingsDialog({
 
               {!hasPIN && (
                 <div className="space-y-3">
-                  <div className={`${isMobile ? "space-y-3" : "grid grid-cols-2 gap-3"}`}>
+                  <div className="grid grid-cols-2 gap-3">
                     <div className="space-y-2">
                       <Label htmlFor="new-pin">New PIN (4 digits)</Label>
                       <Input
@@ -264,13 +247,11 @@ export function SettingsDialog({
           </TabsContent>
         </Tabs>
 
-        <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-end gap-2"} pt-4 border-t`}>
-          <Button variant="outline" onClick={() => setOpen(false)} className={isMobile ? "w-full" : ""}>
+        <div className="flex justify-end gap-2 pt-4 border-t">
+          <Button variant="outline" onClick={() => setOpen(false)}>
             Cancel
           </Button>
-          <Button onClick={handleSaveSettings} className={isMobile ? "w-full" : ""}>
-            Save Settings
-          </Button>
+          <Button onClick={handleSaveSettings}>Save Settings</Button>
         </div>
       </DialogContent>
     </Dialog>

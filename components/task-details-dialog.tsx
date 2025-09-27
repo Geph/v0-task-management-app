@@ -9,7 +9,6 @@ import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { Copy, Edit3 } from "lucide-react"
-import { useIsMobile } from "@/hooks/use-mobile" // Added mobile hook import
 
 interface TaskDetailsDialogProps {
   taskName: string
@@ -35,8 +34,6 @@ export function TaskDetailsDialog({
   const [isRenaming, setIsRenaming] = useState(false)
   const [newTaskName, setNewTaskName] = useState(taskName)
 
-  const isMobile = useIsMobile()
-
   const handleSave = () => {
     onUpdateNotes(notes)
     if (isRenaming && newTaskName.trim() !== taskName) {
@@ -61,7 +58,7 @@ export function TaskDetailsDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className={`${isMobile ? "max-w-[95vw] w-full mx-2" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}>
+      <DialogContent className="max-w-2xl">
         <DialogHeader>
           <div className="flex items-center gap-3">
             <div className="text-2xl">{taskEmoji}</div>
@@ -83,7 +80,7 @@ export function TaskDetailsDialog({
               />
             ) : (
               <>
-                <DialogTitle className="flex-1 text-left">{newTaskName}</DialogTitle>
+                <DialogTitle className="flex-1">{newTaskName}</DialogTitle>
                 <Button variant="ghost" size="sm" onClick={() => setIsRenaming(true)} className="h-6 w-6 p-0">
                   <Edit3 className="w-3 h-3" />
                 </Button>
@@ -104,18 +101,16 @@ export function TaskDetailsDialog({
             />
           </div>
 
-          <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-between"}`}>
+          <div className="flex justify-between">
             <Button variant="outline" onClick={handleDuplicate} className="flex items-center gap-2 bg-transparent">
               <Copy className="w-4 h-4" />
               Duplicate Task
             </Button>
-            <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
-              <Button variant="outline" onClick={handleCancel} className={isMobile ? "w-full" : ""}>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleCancel}>
                 Cancel
               </Button>
-              <Button onClick={handleSave} className={isMobile ? "w-full" : ""}>
-                Save
-              </Button>
+              <Button onClick={handleSave}>Save</Button>
             </div>
           </div>
         </div>
