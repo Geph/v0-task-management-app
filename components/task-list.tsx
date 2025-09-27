@@ -1120,14 +1120,16 @@ export function TaskList() {
     return (
       <div
         key={task.id}
-        className={`p-3 hover:bg-muted/50 border-b border-border/50 ${
+        className={`p-2 hover:bg-muted/50 border-b border-border/50 ${
+          // reduced padding from p-3 to p-2
           task.completed ? "opacity-60" : ""
         } ${selectedTasks.has(task.id) ? "bg-blue-50" : ""}`}
       >
         {/* Main row with checkbox, emoji, name, and files */}
-        <div className="flex items-center gap-3 mb-2">
+        <div className="flex items-center gap-3 mb-1">
+          {" "}
+          {/* reduced margin bottom from mb-2 to mb-1 */}
           <Checkbox checked={selectedTasks.has(task.id)} onCheckedChange={() => toggleTaskSelection(task.id)} />
-
           <div onClick={() => console.log("[v0] Emoji picker container clicked in mobile row")}>
             <EmojiPicker
               value={task.emoji}
@@ -1137,7 +1139,6 @@ export function TaskList() {
               }}
             />
           </div>
-
           <div className="flex-1">
             {editingTaskId === task.id ? (
               <Input
@@ -1190,7 +1191,6 @@ export function TaskList() {
               </TaskDetailsDialog>
             )}
           </div>
-
           {columnVisibility.attachments && (
             <div className="flex items-center">
               <FileAttachmentComponent
@@ -1203,14 +1203,17 @@ export function TaskList() {
         </div>
 
         {mobileColumns.filter((col) => col !== "attachments").length > 0 && (
-          <div className="grid grid-cols-2 gap-2 ml-12 text-xs">
+          <div className="grid grid-cols-2 gap-1 ml-12 text-xs">
+            {" "}
+            {/* reduced gap from gap-2 to gap-1 */}
             {mobileColumns
               .map((columnId) => {
                 switch (columnId) {
                   case "status":
                     return columnVisibility.status ? (
-                      <div key="status" className="flex items-center gap-1">
-                        <span className="text-muted-foreground font-medium">Status:</span>
+                      <div key="status" className="flex items-center">
+                        {" "}
+                        {/* removed label and gap-1 */}
                         <div className="flex-1">
                           <StatusDropdown
                             value={task.status}
@@ -1218,6 +1221,7 @@ export function TaskList() {
                             options={statusOptions}
                             onUpdateOptions={setStatusOptions}
                             fullWidth
+                            mobileHeight // added mobile height prop
                           />
                         </div>
                       </div>
@@ -1225,8 +1229,9 @@ export function TaskList() {
 
                   case "priority":
                     return columnVisibility.priority ? (
-                      <div key="priority" className="flex items-center gap-1">
-                        <span className="text-muted-foreground font-medium">Priority:</span>
+                      <div key="priority" className="flex items-center">
+                        {" "}
+                        {/* removed label and gap-1 */}
                         <div className="flex-1">
                           <PriorityDropdown
                             value={task.priority}
@@ -1234,6 +1239,7 @@ export function TaskList() {
                             options={priorityOptions}
                             onUpdateOptions={setPriorityOptions}
                             fullWidth
+                            mobileHeight // added mobile height prop
                           />
                         </div>
                       </div>
@@ -1461,7 +1467,9 @@ export function TaskList() {
               <>
                 {isMobile ? (
                   // Mobile layout - stacked cards
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
+                    {" "}
+                    {/* reduced spacing from space-y-1 to space-y-0.5 */}
                     {section.tasks
                       .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
                       .sort((a, b) => (sortTasks([a, b])[0] === a ? -1 : 1))
