@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import {
   Dialog,
   DialogContent,
@@ -24,11 +24,30 @@ interface SectionRenameDialogProps {
 export function SectionRenameDialog({ currentName, onRename, children }: SectionRenameDialogProps) {
   const [newName, setNewName] = useState(currentName)
   const [isOpen, setIsOpen] = useState(false)
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    if (isOpen) {
+      setNewName(currentName)
+      // Use setTimeout to ensure the dialog is fully rendered before focusing
+      setTimeout(() => {
+        if (inputRef.current) {
+          inputRef.current.focus()
+          inputRef.current.select() // Select all text for easy replacement
+        }
+      }, 100)
+    }
+  }, [isOpen, currentName])
 
   const handleSave = () => {
     if (newName.trim() && newName.trim() !== currentName) {
       onRename(newName.trim())
     }
+    setIsOpen(false)
+  }
+
+  const handleCancel = () => {
+    setNewName(currentName) // Reset to original name
     setIsOpen(false)
   }
 
@@ -46,18 +65,25 @@ export function SectionRenameDialog({ currentName, onRename, children }: Section
           <div>
             <Label htmlFor="section-name">Section Name</Label>
             <Input
+              ref={inputRef}
               id="section-name"
               value={newName}
               onChange={(e) => setNewName(e.target.value)}
               onKeyDown={(e) => {
-                if (e.key === "Enter") handleSave()
-                if (e.key === "Escape") setIsOpen(false)
+                if (e.key === "Enter") {
+                  e.preventDefault()
+                  handleSave()
+                }
+                if (e.key === "Escape") {
+                  e.preventDefault()
+                  handleCancel()
+                }
               }}
-              autoFocus
+              placeholder="Enter section name"
             />
           </div>
           <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setIsOpen(false)}>
+            <Button variant="outline" onClick={handleCancel}>
               Cancel
             </Button>
             <Button onClick={handleSave}>Save</Button>
