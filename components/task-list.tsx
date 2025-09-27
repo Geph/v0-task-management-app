@@ -1435,7 +1435,11 @@ export function TaskList() {
                     currentName={section.name}
                     onRename={(newName) => renameSection(section.id, newName)}
                   >
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <DropdownMenuItem
+                      onSelect={(e) => e.preventDefault()}
+                      className="select-none cursor-pointer"
+                      onMouseDown={(e) => e.preventDefault()}
+                    >
                       <Edit className="w-4 h-4 mr-2" />
                       Rename Section
                     </DropdownMenuItem>
@@ -1445,7 +1449,7 @@ export function TaskList() {
                     availableSections={sections}
                     onRemoveSection={removeSection}
                   >
-                    <DropdownMenuItem onSelect={(e) => e.preventDefault()}>
+                    <DropdownMenuItem onSelect={(e) => e.preventDefault()} className="select-none cursor-pointer">
                       <Trash2 className="w-4 h-4 mr-2" />
                       Remove Section
                     </DropdownMenuItem>
