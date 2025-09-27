@@ -14,6 +14,7 @@ import {
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useIsMobile } from "@/hooks/use-mobile" // Added mobile hook import
 
 interface MergeTasksDialogProps {
   children: React.ReactNode
@@ -24,6 +25,8 @@ interface MergeTasksDialogProps {
 export function MergeTasksDialog({ children, selectedTaskNames, onMerge }: MergeTasksDialogProps) {
   const [open, setOpen] = useState(false)
   const [newTaskName, setNewTaskName] = useState(selectedTaskNames.join(" + "))
+
+  const isMobile = useIsMobile()
 
   const handleMerge = () => {
     if (newTaskName.trim()) {
@@ -36,7 +39,9 @@ export function MergeTasksDialog({ children, selectedTaskNames, onMerge }: Merge
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent
+        className={`${isMobile ? "max-w-[95vw] w-full mx-2" : "sm:max-w-md"} max-h-[90vh] overflow-y-auto`}
+      >
         <DialogHeader>
           <DialogTitle>Merge Tasks</DialogTitle>
           <DialogDescription>
@@ -55,7 +60,9 @@ export function MergeTasksDialog({ children, selectedTaskNames, onMerge }: Merge
           </div>
           <div className="text-sm text-muted-foreground">
             <p>Merging {selectedTaskNames.length} tasks:</p>
-            <ul className="list-disc list-inside mt-1">
+            <ul
+              className={`list-disc list-inside mt-1 ${isMobile && selectedTaskNames.length > 5 ? "max-h-32 overflow-y-auto" : ""}`}
+            >
               {selectedTaskNames.map((name, index) => (
                 <li key={index} className="truncate">
                   {name}
@@ -63,11 +70,13 @@ export function MergeTasksDialog({ children, selectedTaskNames, onMerge }: Merge
               ))}
             </ul>
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>
+          <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-end gap-2"}`}>
+            <Button variant="outline" onClick={() => setOpen(false)} className={isMobile ? "w-full" : ""}>
               Cancel
             </Button>
-            <Button onClick={handleMerge}>Merge Tasks</Button>
+            <Button onClick={handleMerge} className={isMobile ? "w-full" : ""}>
+              Merge Tasks
+            </Button>
           </div>
         </div>
       </DialogContent>
