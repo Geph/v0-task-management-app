@@ -68,8 +68,11 @@ export function TaskDetailsDialog({
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
-      <DialogContent className={`${isMobile ? "max-w-[95vw] w-full mx-2" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}>
-        <DialogHeader>
+      <DialogContent
+        className={`${isMobile ? "max-w-[95vw] w-full mx-2" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}
+        hideClose
+      >
+        <DialogHeader className="relative">
           <div className="flex items-center gap-3">
             <div className="text-2xl">{taskEmoji}</div>
             {isRenaming ? (

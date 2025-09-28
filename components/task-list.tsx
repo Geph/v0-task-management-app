@@ -352,7 +352,7 @@ export function TaskList() {
   const [hasPIN, setHasPIN] = useState(false)
   const [userPIN, setUserPIN] = useState("")
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
-    attachments: true, // Added default visibility for attachments
+    attachments: false, // Changed from true to false to hide empty attachments column by default
     status: true, // Added default visibility for status
     priority: true, // Added default visibility for priority
     progress: false,
@@ -1532,6 +1532,8 @@ export function TaskList() {
                   <Trash2 className="w-4 h-4" />
                 </Button>
               </RemoveSectionDialog>
+
+              <div className="flex-1"></div>
 
               <Button
                 size="sm"
