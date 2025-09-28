@@ -372,14 +372,14 @@ export function TaskList() {
     "who",
   ])
 
-  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
-  const [sectionToRename, setSectionToRename] = useState<{ id: string; name: string } | null>(null)
+  // const [renameDialogOpen, setRenameDialogOpen] = useState(false)
+  // const [sectionToRename, setSectionToRename] = useState<{ id: string; name: string } | null>(null)
 
-  const handleRenameDialogClose = () => {
-    console.log("[v0] Rename dialog closing, cleaning up state")
-    setRenameDialogOpen(false)
-    setSectionToRename(null)
-  }
+  // const handleRenameDialogClose = () => {
+  //   console.log("[v0] Rename dialog closing, cleaning up state")
+  //   setRenameDialogOpen(false)
+  //   setSectionToRename(null)
+  // }
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -1440,24 +1440,22 @@ export function TaskList() {
                   <MoreHorizontal className="w-4 h-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48">
-                  {/* <SectionRenameDialog
+                  <SectionRenameDialog
                     currentName={section.name}
                     onRename={(newName) => renameSection(section.id, newName)}
-                  > */}
-                  <DropdownMenuItem
-                    className="select-none cursor-pointer"
-                    onClick={(e) => {
-                      console.log("[v0] Rename section menu item clicked")
-                      e.preventDefault()
-                      e.stopPropagation()
-                      setSectionToRename({ id: section.id, name: section.name })
-                      setRenameDialogOpen(true)
-                    }}
                   >
-                    <Edit className="w-4 h-4 mr-2" />
-                    Rename Section
-                  </DropdownMenuItem>
-                  {/* </SectionRenameDialog> */}
+                    <DropdownMenuItem
+                      className="select-none cursor-pointer"
+                      onSelect={(e) => {
+                        console.log("[v0] Rename section menu item clicked")
+                        e.preventDefault()
+                      }}
+                    >
+                      <Edit className="w-4 h-4 mr-2" />
+                      Rename Section
+                    </DropdownMenuItem>
+                  </SectionRenameDialog>
+
                   <RemoveSectionDialog
                     sectionToRemove={section}
                     availableSections={sections}
@@ -1688,7 +1686,7 @@ export function TaskList() {
         )}
       </div>
 
-      {sectionToRename && (
+      {/* {sectionToRename && (
         <SectionRenameDialog
           currentName={sectionToRename.name}
           onRename={(newName) => {
@@ -1706,7 +1704,7 @@ export function TaskList() {
             }
           }}
         />
-      )}
+      )} */}
     </div>
   )
 }
