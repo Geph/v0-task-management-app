@@ -57,7 +57,7 @@ interface TaskSection {
   expanded: boolean
 }
 
-type SortField = "name" | "status" | "priority"
+type SortField = "name" | "status" | "priority" | "due" // Added "due" to sort field options
 type SortDirection = "asc" | "desc"
 
 interface ColumnVisibility {
@@ -534,8 +534,18 @@ export function TaskList() {
         }
       }
 
-      // Then sort by progress if progress column is visible
-      if (columnVisibility.progress) {
+      if (!columnVisibility.priority && columnVisibility.due) {
+        // Sort by due date - tasks with due dates come first, sorted by earliest first
+        const aDate = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER
+        const bDate = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER
+
+        if (aDate !== bDate) {
+          return aDate - bDate // Earlier dates first
+        }
+      }
+
+      // Then sort by progress if progress column is visible and priority/due columns are not
+      if (!columnVisibility.priority && !columnVisibility.due && columnVisibility.progress) {
         if (a.progress !== b.progress) {
           return b.progress - a.progress // Higher progress first
         }
@@ -630,11 +640,11 @@ export function TaskList() {
 
     setSections(
       sections.map((section) =>
-        section.id === sectionId ? { ...section, tasks: [...section.tasks, newTask] } : section,
+        section.id === sectionId ? { ...section, tasks: [newTask, ...section.tasks] } : section,
       ),
     )
 
-    // setEditingTaskId(newTask.id)
+    setEditingTaskId(newTask.id)
   }
 
   const duplicateTask = (sectionId: string, taskId: string) => {
@@ -1128,8 +1138,13 @@ export function TaskList() {
         </div>
       ) : null,
       due: columnVisibility.due ? (
-        <div className="flex items-center justify-center gap-1 relative" style={{ width: columnWidths.due }}>
+        <div
+          className="flex items-center justify-center gap-1 cursor-pointer relative" // Added cursor-pointer and onClick handler for due date sorting
+          style={{ width: columnWidths.due }}
+          onClick={() => handleSort("due")}
+        >
           Due
+          <ArrowUpDown className="w-3 h-3" />
         </div>
       ) : null,
       who: columnVisibility.who ? (
