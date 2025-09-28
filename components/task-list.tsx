@@ -458,7 +458,6 @@ export function TaskList() {
       name: "35%",
     }
 
-    const dynamicColumns: Record<string, string> = {}
     const visibleColumns = columnOrder.filter((columnId) => {
       switch (columnId) {
         case "attachments":
@@ -478,28 +477,45 @@ export function TaskList() {
       }
     })
 
-    const remainingWidth = 52 // 100% - 5% - 8% - 35%
-    const columnWidth = remainingWidth / visibleColumns.length
+    // Calculate remaining width after base columns (52% remaining)
+    const remainingWidth = 52
 
-    columnOrder.forEach((columnId) => {
+    // If no dynamic columns are visible, give all remaining space to name
+    if (visibleColumns.length === 0) {
+      return {
+        ...baseColumns,
+        name: "87%", // 35% + 52% = 87%
+      }
+    }
+
+    // Distribute remaining width evenly among visible columns
+    const columnWidth = Math.floor(remainingWidth / visibleColumns.length)
+    const remainder = remainingWidth - columnWidth * visibleColumns.length
+
+    const dynamicColumns: Record<string, string> = {}
+
+    visibleColumns.forEach((columnId, index) => {
+      // Add remainder to the last column to ensure we reach exactly 100%
+      const width = columnWidth + (index === visibleColumns.length - 1 ? remainder : 0)
+
       switch (columnId) {
         case "attachments":
-          if (columnVisibility.attachments) dynamicColumns.attachments = "6%"
+          if (columnVisibility.attachments) dynamicColumns.attachments = `${width}%`
           break
         case "status":
-          if (columnVisibility.status) dynamicColumns.status = `${Math.max(columnWidth, 15)}%`
+          if (columnVisibility.status) dynamicColumns.status = `${width}%`
           break
         case "priority":
-          if (columnVisibility.priority) dynamicColumns.priority = `${Math.max(columnWidth, 15)}%`
+          if (columnVisibility.priority) dynamicColumns.priority = `${width}%`
           break
         case "progress":
-          if (columnVisibility.progress) dynamicColumns.progress = `${Math.max(columnWidth, 12)}%`
+          if (columnVisibility.progress) dynamicColumns.progress = `${width}%`
           break
         case "due":
-          if (columnVisibility.due) dynamicColumns.due = `${Math.max(columnWidth, 10)}%`
+          if (columnVisibility.due) dynamicColumns.due = `${width}%`
           break
         case "who":
-          if (columnVisibility.who) dynamicColumns.who = `${Math.max(columnWidth, 12)}%`
+          if (columnVisibility.who) dynamicColumns.who = `${width}%`
           break
       }
     })
