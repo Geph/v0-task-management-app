@@ -36,6 +36,9 @@ export function SectionRenameDialog({ currentName, onRename, isOpen, onOpenChang
           }
         }, 100)
       })
+    } else {
+      console.log("[v0] Dialog closed, cleaning up state")
+      setNewName(currentName)
     }
   }, [isOpen, currentName])
 
@@ -44,6 +47,7 @@ export function SectionRenameDialog({ currentName, onRename, isOpen, onOpenChang
     if (newName.trim() && newName.trim() !== currentName) {
       onRename(newName.trim())
     }
+    setNewName(currentName)
     onOpenChange(false)
   }
 
@@ -51,6 +55,15 @@ export function SectionRenameDialog({ currentName, onRename, isOpen, onOpenChang
     console.log("[v0] Cancel clicked")
     setNewName(currentName)
     onOpenChange(false)
+  }
+
+  const handleOpenChange = (open: boolean) => {
+    console.log("[v0] Dialog open state changing:", open)
+    if (!open) {
+      console.log("[v0] Dialog closing, resetting state")
+      setNewName(currentName)
+    }
+    onOpenChange(open)
   }
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -73,8 +86,15 @@ export function SectionRenameDialog({ currentName, onRename, isOpen, onOpenChang
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
+      <DialogContent
+        className="max-w-sm"
+        onInteractOutside={(e) => {
+          console.log("[v0] Dialog interact outside")
+          e.preventDefault()
+          handleCancel()
+        }}
+      >
         <DialogHeader>
           <DialogTitle>Rename Section</DialogTitle>
           <DialogDescription>

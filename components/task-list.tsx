@@ -375,6 +375,12 @@ export function TaskList() {
   const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   const [sectionToRename, setSectionToRename] = useState<{ id: string; name: string } | null>(null)
 
+  const handleRenameDialogClose = () => {
+    console.log("[v0] Rename dialog closing, cleaning up state")
+    setRenameDialogOpen(false)
+    setSectionToRename(null)
+  }
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedAppName = localStorage.getItem("appName")
@@ -1686,11 +1692,19 @@ export function TaskList() {
         <SectionRenameDialog
           currentName={sectionToRename.name}
           onRename={(newName) => {
+            console.log("[v0] Renaming section to:", newName)
             renameSection(sectionToRename.id, newName)
-            setSectionToRename(null)
+            handleRenameDialogClose()
           }}
           isOpen={renameDialogOpen}
-          onOpenChange={setRenameDialogOpen}
+          onOpenChange={(open) => {
+            console.log("[v0] Rename dialog open change:", open)
+            if (!open) {
+              handleRenameDialogClose()
+            } else {
+              setRenameDialogOpen(open)
+            }
+          }}
         />
       )}
     </div>
