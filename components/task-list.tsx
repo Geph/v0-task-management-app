@@ -517,47 +517,56 @@ export function TaskList() {
   }
 
   const handleSort = (field: SortField) => {
-    setSortField(field)
-    setSortDirection((prevDirection) => (prevDirection === "asc" ? "desc" : "asc"))
+    console.log("[v0] Sort clicked:", field, "current direction:", sortDirection)
+    if (sortField === field) {
+      setSortDirection((prevDirection) => (prevDirection === "asc" ? "desc" : "asc"))
+    } else {
+      setSortField(field)
+      setSortDirection("asc")
+    }
   }
 
   const sortTasks = (tasks: Task[]) => {
     return [...tasks].sort((a, b) => {
-      // First sort by priority if priority column is visible
-      if (columnVisibility.priority) {
-        const priorityOrder = { high: 3, medium: 2, low: 1, someday: 0, blank: -1 }
-        const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || -1
-        const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || -1
+      let result = 0
 
-        if (aPriority !== bPriority) {
-          return bPriority - aPriority // Higher priority first
-        }
+      switch (sortField) {
+        case "priority":
+          const priorityOrder = { high: 3, medium: 2, low: 1, someday: 0, blank: -1 }
+          const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || -1
+          const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || -1
+          result = bPriority - aPriority // Higher priority first
+          break
+
+        case "due":
+          const aDate = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER
+          const bDate = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER
+          result = aDate - bDate // Earlier dates first
+          break
+
+        case "status":
+          result = a.status.localeCompare(b.status)
+          break
+
+        case "name":
+        default:
+          const aName = a.name.toLowerCase() || "zzz" // Empty names go to end
+          const bName = b.name.toLowerCase() || "zzz"
+          result = aName.localeCompare(bName)
+          break
       }
 
-      if (!columnVisibility.priority && columnVisibility.due) {
-        // Sort by due date - tasks with due dates come first, sorted by earliest first
-        const aDate = a.dueDate ? new Date(a.dueDate).getTime() : Number.MAX_SAFE_INTEGER
-        const bDate = b.dueDate ? new Date(b.dueDate).getTime() : Number.MAX_SAFE_INTEGER
-
-        if (aDate !== bDate) {
-          return aDate - bDate // Earlier dates first
-        }
+      if (sortDirection === "desc") {
+        result = -result
       }
 
-      // Then sort by progress if progress column is visible and priority/due columns are not
-      if (!columnVisibility.priority && !columnVisibility.due && columnVisibility.progress) {
-        if (a.progress !== b.progress) {
-          return b.progress - a.progress // Higher progress first
-        }
+      if (result === 0 && sortField !== "name") {
+        const aName = a.name.toLowerCase() || "zzz"
+        const bName = b.name.toLowerCase() || "zzz"
+        result = aName.localeCompare(bName)
       }
 
-      // Finally sort alphabetically by name
-      const aName = a.name.toLowerCase() || "zzz" // Empty names go to end
-      const bName = b.name.toLowerCase() || "zzz"
-
-      if (aName < bName) return -1
-      if (aName > bName) return 1
-      return 0
+      return result
     })
   }
 
@@ -638,6 +647,7 @@ export function TaskList() {
       assignedTo: "",
     }
 
+    console.log("[v0] Adding new task to section:", sectionId)
     setSections(
       sections.map((section) =>
         section.id === sectionId ? { ...section, tasks: [newTask, ...section.tasks] } : section,
@@ -838,6 +848,23 @@ export function TaskList() {
 
     setCompletedTasks([...completedTasks, ...tasksToComplete])
     setSelectedTasks(new Set())
+  }
+
+  const markTaskAsCompleted = (sectionId: string, taskId: string) => {
+    const section = sections.find((s) => s.id === sectionId)
+    const task = section?.tasks.find((t) => t.id === taskId)
+
+    if (task) {
+      const completedTask = { ...task, completed: true }
+
+      setSections(
+        sections.map((section) =>
+          section.id === sectionId ? { ...section, tasks: section.tasks.filter((t) => t.id !== taskId) } : section,
+        ),
+      )
+
+      setCompletedTasks([...completedTasks, completedTask])
+    }
   }
 
   const renameSection = (sectionId: string, newName: string) => {
@@ -1525,7 +1552,10 @@ export function TaskList() {
                     {/* reduced spacing from space-y-1 to space-y-0.5 */}
                     {section.tasks
                       .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                      .sort((a, b) => (sortTasks([a, b])[0] === a ? -1 : 1))
+                      .sort((a, b) => {
+                        const sorted = sortTasks([a, b])
+                        return sorted[0] === a ? -1 : 1
+                      })
                       .map((task) => renderMobileTaskRow(task, section))}
                   </div>
                 ) : (
@@ -1534,15 +1564,25 @@ export function TaskList() {
                     <div className="flex gap-1 px-4 py-2 text-sm text-muted-foreground border-b border-border overflow-x-auto">
                       <div style={{ width: columnWidths.checkbox }}>☑️</div>
                       <div style={{ width: columnWidths.emoji }}>😀</div>
-                      <div className="flex items-center gap-1 relative" style={{ width: columnWidths.name }}>
+                      <div
+                        className="flex items-center gap-1 cursor-pointer relative"
+                        style={{ width: columnWidths.name }}
+                        onClick={() => handleSort("name")}
+                      >
                         Name
+                        {sortField === "name" && (
+                          <ArrowUpDown className={`w-3 h-3 ${sortDirection === "desc" ? "rotate-180" : ""}`} />
+                        )}
                       </div>
                       {renderColumnHeaders()}
                     </div>
 
                     {section.tasks
                       .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
-                      .sort((a, b) => (sortTasks([a, b])[0] === a ? -1 : 1))
+                      .sort((a, b) => {
+                        const sorted = sortTasks([a, b])
+                        return sorted[0] === a ? -1 : 1
+                      })
                       .map((task) => (
                         <div
                           key={task.id}
@@ -1628,6 +1668,7 @@ export function TaskList() {
                                     onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
                                     onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
                                     onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                                    onMarkCompleted={() => markTaskAsCompleted(section.id, task.id)}
                                   >
                                     <span>{task.name}</span>
                                   </TaskDetailsDialog>

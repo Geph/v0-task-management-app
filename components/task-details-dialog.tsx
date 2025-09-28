@@ -8,8 +8,8 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { RichTextEditor } from "@/components/rich-text-editor"
-import { Copy, Edit3 } from "lucide-react"
-import { useIsMobile } from "@/hooks/use-mobile" // Added mobile hook import
+import { Copy, Edit3, CheckCircle } from "lucide-react"
+import { useIsMobile } from "@/hooks/use-mobile"
 
 interface TaskDetailsDialogProps {
   taskName: string
@@ -18,6 +18,7 @@ interface TaskDetailsDialogProps {
   onUpdateNotes: (notes: string) => void
   onRenameTask: (newName: string) => void
   onDuplicateTask: () => void
+  onMarkCompleted: () => void // Added onMarkCompleted prop
   children: React.ReactNode
 }
 
@@ -28,6 +29,7 @@ export function TaskDetailsDialog({
   onUpdateNotes,
   onRenameTask,
   onDuplicateTask,
+  onMarkCompleted, // Added onMarkCompleted prop
   children,
 }: TaskDetailsDialogProps) {
   const [notes, setNotes] = useState(taskNotes)
@@ -55,6 +57,11 @@ export function TaskDetailsDialog({
 
   const handleDuplicate = () => {
     onDuplicateTask()
+    setIsOpen(false)
+  }
+
+  const handleMarkCompleted = () => {
+    onMarkCompleted()
     setIsOpen(false)
   }
 
@@ -86,6 +93,9 @@ export function TaskDetailsDialog({
                 <DialogTitle className="flex-1 text-left">{newTaskName}</DialogTitle>
                 <Button variant="ghost" size="sm" onClick={() => setIsRenaming(true)} className="h-6 w-6 p-0">
                   <Edit3 className="w-3 h-3" />
+                </Button>
+                <Button variant="ghost" size="sm" onClick={handleMarkCompleted} className="h-6 w-6 p-0">
+                  <CheckCircle className="w-3 h-3" />
                 </Button>
               </>
             )}
