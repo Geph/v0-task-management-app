@@ -384,6 +384,10 @@ export function TaskList() {
       const storedUserPIN = localStorage.getItem("userPIN")
       const storedColumnVisibility = localStorage.getItem("columnVisibility")
       const storedColumnOrder = localStorage.getItem("columnOrder")
+      const storedSections = localStorage.getItem("taskSections")
+      const storedCompletedTasks = localStorage.getItem("completedTasks")
+      const storedStatusOptions = localStorage.getItem("statusOptions")
+      const storedPriorityOptions = localStorage.getItem("priorityOptions")
 
       if (storedAppName) setAppName(storedAppName)
       if (storedAppIcon) setAppIcon(storedAppIcon)
@@ -397,8 +401,44 @@ export function TaskList() {
       if (storedColumnOrder) {
         setColumnOrder(JSON.parse(storedColumnOrder))
       }
+      if (storedSections) {
+        setSections(JSON.parse(storedSections))
+      }
+      if (storedCompletedTasks) {
+        setCompletedTasks(JSON.parse(storedCompletedTasks))
+      }
+      if (storedStatusOptions) {
+        setStatusOptions(JSON.parse(storedStatusOptions))
+      }
+      if (storedPriorityOptions) {
+        setPriorityOptions(JSON.parse(storedPriorityOptions))
+      }
     }
   }, [])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("taskSections", JSON.stringify(sections))
+    }
+  }, [sections])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("completedTasks", JSON.stringify(completedTasks))
+    }
+  }, [completedTasks])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("statusOptions", JSON.stringify(statusOptions))
+    }
+  }, [statusOptions])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("priorityOptions", JSON.stringify(priorityOptions))
+    }
+  }, [priorityOptions])
 
   const isMobile = useIsMobile()
 
@@ -483,30 +523,30 @@ export function TaskList() {
 
   const sortTasks = (tasks: Task[]) => {
     return [...tasks].sort((a, b) => {
-      let aValue: string | number
-      let bValue: string | number
+      // First sort by priority if priority column is visible
+      if (columnVisibility.priority) {
+        const priorityOrder = { high: 3, medium: 2, low: 1, someday: 0, blank: -1 }
+        const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || -1
+        const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || -1
 
-      switch (sortField) {
-        case "name":
-          aValue = a.name.toLowerCase()
-          bValue = b.name.toLowerCase()
-          break
-        case "status":
-          aValue = a.status
-          bValue = b.status
-          break
-        case "priority":
-          // Define priority order
-          const priorityOrder = { high: 3, medium: 2, low: 1, someday: 0, blank: -1 }
-          aValue = priorityOrder[a.priority as keyof typeof priorityOrder] || 0
-          bValue = priorityOrder[b.priority as keyof typeof priorityOrder] || 0
-          break
-        default:
-          return 0
+        if (aPriority !== bPriority) {
+          return bPriority - aPriority // Higher priority first
+        }
       }
 
-      if (aValue < bValue) return sortDirection === "asc" ? -1 : 1
-      if (aValue > bValue) return sortDirection === "asc" ? 1 : -1
+      // Then sort by progress if progress column is visible
+      if (columnVisibility.progress) {
+        if (a.progress !== b.progress) {
+          return b.progress - a.progress // Higher progress first
+        }
+      }
+
+      // Finally sort alphabetically by name
+      const aName = a.name.toLowerCase() || "zzz" // Empty names go to end
+      const bName = b.name.toLowerCase() || "zzz"
+
+      if (aName < bName) return -1
+      if (aName > bName) return 1
       return 0
     })
   }
@@ -576,7 +616,7 @@ export function TaskList() {
   const addTask = (sectionId: string) => {
     const newTask: Task = {
       id: Date.now().toString(),
-      name: "New Task",
+      name: "",
       status: "not-yet",
       priority: "blank",
       completed: false,
@@ -594,7 +634,7 @@ export function TaskList() {
       ),
     )
 
-    setEditingTaskId(newTask.id)
+    // setEditingTaskId(newTask.id)
   }
 
   const duplicateTask = (sectionId: string, taskId: string) => {
@@ -1177,23 +1217,32 @@ export function TaskList() {
                 className="text-sm h-8"
               />
             ) : (
-              <TaskDetailsDialog
-                taskName={task.name}
-                taskNotes={task.notes}
-                taskEmoji={task.emoji}
-                onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
-                onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
-                onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
-                onDuplicateTask={() => duplicateTask(section.id, task.id)}
+              <div
+                className={`text-sm cursor-pointer hover:bg-muted/50 px-2 py-1 rounded flex-1 block ${
+                  task.completed ? "line-through" : ""
+                } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
+                onClick={() => {
+                  if (task.name === "") {
+                    setEditingTaskId(task.id)
+                  }
+                }}
               >
-                <span
-                  className={`text-sm cursor-pointer hover:bg-muted/50 px-2 py-1 rounded flex-1 block ${
-                    task.completed ? "line-through" : ""
-                  }`}
-                >
-                  {task.name}
-                </span>
-              </TaskDetailsDialog>
+                {task.name === "" ? (
+                  <span>Click to add task name...</span>
+                ) : (
+                  <TaskDetailsDialog
+                    taskName={task.name}
+                    taskNotes={task.notes}
+                    taskEmoji={task.emoji}
+                    onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                    onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
+                    onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                    onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                  >
+                    <span>{task.name}</span>
+                  </TaskDetailsDialog>
+                )}
+              </div>
             )}
           </div>
           {columnVisibility.attachments && (
@@ -1427,9 +1476,8 @@ export function TaskList() {
                 currentName={section.name}
                 onRename={(newName) => renameSection(section.id, newName)}
               >
-                <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-foreground">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
                   <Edit className="w-4 h-4" />
-                  Rename
                 </Button>
               </SectionRenameDialog>
 
@@ -1438,16 +1486,14 @@ export function TaskList() {
                 availableSections={sections}
                 onRemoveSection={removeSection}
               >
-                <Button variant="ghost" size="sm" className="gap-1 text-muted-foreground hover:text-destructive">
+                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
                   <Trash2 className="w-4 h-4" />
-                  Delete
                 </Button>
               </RemoveSectionDialog>
 
               <Button
-                variant="ghost"
                 size="sm"
-                className="gap-1 text-muted-foreground"
+                className="gap-1 bg-gray-600 text-white hover:bg-gray-700"
                 onClick={() => addTask(section.id)}
               >
                 <Plus className="w-4 h-4" />
@@ -1546,23 +1592,32 @@ export function TaskList() {
                                 className="text-sm h-6 px-1 py-0"
                               />
                             ) : (
-                              <TaskDetailsDialog
-                                taskName={task.name}
-                                taskNotes={task.notes}
-                                taskEmoji={task.emoji}
-                                onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
-                                onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
-                                onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
-                                onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                              <div
+                                className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
+                                  task.completed ? "line-through" : ""
+                                } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
+                                onClick={() => {
+                                  if (task.name === "") {
+                                    setEditingTaskId(task.id)
+                                  }
+                                }}
                               >
-                                <span
-                                  className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
-                                    task.completed ? "line-through" : ""
-                                  }`}
-                                >
-                                  {task.name}
-                                </span>
-                              </TaskDetailsDialog>
+                                {task.name === "" ? (
+                                  <span>Click to add task name...</span>
+                                ) : (
+                                  <TaskDetailsDialog
+                                    taskName={task.name}
+                                    taskNotes={task.notes}
+                                    taskEmoji={task.emoji}
+                                    onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                                    onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
+                                    onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                                    onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                                  >
+                                    <span>{task.name}</span>
+                                  </TaskDetailsDialog>
+                                )}
+                              </div>
                             )}
                           </div>
 
