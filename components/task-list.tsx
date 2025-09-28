@@ -372,6 +372,9 @@ export function TaskList() {
     "who",
   ])
 
+  const [renameDialogOpen, setRenameDialogOpen] = useState(false)
+  const [sectionToRename, setSectionToRename] = useState<{ id: string; name: string } | null>(null)
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedAppName = localStorage.getItem("appName")
@@ -1431,19 +1434,24 @@ export function TaskList() {
                   <MoreHorizontal className="w-4 h-4" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="start" className="w-48">
-                  <SectionRenameDialog
+                  {/* <SectionRenameDialog
                     currentName={section.name}
                     onRename={(newName) => renameSection(section.id, newName)}
+                  > */}
+                  <DropdownMenuItem
+                    className="select-none cursor-pointer"
+                    onClick={(e) => {
+                      console.log("[v0] Rename section menu item clicked")
+                      e.preventDefault()
+                      e.stopPropagation()
+                      setSectionToRename({ id: section.id, name: section.name })
+                      setRenameDialogOpen(true)
+                    }}
                   >
-                    <DropdownMenuItem
-                      onSelect={(e) => e.preventDefault()}
-                      className="select-none cursor-pointer"
-                      onMouseDown={(e) => e.preventDefault()}
-                    >
-                      <Edit className="w-4 h-4 mr-2" />
-                      Rename Section
-                    </DropdownMenuItem>
-                  </SectionRenameDialog>
+                    <Edit className="w-4 h-4 mr-2" />
+                    Rename Section
+                  </DropdownMenuItem>
+                  {/* </SectionRenameDialog> */}
                   <RemoveSectionDialog
                     sectionToRemove={section}
                     availableSections={sections}
@@ -1497,7 +1505,7 @@ export function TaskList() {
                       .map((task) => (
                         <div
                           key={task.id}
-                          className={`flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 overflow-x-auto ${
+                          className={`flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 ${
                             task.completed ? "opacity-60" : ""
                           } ${selectedTasks.has(task.id) ? "bg-blue-50" : ""}`}
                           style={{
@@ -1673,6 +1681,18 @@ export function TaskList() {
           </div>
         )}
       </div>
+
+      {sectionToRename && (
+        <SectionRenameDialog
+          currentName={sectionToRename.name}
+          onRename={(newName) => {
+            renameSection(sectionToRename.id, newName)
+            setSectionToRename(null)
+          }}
+          isOpen={renameDialogOpen}
+          onOpenChange={setRenameDialogOpen}
+        />
+      )}
     </div>
   )
 }

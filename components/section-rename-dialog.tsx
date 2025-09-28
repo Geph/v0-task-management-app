@@ -3,14 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useRef } from "react"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
@@ -18,42 +11,69 @@ import { Label } from "@/components/ui/label"
 interface SectionRenameDialogProps {
   currentName: string
   onRename: (newName: string) => void
-  children: React.ReactNode
+  isOpen: boolean
+  onOpenChange: (open: boolean) => void
 }
 
-export function SectionRenameDialog({ currentName, onRename, children }: SectionRenameDialogProps) {
+export function SectionRenameDialog({ currentName, onRename, isOpen, onOpenChange }: SectionRenameDialogProps) {
   const [newName, setNewName] = useState(currentName)
-  const [isOpen, setIsOpen] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (isOpen) {
+      console.log("[v0] Dialog opened, setting up focus for input")
       setNewName(currentName)
-      // Use setTimeout to ensure the dialog is fully rendered before focusing
-      setTimeout(() => {
-        if (inputRef.current) {
-          inputRef.current.focus()
-          inputRef.current.select() // Select all text for easy replacement
-        }
-      }, 100)
+      // Use requestAnimationFrame to ensure the dialog is fully rendered
+      requestAnimationFrame(() => {
+        setTimeout(() => {
+          if (inputRef.current) {
+            console.log("[v0] Attempting to focus input field")
+            inputRef.current.focus()
+            inputRef.current.select()
+            console.log("[v0] Input focused and text selected")
+          } else {
+            console.log("[v0] Input ref not available")
+          }
+        }, 100)
+      })
     }
   }, [isOpen, currentName])
 
   const handleSave = () => {
+    console.log("[v0] Save clicked with name:", newName.trim())
     if (newName.trim() && newName.trim() !== currentName) {
       onRename(newName.trim())
     }
-    setIsOpen(false)
+    onOpenChange(false)
   }
 
   const handleCancel = () => {
-    setNewName(currentName) // Reset to original name
-    setIsOpen(false)
+    console.log("[v0] Cancel clicked")
+    setNewName(currentName)
+    onOpenChange(false)
+  }
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log("[v0] Input changed:", e.target.value)
+    setNewName(e.target.value)
+  }
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    console.log("[v0] Key pressed:", e.key)
+    if (e.key === "Enter") {
+      e.preventDefault()
+      e.stopPropagation()
+      handleSave()
+    }
+    if (e.key === "Escape") {
+      e.preventDefault()
+      e.stopPropagation()
+      handleCancel()
+    }
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>{children}</DialogTrigger>
+    <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-sm">
         <DialogHeader>
           <DialogTitle>Rename Section</DialogTitle>
@@ -68,18 +88,13 @@ export function SectionRenameDialog({ currentName, onRename, children }: Section
               ref={inputRef}
               id="section-name"
               value={newName}
-              onChange={(e) => setNewName(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault()
-                  handleSave()
-                }
-                if (e.key === "Escape") {
-                  e.preventDefault()
-                  handleCancel()
-                }
-              }}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
               placeholder="Enter section name"
+              autoComplete="off"
+              spellCheck={false}
+              onFocus={() => console.log("[v0] Input focused")}
+              onBlur={() => console.log("[v0] Input blurred")}
             />
           </div>
           <div className="flex justify-end gap-2">
