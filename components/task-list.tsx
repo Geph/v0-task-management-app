@@ -455,7 +455,7 @@ export function TaskList() {
     const baseColumns = {
       checkbox: "5%",
       emoji: "8%",
-      name: "35%",
+      name: "50%", // Increased from 35% to 50%
     }
 
     const visibleColumns = columnOrder.filter((columnId) => {
@@ -477,14 +477,14 @@ export function TaskList() {
       }
     })
 
-    // Calculate remaining width after base columns (52% remaining)
-    const remainingWidth = 52
+    // Calculate remaining width after base columns (37% remaining instead of 52%)
+    const remainingWidth = 37
 
     // If no dynamic columns are visible, give all remaining space to name
     if (visibleColumns.length === 0) {
       return {
         ...baseColumns,
-        name: "87%", // 35% + 52% = 87%
+        name: "87%", // 50% + 37% = 87%
       }
     }
 
@@ -1521,44 +1521,79 @@ export function TaskList() {
       <div className="p-4 table-container" ref={tableRef}>
         {sections.map((section) => (
           <div key={section.id} className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Button variant="ghost" size="sm" onClick={() => toggleSection(section.id)} className="p-1">
-                {section.expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-              </Button>
-              <div className="bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium flex items-center gap-2">
-                <span>{section.name}</span>
-                <span className="bg-white/20 px-2 py-0.5 rounded text-xs">{section.tasks.length}</span>
+            <div className="flex flex-col gap-2 mb-4">
+              {/* Main section header row */}
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => toggleSection(section.id)} className="p-1">
+                  {section.expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </Button>
+                <div className="bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium flex items-center gap-2">
+                  <span>{section.name}</span>
+                  <span className="bg-white/20 px-2 py-0.5 rounded text-xs">{section.tasks.length}</span>
+                </div>
+
+                {/* Desktop: buttons inline */}
+                <div className="hidden sm:flex items-center gap-2 ml-auto">
+                  <SectionRenameDialog
+                    currentName={section.name}
+                    onRename={(newName) => renameSection(section.id, newName)}
+                  >
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </SectionRenameDialog>
+
+                  <RemoveSectionDialog
+                    sectionToRemove={section}
+                    availableSections={sections}
+                    onRemoveSection={removeSection}
+                  >
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </RemoveSectionDialog>
+
+                  <Button
+                    size="sm"
+                    className="gap-1 bg-gray-600 text-white hover:bg-gray-700"
+                    onClick={() => addTask(section.id)}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Task
+                  </Button>
+                </div>
               </div>
 
-              <SectionRenameDialog
-                currentName={section.name}
-                onRename={(newName) => renameSection(section.id, newName)}
-              >
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                  <Edit className="w-4 h-4" />
+              {/* Mobile: buttons below section header */}
+              <div className="flex sm:hidden items-center gap-2 ml-8">
+                <SectionRenameDialog
+                  currentName={section.name}
+                  onRename={(newName) => renameSection(section.id, newName)}
+                >
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                </SectionRenameDialog>
+
+                <RemoveSectionDialog
+                  sectionToRemove={section}
+                  availableSections={sections}
+                  onRemoveSection={removeSection}
+                >
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </RemoveSectionDialog>
+
+                <Button
+                  size="sm"
+                  className="gap-1 bg-gray-600 text-white hover:bg-gray-700"
+                  onClick={() => addTask(section.id)}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Task
                 </Button>
-              </SectionRenameDialog>
-
-              <RemoveSectionDialog
-                sectionToRemove={section}
-                availableSections={sections}
-                onRemoveSection={removeSection}
-              >
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </RemoveSectionDialog>
-
-              <div className="flex-1"></div>
-
-              <Button
-                size="sm"
-                className="gap-1 bg-gray-600 text-white hover:bg-gray-700"
-                onClick={() => addTask(section.id)}
-              >
-                <Plus className="w-4 h-4" />
-                Add Task
-              </Button>
+              </div>
             </div>
 
             {section.expanded && (

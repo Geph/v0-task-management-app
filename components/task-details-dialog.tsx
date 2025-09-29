@@ -97,9 +97,6 @@ export function TaskDetailsDialog({
                 <Button variant="ghost" size="sm" onClick={() => setIsRenaming(true)} className="h-6 w-6 p-0">
                   <Edit3 className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleMarkCompleted} className="h-6 w-6 p-0">
-                  <CheckCircle className="w-3 h-3" />
-                </Button>
               </>
             )}
           </div>
@@ -118,10 +115,23 @@ export function TaskDetailsDialog({
           </div>
 
           <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-between"}`}>
-            <Button variant="outline" onClick={handleDuplicate} className="flex items-center gap-2 bg-transparent">
-              <Copy className="w-4 h-4" />
-              Duplicate Task
-            </Button>
+            <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
+              <Button
+                onClick={handleMarkCompleted}
+                className={`flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white ${isMobile ? "w-full" : ""}`}
+              >
+                <CheckCircle className="w-4 h-4" />
+                Task Complete
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleDuplicate}
+                className={`flex items-center gap-2 bg-transparent ${isMobile ? "w-full" : ""}`}
+              >
+                <Copy className="w-4 h-4" />
+                Duplicate Task
+              </Button>
+            </div>
             <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
               <Button variant="outline" onClick={handleCancel} className={isMobile ? "w-full" : ""}>
                 Cancel
