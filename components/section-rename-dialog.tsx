@@ -106,7 +106,7 @@ export function SectionRenameDialog({ currentName, onRename, children }: Section
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-4">
-          <div>
+          <div className="space-y-2">
             <Label htmlFor="section-name">Section Name</Label>
             <Input
               ref={inputRef}
