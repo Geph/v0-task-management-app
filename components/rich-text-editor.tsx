@@ -199,7 +199,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         ref={editorRef}
         contentEditable
         onInput={handleInput}
-        className="p-3 min-h-[120px] focus:outline-none"
+        className="p-3 min-h-[120px] focus:outline-none prose prose-sm max-w-none"
         style={{ wordWrap: "break-word" }}
         data-placeholder={placeholder}
         suppressContentEditableWarning={true}
@@ -209,6 +209,20 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           content: attr(data-placeholder);
           color: #9ca3af;
           pointer-events: none;
+        }
+        /* Added styles for lists to display properly */
+        [contenteditable] ul {
+          list-style-type: disc;
+          padding-left: 1.5rem;
+          margin: 0.5rem 0;
+        }
+        [contenteditable] ol {
+          list-style-type: decimal;
+          padding-left: 1.5rem;
+          margin: 0.5rem 0;
+        }
+        [contenteditable] li {
+          margin: 0.25rem 0;
         }
       `}</style>
     </div>

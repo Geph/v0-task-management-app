@@ -14,6 +14,8 @@ import {
   Edit,
   Merge,
   Settings,
+  ChevronUp,
+  ChevronDownIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -86,6 +88,7 @@ export function TaskList() {
     { key: "medium", label: "Medium", color: "#ff7800" },
     { key: "low", label: "Low", color: "#3082b7" },
     { key: "someday", label: "Someday", color: "#1bbc9c" },
+    { key: "paused", label: "Paused", color: "#6b7280" }, // Added "paused" priority
   ])
 
   const [sections, setSections] = useState<TaskSection[]>([
@@ -548,10 +551,12 @@ export function TaskList() {
 
       switch (sortField) {
         case "priority":
-          const priorityOrder = { high: 3, medium: 2, low: 1, someday: 0, blank: -1 }
-          const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || -1
-          const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || -1
-          result = bPriority - aPriority // Higher priority first
+          const aPriorityIndex = priorityOptions.findIndex((p) => p.key === a.priority)
+          const bPriorityIndex = priorityOptions.findIndex((p) => p.key === b.priority)
+          // If priority not found, put it at the end
+          const aPriority = aPriorityIndex === -1 ? 999 : aPriorityIndex
+          const bPriority = bPriorityIndex === -1 ? 999 : bPriorityIndex
+          result = aPriority - bPriority // Lower index (higher priority) first
           break
 
         case "due":
@@ -918,6 +923,28 @@ export function TaskList() {
       expanded: true,
     }
     setSections([...sections, newSection])
+  }
+
+  const moveSectionUp = (sectionId: string) => {
+    const index = sections.findIndex((s) => s.id === sectionId)
+    if (index > 0) {
+      const newSections = [...sections]
+      const temp = newSections[index]
+      newSections[index] = newSections[index - 1]
+      newSections[index - 1] = temp
+      setSections(newSections)
+    }
+  }
+
+  const moveSectionDown = (sectionId: string) => {
+    const index = sections.findIndex((s) => s.id === sectionId)
+    if (index < sections.length - 1) {
+      const newSections = [...sections]
+      const temp = newSections[index]
+      newSections[index] = newSections[index + 1]
+      newSections[index + 1] = temp
+      setSections(newSections)
+    }
   }
 
   const handleImport = (data: {
@@ -1534,6 +1561,26 @@ export function TaskList() {
 
                 {/* Desktop: buttons inline */}
                 <div className="hidden sm:flex items-center gap-2 ml-auto">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => moveSectionUp(section.id)}
+                    disabled={sections.findIndex((s) => s.id === section.id) === 0}
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => moveSectionDown(section.id)}
+                    disabled={sections.findIndex((s) => s.id === section.id) === sections.length - 1}
+                  >
+                    <ChevronDownIcon className="w-4 h-4" />
+                  </Button>
+
                   <SectionRenameDialog
                     currentName={section.name}
                     onRename={(newName) => renameSection(section.id, newName)}
@@ -1566,6 +1613,26 @@ export function TaskList() {
 
               {/* Mobile: buttons below section header */}
               <div className="flex sm:hidden items-center gap-2 ml-8">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => moveSectionUp(section.id)}
+                  disabled={sections.findIndex((s) => s.id === section.id) === 0}
+                >
+                  <ChevronUp className="w-4 h-4" />
+                </Button>
+
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => moveSectionDown(section.id)}
+                  disabled={sections.findIndex((s) => s.id === section.id) === sections.length - 1}
+                >
+                  <ChevronDownIcon className="w-4 h-4" />
+                </Button>
+
                 <SectionRenameDialog
                   currentName={section.name}
                   onRename={(newName) => renameSection(section.id, newName)}
@@ -1604,7 +1671,12 @@ export function TaskList() {
                     {" "}
                     {/* reduced spacing from space-y-1 to space-y-0.5 */}
                     {section.tasks
-                      .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                      .filter(
+                        (task) =>
+                          searchTerm === "" ||
+                          task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          task.emoji.includes(searchTerm),
+                      )
                       .sort((a, b) => {
                         const sorted = sortTasks([a, b])
                         return sorted[0] === a ? -1 : 1
@@ -1631,7 +1703,12 @@ export function TaskList() {
                     </div>
 
                     {section.tasks
-                      .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                      .filter(
+                        (task) =>
+                          searchTerm === "" ||
+                          task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          task.emoji.includes(searchTerm),
+                      )
                       .sort((a, b) => {
                         const sorted = sortTasks([a, b])
                         return sorted[0] === a ? -1 : 1
