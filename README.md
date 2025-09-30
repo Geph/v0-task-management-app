@@ -14,7 +14,7 @@ Any changes you make to your deployed app will be automatically pushed to this r
 
 May require modification to your specific server directory and settings. next.config.mjs will likely need to be changed, here's an example:
 
-```
+\`\`\`
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',        // produce /out for static hosting
@@ -27,4 +27,4 @@ const nextConfig = {
 };
 
 export default nextConfig;
-```
+\`\`\`
