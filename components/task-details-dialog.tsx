@@ -75,7 +75,6 @@ export function TaskDetailsDialog({
         <div className="absolute top-4 left-4 z-10">
           <Label className="text-xs text-muted-foreground">Notes</Label>
         </div>
-        {/* </CHANGE> */}
         <DialogHeader className="relative pt-6">
           <div className="flex items-center gap-3">
             <div className="text-2xl">{taskEmoji}</div>
@@ -113,18 +112,9 @@ export function TaskDetailsDialog({
               placeholder="Add notes for this task..."
               className="mt-1"
             />
-            {/* </CHANGE> */}
           </div>
 
           <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-between items-center"}`}>
-            <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
-              <Button onClick={handleSave} className={isMobile ? "w-full" : ""}>
-                Save
-              </Button>
-              <Button variant="outline" onClick={handleCancel} className={isMobile ? "w-full" : ""}>
-                Cancel
-              </Button>
-            </div>
             <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
               <Button
                 variant="outline"
@@ -140,6 +130,14 @@ export function TaskDetailsDialog({
               >
                 <CheckCircle className="w-4 h-4" />
                 Complete
+              </Button>
+            </div>
+            <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
+              <Button onClick={handleSave} className={isMobile ? "w-full" : ""}>
+                Save
+              </Button>
+              <Button variant="outline" onClick={handleCancel} className={isMobile ? "w-full" : ""}>
+                Cancel
               </Button>
             </div>
           </div>
