@@ -4,13 +4,13 @@
 
 1. **Clone or download** your repository from GitHub
 2. **Install dependencies** (requires Node.js on your local machine):
-   \`\`\`bash
+   ```bash
    npm install
-   \`\`\`
+   ```
 3. **Build the static site**:
-   \`\`\`bash
+   ```bash
    npm run build
-   \`\`\`
+   ```
 4. **Upload the `out` folder** contents to your Dreamhost public_html directory via FTP
 
 ## Option 2: Direct FTP Upload
