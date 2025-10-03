@@ -16,12 +16,26 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Download, Upload } from "lucide-react"
 
+interface Task {
+  id: string
+  name: string
+  status: string
+  priority: string
+  completed: boolean
+  notes: string
+  emoji: string
+  attachments: any[]
+  progress: number
+  dueDate: Date | null
+  assignedTo: string
+}
+
 interface ExportImportDialogProps {
-  sections: Array<{ id: string; name: string }>
+  sections: Array<{ id: string; name: string; tasks?: Task[] }> // Added tasks to sections
   statusOptions: Array<{ key: string; label: string; color: string }>
   priorityOptions: Array<{ key: string; label: string; color: string }>
   onImport: (data: {
-    sections: Array<{ id: string; name: string }>
+    sections: Array<{ id: string; name: string; tasks?: Task[] }> // Added tasks to import
     statusOptions: Array<{ key: string; label: string; color: string }>
     priorityOptions: Array<{ key: string; label: string; color: string }>
   }) => void
@@ -40,12 +54,31 @@ export function ExportImportDialog({
   const [importUrl, setImportUrl] = useState("")
   const [isLoadingUrl, setIsLoadingUrl] = useState(false)
 
+  const escapeXml = (str: string) => {
+    return str
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&apos;")
+  }
+
+  const unescapeXml = (str: string) => {
+    return str
+      .replace(/&amp;/g, "&")
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+  }
+
   const exportData = () => {
     const data = {
       sections: sections.map((section, index) => ({
         id: section.id,
         name: section.name,
         order: index,
+        tasks: section.tasks || [], // Include tasks in export
       })),
       statusOptions: statusOptions.map((option, index) => ({
         key: option.key,
@@ -67,14 +100,33 @@ export function ExportImportDialog({
 <taskManagementConfig version="1.0" exportDate="${data.exportDate}">
   <sections>
     ${data.sections
-      .map((section) => `    <section id="${section.id}" name="${section.name}" order="${section.order}" />`)
+      .map(
+        (section) => `    <section id="${section.id}" name="${escapeXml(section.name)}" order="${section.order}">
+      ${section.tasks
+        .map(
+          (task) => `      <task 
+        id="${task.id}" 
+        name="${escapeXml(task.name)}" 
+        status="${task.status}" 
+        priority="${task.priority}" 
+        completed="${task.completed}" 
+        emoji="${escapeXml(task.emoji)}" 
+        progress="${task.progress}" 
+        dueDate="${task.dueDate ? new Date(task.dueDate).toISOString() : ""}" 
+        assignedTo="${escapeXml(task.assignedTo)}">
+        <notes>${escapeXml(task.notes)}</notes>
+      </task>`,
+        )
+        .join("\n")}
+    </section>`,
+      )
       .join("\n")}
   </sections>
   <statusOptions>
     ${data.statusOptions
       .map(
         (option) =>
-          `    <status key="${option.key}" label="${option.label}" color="${option.color}" order="${option.order}" />`,
+          `    <status key="${option.key}" label="${escapeXml(option.label)}" color="${option.color}" order="${option.order}" />`,
       )
       .join("\n")}
   </statusOptions>
@@ -82,7 +134,7 @@ export function ExportImportDialog({
     ${data.priorityOptions
       .map(
         (option) =>
-          `    <priority key="${option.key}" label="${option.label}" color="${option.color}" order="${option.order}" />`,
+          `    <priority key="${option.key}" label="${escapeXml(option.label)}" color="${option.color}" order="${option.order}" />`,
       )
       .join("\n")}
   </priorityOptions>
@@ -116,7 +168,7 @@ export function ExportImportDialog({
       setImportUrl("")
       alert("Data loaded from URL successfully. Review and click Import Configuration to apply.")
     } catch (error) {
-      alert(`Error loading data from URL: ${error.message}`)
+      alert(`Error loading data from URL: ${error instanceof Error ? error.message : String(error)}`)
     } finally {
       setIsLoadingUrl(false)
     }
@@ -124,24 +176,45 @@ export function ExportImportDialog({
 
   const handleImport = () => {
     try {
-      // Parse XML data (simplified parser for our specific format)
       const parser = new DOMParser()
       const xmlDoc = parser.parseFromString(importData, "application/xml")
 
-      const sections = Array.from(xmlDoc.querySelectorAll("section")).map((section) => ({
-        id: section.getAttribute("id") || "",
-        name: section.getAttribute("name") || "",
-      }))
+      const sections = Array.from(xmlDoc.querySelectorAll("section")).map((section) => {
+        const tasks = Array.from(section.querySelectorAll("task")).map((task) => {
+          const notesElement = task.querySelector("notes")
+          const dueDateStr = task.getAttribute("dueDate") || ""
+
+          return {
+            id: task.getAttribute("id") || "",
+            name: unescapeXml(task.getAttribute("name") || ""),
+            status: task.getAttribute("status") || "not-yet",
+            priority: task.getAttribute("priority") || "blank",
+            completed: task.getAttribute("completed") === "true",
+            emoji: unescapeXml(task.getAttribute("emoji") || ""),
+            progress: Number.parseInt(task.getAttribute("progress") || "0", 10),
+            dueDate: dueDateStr ? new Date(dueDateStr) : null,
+            assignedTo: unescapeXml(task.getAttribute("assignedTo") || ""),
+            notes: notesElement ? unescapeXml(notesElement.textContent || "") : "",
+            attachments: [], // Attachments are not exported/imported as they contain file data
+          }
+        })
+
+        return {
+          id: section.getAttribute("id") || "",
+          name: unescapeXml(section.getAttribute("name") || ""),
+          tasks,
+        }
+      })
 
       const statusOptions = Array.from(xmlDoc.querySelectorAll("status")).map((status) => ({
         key: status.getAttribute("key") || "",
-        label: status.getAttribute("label") || "",
+        label: unescapeXml(status.getAttribute("label") || ""),
         color: status.getAttribute("color") || "",
       }))
 
       const priorityOptions = Array.from(xmlDoc.querySelectorAll("priority")).map((priority) => ({
         key: priority.getAttribute("key") || "",
-        label: priority.getAttribute("label") || "",
+        label: unescapeXml(priority.getAttribute("label") || ""),
         color: priority.getAttribute("color") || "",
       }))
 
@@ -160,14 +233,15 @@ export function ExportImportDialog({
         <DialogHeader>
           <DialogTitle>Export / Import Configuration</DialogTitle>
           <DialogDescription>
-            Export your current configuration to share with others or import a configuration from XML data or URL.
+            Export your current configuration including tasks, sections, status options, and priority options to share
+            with others or import a configuration from XML data or URL.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-6">
           <div>
             <Label className="text-base font-medium">Export Current Configuration</Label>
             <p className="text-sm text-muted-foreground mb-3">
-              Download your current sections, status options, and priority options as an XML file.
+              Download your current tasks, sections, status options, and priority options as an XML file.
             </p>
             <Button onClick={exportData} className="gap-2">
               <Download className="w-4 h-4" />

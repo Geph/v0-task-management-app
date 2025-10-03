@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { RichTextEditor } from "@/components/rich-text-editor"
-import { Copy, Edit3, CheckCircle } from "lucide-react"
+import { Copy, Edit3, CheckCircle, Trash2 } from "lucide-react" // Added Trash2 icon
 import { useIsMobile } from "@/hooks/use-mobile"
 
 interface TaskDetailsDialogProps {
@@ -18,7 +18,8 @@ interface TaskDetailsDialogProps {
   onUpdateNotes: (notes: string) => void
   onRenameTask: (newName: string) => void
   onDuplicateTask: () => void
-  onMarkCompleted: () => void // Added onMarkCompleted prop
+  onMarkCompleted: () => void
+  onDeleteTask: () => void // Added onDeleteTask prop
   children: React.ReactNode
 }
 
@@ -29,7 +30,8 @@ export function TaskDetailsDialog({
   onUpdateNotes,
   onRenameTask,
   onDuplicateTask,
-  onMarkCompleted, // Added onMarkCompleted prop
+  onMarkCompleted,
+  onDeleteTask, // Added onDeleteTask prop
   children,
 }: TaskDetailsDialogProps) {
   const [notes, setNotes] = useState(taskNotes)
@@ -63,6 +65,13 @@ export function TaskDetailsDialog({
   const handleMarkCompleted = () => {
     onMarkCompleted()
     setIsOpen(false)
+  }
+
+  const handleDelete = () => {
+    if (confirm(`Are you sure you want to delete "${taskName}"?`)) {
+      onDeleteTask()
+      setIsOpen(false)
+    }
   }
 
   return (
@@ -123,6 +132,14 @@ export function TaskDetailsDialog({
               >
                 <Copy className="w-4 h-4" />
                 Duplicate
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleDelete}
+                className={`flex items-center gap-2 bg-transparent text-destructive hover:bg-destructive hover:text-destructive-foreground ${isMobile ? "w-full" : ""}`}
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
               </Button>
               <Button
                 onClick={handleMarkCompleted}

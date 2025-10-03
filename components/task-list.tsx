@@ -888,6 +888,14 @@ export function TaskList() {
     }
   }
 
+  const deleteTask = (sectionId: string, taskId: string) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId ? { ...section, tasks: section.tasks.filter((t) => t.id !== taskId) } : section,
+      ),
+    )
+  }
+
   const renameSection = (sectionId: string, newName: string) => {
     setSections(sections.map((section) => (section.id === sectionId ? { ...section, name: newName } : section)))
   }
@@ -948,10 +956,20 @@ export function TaskList() {
   }
 
   const handleImport = (data: {
-    sections: Array<{ id: string; name: string }>
+    sections: Array<{ id: string; name: string; tasks?: Task[] }> // Added tasks to import type
     statusOptions: Array<{ key: string; label: string; color: string }>
     priorityOptions: Array<{ key: string; label: string; color: string }>
   }) => {
+    if (data.sections && data.sections.length > 0) {
+      setSections(
+        data.sections.map((section) => ({
+          id: section.id,
+          name: section.name,
+          tasks: section.tasks || [],
+          expanded: true,
+        })),
+      )
+    }
     setStatusOptions(data.statusOptions)
     setPriorityOptions(data.priorityOptions)
   }
@@ -1302,31 +1320,47 @@ export function TaskList() {
                 className="text-sm h-8"
               />
             ) : (
-              <div
-                className={`text-sm cursor-pointer hover:bg-muted/50 px-2 py-1 rounded flex-1 block ${
-                  task.completed ? "line-through" : ""
-                } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
-                onClick={() => {
-                  if (task.name === "") {
-                    setEditingTaskId(task.id)
-                  }
-                }}
-              >
-                {task.name === "" ? (
-                  <span>Click to add task name...</span>
-                ) : (
-                  <TaskDetailsDialog
-                    taskName={task.name}
-                    taskNotes={task.notes}
-                    taskEmoji={task.emoji}
-                    onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
-                    onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
-                    onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
-                    onDuplicateTask={() => duplicateTask(section.id, task.id)}
-                  >
-                    <span>{task.name}</span>
-                  </TaskDetailsDialog>
-                )}
+              <div className="flex items-center gap-2 flex-1">
+                <div
+                  className={`text-sm cursor-pointer hover:bg-muted/50 px-2 py-1 rounded flex-1 block ${
+                    task.completed ? "line-through" : ""
+                  } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
+                  onClick={() => {
+                    if (task.name === "") {
+                      setEditingTaskId(task.id)
+                    }
+                  }}
+                >
+                  {task.name === "" ? (
+                    <span>Click to add task name...</span>
+                  ) : (
+                    <TaskDetailsDialog
+                      taskName={task.name}
+                      taskNotes={task.notes}
+                      taskEmoji={task.emoji}
+                      onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                      onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
+                      onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                      onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                      onDeleteTask={() => deleteTask(section.id, task.id)}
+                    >
+                      <span>{task.name}</span>
+                    </TaskDetailsDialog>
+                  )}
+                </div>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive shrink-0"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    if (confirm(`Delete task "${task.name}"?`)) {
+                      deleteTask(section.id, task.id)
+                    }
+                  }}
+                >
+                  <Trash2 className="w-4 h-4" />
+                </Button>
               </div>
             )}
           </div>
@@ -1716,7 +1750,7 @@ export function TaskList() {
                       .map((task) => (
                         <div
                           key={task.id}
-                          className={`flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 ${
+                          className={`group flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 ${
                             task.completed ? "opacity-60" : ""
                           } ${selectedTasks.has(task.id) ? "bg-blue-50" : ""}`}
                           style={{
@@ -1777,32 +1811,48 @@ export function TaskList() {
                                 className="text-sm h-6 px-1 py-0"
                               />
                             ) : (
-                              <div
-                                className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
-                                  task.completed ? "line-through" : ""
-                                } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
-                                onClick={() => {
-                                  if (task.name === "") {
-                                    setEditingTaskId(task.id)
-                                  }
-                                }}
-                              >
-                                {task.name === "" ? (
-                                  <span>Click to add task name...</span>
-                                ) : (
-                                  <TaskDetailsDialog
-                                    taskName={task.name}
-                                    taskNotes={task.notes}
-                                    taskEmoji={task.emoji}
-                                    onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
-                                    onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
-                                    onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
-                                    onDuplicateTask={() => duplicateTask(section.id, task.id)}
-                                    onMarkCompleted={() => markTaskAsCompleted(section.id, task.id)}
-                                  >
-                                    <span>{task.name}</span>
-                                  </TaskDetailsDialog>
-                                )}
+                              <div className="flex items-center gap-2 flex-1">
+                                <div
+                                  className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
+                                    task.completed ? "line-through" : ""
+                                  } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
+                                  onClick={() => {
+                                    if (task.name === "") {
+                                      setEditingTaskId(task.id)
+                                    }
+                                  }}
+                                >
+                                  {task.name === "" ? (
+                                    <span>Click to add task name...</span>
+                                  ) : (
+                                    <TaskDetailsDialog
+                                      taskName={task.name}
+                                      taskNotes={task.notes}
+                                      taskEmoji={task.emoji}
+                                      onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                                      onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
+                                      onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                                      onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                                      onMarkCompleted={() => markTaskAsCompleted(section.id, task.id)}
+                                      onDeleteTask={() => deleteTask(section.id, task.id)}
+                                    >
+                                      <span>{task.name}</span>
+                                    </TaskDetailsDialog>
+                                  )}
+                                </div>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive shrink-0"
+                                  onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (confirm(`Delete task "${task.name}"?`)) {
+                                      deleteTask(section.id, task.id)
+                                    }
+                                  }}
+                                >
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
                               </div>
                             )}
                           </div>
