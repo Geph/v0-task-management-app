@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
@@ -22,6 +24,17 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
     }
   }, [value])
 
+  const handleClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    const target = e.target as HTMLElement
+    if (target.tagName === "A") {
+      e.preventDefault()
+      const href = target.getAttribute("href")
+      if (href) {
+        window.open(href, "_blank", "noopener,noreferrer")
+      }
+    }
+  }
+
   const handleInput = () => {
     if (editorRef.current) {
       onChange(editorRef.current.innerHTML)
@@ -35,9 +48,11 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   }
 
   const insertLink = () => {
-    const url = prompt("Enter URL:")
+    const url = prompt("Enter URL (e.g., https://example.com):")
     if (url) {
-      execCommand("createLink", url)
+      // Add https:// if no protocol is specified
+      const formattedUrl = url.match(/^https?:\/\//) ? url : `https://${url}`
+      execCommand("createLink", formattedUrl)
     }
   }
 
@@ -199,7 +214,8 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         ref={editorRef}
         contentEditable
         onInput={handleInput}
-        className="p-3 min-h-[120px] focus:outline-none"
+        onClick={handleClick}
+        className="p-3 min-h-[120px] focus:outline-none prose prose-sm max-w-none"
         style={{ wordWrap: "break-word" }}
         data-placeholder={placeholder}
         suppressContentEditableWarning={true}
@@ -209,6 +225,30 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           content: attr(data-placeholder);
           color: #9ca3af;
           pointer-events: none;
+        }
+        /* Added styles for lists to display properly */
+        [contenteditable] ul {
+          list-style-type: disc;
+          padding-left: 1.5rem;
+          margin: 0.5rem 0;
+        }
+        [contenteditable] ol {
+          list-style-type: decimal;
+          padding-left: 1.5rem;
+          margin: 0.5rem 0;
+        }
+        [contenteditable] li {
+          margin: 0.25rem 0;
+        }
+        /* Added styles for links to make them visible and clickable */
+        [contenteditable] a {
+          color: #3b82f6;
+          text-decoration: underline;
+          cursor: pointer;
+        }
+        [contenteditable] a:hover {
+          color: #2563eb;
+          text-decoration: underline;
         }
       `}</style>
     </div>

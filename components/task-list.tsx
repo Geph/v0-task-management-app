@@ -14,6 +14,8 @@ import {
   Edit,
   Merge,
   Settings,
+  ChevronUp,
+  ChevronDownIcon,
 } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -86,6 +88,7 @@ export function TaskList() {
     { key: "medium", label: "Medium", color: "#ff7800" },
     { key: "low", label: "Low", color: "#3082b7" },
     { key: "someday", label: "Someday", color: "#1bbc9c" },
+    { key: "paused", label: "Paused", color: "#6b7280" }, // Added "paused" priority
   ])
 
   const [sections, setSections] = useState<TaskSection[]>([
@@ -455,7 +458,7 @@ export function TaskList() {
     const baseColumns = {
       checkbox: "5%",
       emoji: "8%",
-      name: "35%",
+      name: "50%", // Increased from 35% to 50%
     }
 
     const visibleColumns = columnOrder.filter((columnId) => {
@@ -477,14 +480,14 @@ export function TaskList() {
       }
     })
 
-    // Calculate remaining width after base columns (52% remaining)
-    const remainingWidth = 52
+    // Calculate remaining width after base columns (37% remaining instead of 52%)
+    const remainingWidth = 37
 
     // If no dynamic columns are visible, give all remaining space to name
     if (visibleColumns.length === 0) {
       return {
         ...baseColumns,
-        name: "87%", // 35% + 52% = 87%
+        name: "87%", // 50% + 37% = 87%
       }
     }
 
@@ -548,10 +551,12 @@ export function TaskList() {
 
       switch (sortField) {
         case "priority":
-          const priorityOrder = { high: 3, medium: 2, low: 1, someday: 0, blank: -1 }
-          const aPriority = priorityOrder[a.priority as keyof typeof priorityOrder] || -1
-          const bPriority = priorityOrder[b.priority as keyof typeof priorityOrder] || -1
-          result = bPriority - aPriority // Higher priority first
+          const aPriorityIndex = priorityOptions.findIndex((p) => p.key === a.priority)
+          const bPriorityIndex = priorityOptions.findIndex((p) => p.key === b.priority)
+          // If priority not found, put it at the end
+          const aPriority = aPriorityIndex === -1 ? 999 : aPriorityIndex
+          const bPriority = bPriorityIndex === -1 ? 999 : bPriorityIndex
+          result = aPriority - bPriority // Lower index (higher priority) first
           break
 
         case "due":
@@ -918,6 +923,28 @@ export function TaskList() {
       expanded: true,
     }
     setSections([...sections, newSection])
+  }
+
+  const moveSectionUp = (sectionId: string) => {
+    const index = sections.findIndex((s) => s.id === sectionId)
+    if (index > 0) {
+      const newSections = [...sections]
+      const temp = newSections[index]
+      newSections[index] = newSections[index - 1]
+      newSections[index - 1] = temp
+      setSections(newSections)
+    }
+  }
+
+  const moveSectionDown = (sectionId: string) => {
+    const index = sections.findIndex((s) => s.id === sectionId)
+    if (index < sections.length - 1) {
+      const newSections = [...sections]
+      const temp = newSections[index]
+      newSections[index] = newSections[index + 1]
+      newSections[index + 1] = temp
+      setSections(newSections)
+    }
   }
 
   const handleImport = (data: {
@@ -1521,44 +1548,119 @@ export function TaskList() {
       <div className="p-4 table-container" ref={tableRef}>
         {sections.map((section) => (
           <div key={section.id} className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
-              <Button variant="ghost" size="sm" onClick={() => toggleSection(section.id)} className="p-1">
-                {section.expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
-              </Button>
-              <div className="bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium flex items-center gap-2">
-                <span>{section.name}</span>
-                <span className="bg-white/20 px-2 py-0.5 rounded text-xs">{section.tasks.length}</span>
+            <div className="flex flex-col gap-2 mb-4">
+              {/* Main section header row */}
+              <div className="flex items-center gap-2">
+                <Button variant="ghost" size="sm" onClick={() => toggleSection(section.id)} className="p-1">
+                  {section.expanded ? <ChevronDown className="w-4 h-4" /> : <ChevronRight className="w-4 h-4" />}
+                </Button>
+                <div className="bg-gray-700 text-white px-3 py-1 rounded text-sm font-medium flex items-center gap-2">
+                  <span>{section.name}</span>
+                  <span className="bg-white/20 px-2 py-0.5 rounded text-xs">{section.tasks.length}</span>
+                </div>
+
+                {/* Desktop: buttons inline */}
+                <div className="hidden sm:flex items-center gap-2 ml-auto">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => moveSectionUp(section.id)}
+                    disabled={sections.findIndex((s) => s.id === section.id) === 0}
+                  >
+                    <ChevronUp className="w-4 h-4" />
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    className="text-muted-foreground hover:text-foreground"
+                    onClick={() => moveSectionDown(section.id)}
+                    disabled={sections.findIndex((s) => s.id === section.id) === sections.length - 1}
+                  >
+                    <ChevronDownIcon className="w-4 h-4" />
+                  </Button>
+
+                  <SectionRenameDialog
+                    currentName={section.name}
+                    onRename={(newName) => renameSection(section.id, newName)}
+                  >
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                      <Edit className="w-4 h-4" />
+                    </Button>
+                  </SectionRenameDialog>
+
+                  <RemoveSectionDialog
+                    sectionToRemove={section}
+                    availableSections={sections}
+                    onRemoveSection={removeSection}
+                  >
+                    <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
+                  </RemoveSectionDialog>
+
+                  <Button
+                    size="sm"
+                    className="gap-1 bg-gray-600 text-white hover:bg-gray-700"
+                    onClick={() => addTask(section.id)}
+                  >
+                    <Plus className="w-4 h-4" />
+                    Add Task
+                  </Button>
+                </div>
               </div>
 
-              <SectionRenameDialog
-                currentName={section.name}
-                onRename={(newName) => renameSection(section.id, newName)}
-              >
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
-                  <Edit className="w-4 h-4" />
+              {/* Mobile: buttons below section header */}
+              <div className="flex sm:hidden items-center gap-2 ml-8">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => moveSectionUp(section.id)}
+                  disabled={sections.findIndex((s) => s.id === section.id) === 0}
+                >
+                  <ChevronUp className="w-4 h-4" />
                 </Button>
-              </SectionRenameDialog>
 
-              <RemoveSectionDialog
-                sectionToRemove={section}
-                availableSections={sections}
-                onRemoveSection={removeSection}
-              >
-                <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
-                  <Trash2 className="w-4 h-4" />
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-muted-foreground hover:text-foreground"
+                  onClick={() => moveSectionDown(section.id)}
+                  disabled={sections.findIndex((s) => s.id === section.id) === sections.length - 1}
+                >
+                  <ChevronDownIcon className="w-4 h-4" />
                 </Button>
-              </RemoveSectionDialog>
 
-              <div className="flex-1"></div>
+                <SectionRenameDialog
+                  currentName={section.name}
+                  onRename={(newName) => renameSection(section.id, newName)}
+                >
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
+                    <Edit className="w-4 h-4" />
+                  </Button>
+                </SectionRenameDialog>
 
-              <Button
-                size="sm"
-                className="gap-1 bg-gray-600 text-white hover:bg-gray-700"
-                onClick={() => addTask(section.id)}
-              >
-                <Plus className="w-4 h-4" />
-                Add Task
-              </Button>
+                <RemoveSectionDialog
+                  sectionToRemove={section}
+                  availableSections={sections}
+                  onRemoveSection={removeSection}
+                >
+                  <Button variant="ghost" size="sm" className="text-muted-foreground hover:text-destructive">
+                    <Trash2 className="w-4 h-4" />
+                  </Button>
+                </RemoveSectionDialog>
+
+                <Button
+                  size="sm"
+                  className="gap-1 bg-gray-600 text-white hover:bg-gray-700"
+                  onClick={() => addTask(section.id)}
+                >
+                  <Plus className="w-4 h-4" />
+                  Add Task
+                </Button>
+              </div>
             </div>
 
             {section.expanded && (
@@ -1569,7 +1671,12 @@ export function TaskList() {
                     {" "}
                     {/* reduced spacing from space-y-1 to space-y-0.5 */}
                     {section.tasks
-                      .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                      .filter(
+                        (task) =>
+                          searchTerm === "" ||
+                          task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          task.emoji.includes(searchTerm),
+                      )
                       .sort((a, b) => {
                         const sorted = sortTasks([a, b])
                         return sorted[0] === a ? -1 : 1
@@ -1596,7 +1703,12 @@ export function TaskList() {
                     </div>
 
                     {section.tasks
-                      .filter((task) => searchTerm === "" || task.name.toLowerCase().includes(searchTerm.toLowerCase()))
+                      .filter(
+                        (task) =>
+                          searchTerm === "" ||
+                          task.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                          task.emoji.includes(searchTerm),
+                      )
                       .sort((a, b) => {
                         const sorted = sortTasks([a, b])
                         return sorted[0] === a ? -1 : 1

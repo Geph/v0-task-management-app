@@ -1,4 +1,4 @@
-# ClickUp task list
+# Simple Colorful Emoji Task List App
 
 *Automatically synced with your [v0.app](https://v0.app) deployments*
 
@@ -12,19 +12,19 @@ Any changes you make to your deployed app will be automatically pushed to this r
 
 ## Deployment
 
-Your project is live at:
+May require modification to your specific server directory and settings. next.config.mjs will likely need to be changed, here's an example:
 
-**[https://vercel.com/thejeffginger-5327s-projects/v0-click-up-task-list](https://vercel.com/thejeffginger-5327s-projects/v0-click-up-task-list)**
+\`\`\`
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  output: 'export',        // produce /out for static hosting
+  basePath: '/task',       // <<< your subdirectory
+  assetPrefix: '/task/',   // ensure scripts/styles point under /task
+  trailingSlash: true,     // helps static hosts
+  eslint: { ignoreDuringBuilds: true },
+  typescript: { ignoreBuildErrors: true },
+  images: { unoptimized: true },
+};
 
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.app/chat/projects/Y9vCuO7c9OX](https://v0.app/chat/projects/Y9vCuO7c9OX)**
-
-## How It Works
-
-1. Create and modify your project using [v0.app](https://v0.app)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+export default nextConfig;
+\`\`\`

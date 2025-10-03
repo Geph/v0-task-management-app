@@ -72,7 +72,10 @@ export function TaskDetailsDialog({
         className={`${isMobile ? "max-w-[95vw] w-full mx-2" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}
         hideClose
       >
-        <DialogHeader className="relative">
+        <div className="absolute top-4 left-4 z-10">
+          <Label className="text-xs text-muted-foreground">Notes</Label>
+        </div>
+        <DialogHeader className="relative pt-6">
           <div className="flex items-center gap-3">
             <div className="text-2xl">{taskEmoji}</div>
             {isRenaming ? (
@@ -97,18 +100,12 @@ export function TaskDetailsDialog({
                 <Button variant="ghost" size="sm" onClick={() => setIsRenaming(true)} className="h-6 w-6 p-0">
                   <Edit3 className="w-3 h-3" />
                 </Button>
-                <Button variant="ghost" size="sm" onClick={handleMarkCompleted} className="h-6 w-6 p-0">
-                  <CheckCircle className="w-3 h-3" />
-                </Button>
               </>
             )}
           </div>
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <Label htmlFor="notes" className="text-sm font-medium">
-              Notes
-            </Label>
             <RichTextEditor
               value={notes}
               onChange={setNotes}
@@ -117,17 +114,30 @@ export function TaskDetailsDialog({
             />
           </div>
 
-          <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-between"}`}>
-            <Button variant="outline" onClick={handleDuplicate} className="flex items-center gap-2 bg-transparent">
-              <Copy className="w-4 h-4" />
-              Duplicate Task
-            </Button>
+          <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-between items-center"}`}>
             <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
-              <Button variant="outline" onClick={handleCancel} className={isMobile ? "w-full" : ""}>
-                Cancel
+              <Button
+                variant="outline"
+                onClick={handleDuplicate}
+                className={`flex items-center gap-2 bg-transparent ${isMobile ? "w-full" : ""}`}
+              >
+                <Copy className="w-4 h-4" />
+                Duplicate
               </Button>
+              <Button
+                onClick={handleMarkCompleted}
+                className={`flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white ${isMobile ? "w-full" : ""}`}
+              >
+                <CheckCircle className="w-4 h-4" />
+                Complete
+              </Button>
+            </div>
+            <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
               <Button onClick={handleSave} className={isMobile ? "w-full" : ""}>
                 Save
+              </Button>
+              <Button variant="outline" onClick={handleCancel} className={isMobile ? "w-full" : ""}>
+                Cancel
               </Button>
             </div>
           </div>
