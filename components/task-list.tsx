@@ -1269,14 +1269,11 @@ export function TaskList() {
       <div
         key={task.id}
         className={`p-2 hover:bg-muted/50 border-b border-border/50 ${
-          // reduced padding from p-3 to p-2
           task.completed ? "opacity-60" : ""
         } ${selectedTasks.has(task.id) ? "bg-blue-50" : ""}`}
       >
         {/* Main row with checkbox, emoji, name, and files */}
         <div className="flex items-center gap-3 mb-1">
-          {" "}
-          {/* reduced margin bottom from mb-2 to mb-1 */}
           <Checkbox checked={selectedTasks.has(task.id)} onCheckedChange={() => toggleTaskSelection(task.id)} />
           <div onClick={() => console.log("[v0] Emoji picker container clicked in mobile row")}>
             <EmojiPicker
@@ -1320,47 +1317,33 @@ export function TaskList() {
                 className="text-sm h-8"
               />
             ) : (
-              <div className="flex items-center gap-2 flex-1">
-                <div
-                  className={`text-sm cursor-pointer hover:bg-muted/50 px-2 py-1 rounded flex-1 block ${
-                    task.completed ? "line-through" : ""
-                  } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
-                  onClick={() => {
-                    if (task.name === "") {
-                      setEditingTaskId(task.id)
-                    }
-                  }}
-                >
-                  {task.name === "" ? (
-                    <span>Click to add task name...</span>
-                  ) : (
-                    <TaskDetailsDialog
-                      taskName={task.name}
-                      taskNotes={task.notes}
-                      taskEmoji={task.emoji}
-                      onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
-                      onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
-                      onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
-                      onDuplicateTask={() => duplicateTask(section.id, task.id)}
-                      onDeleteTask={() => deleteTask(section.id, task.id)}
-                    >
-                      <span>{task.name}</span>
-                    </TaskDetailsDialog>
-                  )}
-                </div>
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  className="h-8 w-8 p-0 hover:bg-destructive/10 hover:text-destructive shrink-0"
-                  onClick={(e) => {
-                    e.stopPropagation()
-                    if (confirm(`Delete task "${task.name}"?`)) {
-                      deleteTask(section.id, task.id)
-                    }
-                  }}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
+              <div
+                className={`text-sm cursor-pointer hover:bg-muted/50 px-2 py-1 rounded flex-1 block ${
+                  task.completed ? "line-through" : ""
+                } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
+                onClick={() => {
+                  if (task.name === "") {
+                    setEditingTaskId(task.id)
+                  }
+                }}
+              >
+                {task.name === "" ? (
+                  <span>Click to add task name...</span>
+                ) : (
+                  <TaskDetailsDialog
+                    taskName={task.name}
+                    taskNotes={task.notes}
+                    taskEmoji={task.emoji}
+                    onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                    onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
+                    onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                    onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                    onDeleteTask={() => deleteTask(section.id, task.id)}
+                    onMarkCompleted={() => markTaskAsCompleted(section.id, task.id)} // Added mark completed
+                  >
+                    <span>{task.name}</span>
+                  </TaskDetailsDialog>
+                )}
               </div>
             )}
           </div>
@@ -1377,16 +1360,12 @@ export function TaskList() {
 
         {mobileColumns.filter((col) => col !== "attachments").length > 0 && (
           <div className="grid grid-cols-2 gap-1 ml-12 text-xs">
-            {" "}
-            {/* reduced gap from gap-2 to gap-1 */}
             {mobileColumns
               .map((columnId) => {
                 switch (columnId) {
                   case "status":
                     return columnVisibility.status ? (
                       <div key="status" className="flex items-center">
-                        {" "}
-                        {/* removed label and gap-1 */}
                         <div className="flex-1">
                           <StatusDropdown
                             value={task.status}
@@ -1403,8 +1382,6 @@ export function TaskList() {
                   case "priority":
                     return columnVisibility.priority ? (
                       <div key="priority" className="flex items-center">
-                        {" "}
-                        {/* removed label and gap-1 */}
                         <div className="flex-1">
                           <PriorityDropdown
                             value={task.priority}
@@ -1702,8 +1679,6 @@ export function TaskList() {
                 {isMobile ? (
                   // Mobile layout - stacked cards
                   <div className="space-y-0.5">
-                    {" "}
-                    {/* reduced spacing from space-y-1 to space-y-0.5 */}
                     {section.tasks
                       .filter(
                         (task) =>
@@ -1811,48 +1786,33 @@ export function TaskList() {
                                 className="text-sm h-6 px-1 py-0"
                               />
                             ) : (
-                              <div className="flex items-center gap-2 flex-1">
-                                <div
-                                  className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
-                                    task.completed ? "line-through" : ""
-                                  } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
-                                  onClick={() => {
-                                    if (task.name === "") {
-                                      setEditingTaskId(task.id)
-                                    }
-                                  }}
-                                >
-                                  {task.name === "" ? (
-                                    <span>Click to add task name...</span>
-                                  ) : (
-                                    <TaskDetailsDialog
-                                      taskName={task.name}
-                                      taskNotes={task.notes}
-                                      taskEmoji={task.emoji}
-                                      onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
-                                      onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
-                                      onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
-                                      onDuplicateTask={() => duplicateTask(section.id, task.id)}
-                                      onMarkCompleted={() => markTaskAsCompleted(section.id, task.id)}
-                                      onDeleteTask={() => deleteTask(section.id, task.id)}
-                                    >
-                                      <span>{task.name}</span>
-                                    </TaskDetailsDialog>
-                                  )}
-                                </div>
-                                <Button
-                                  variant="ghost"
-                                  size="sm"
-                                  className="h-6 w-6 p-0 hover:bg-destructive/10 hover:text-destructive shrink-0"
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    if (confirm(`Delete task "${task.name}"?`)) {
-                                      deleteTask(section.id, task.id)
-                                    }
-                                  }}
-                                >
-                                  <Trash2 className="w-3 h-3" />
-                                </Button>
+                              <div
+                                className={`text-sm cursor-pointer hover:bg-muted/50 px-1 py-0.5 rounded flex-1 ${
+                                  task.completed ? "line-through" : ""
+                                } ${task.name === "" ? "text-muted-foreground italic" : ""}`}
+                                onClick={() => {
+                                  if (task.name === "") {
+                                    setEditingTaskId(task.id)
+                                  }
+                                }}
+                              >
+                                {task.name === "" ? (
+                                  <span>Click to add task name...</span>
+                                ) : (
+                                  <TaskDetailsDialog
+                                    taskName={task.name}
+                                    taskNotes={task.notes}
+                                    taskEmoji={task.emoji}
+                                    onUpdateNotes={(notes) => updateTaskNotes(section.id, task.id, notes)}
+                                    onUpdateEmoji={(emoji) => updateTaskEmoji(section.id, task.id, emoji)}
+                                    onRenameTask={(newName) => renameTask(section.id, task.id, newName)}
+                                    onDuplicateTask={() => duplicateTask(section.id, task.id)}
+                                    onMarkCompleted={() => markTaskAsCompleted(section.id, task.id)} // Added mark completed
+                                    onDeleteTask={() => deleteTask(section.id, task.id)}
+                                  >
+                                    <span>{task.name}</span>
+                                  </TaskDetailsDialog>
+                                )}
                               </div>
                             )}
                           </div>
