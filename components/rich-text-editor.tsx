@@ -42,9 +42,18 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
   }
 
   const execCommand = (command: string, value?: string) => {
+    // Ensure the editor has focus before executing command
+    if (editorRef.current) {
+      editorRef.current.focus()
+    }
+
+    // Execute the command
     document.execCommand(command, false, value)
-    editorRef.current?.focus()
-    handleInput()
+
+    // Trigger input event to save changes
+    setTimeout(() => {
+      handleInput()
+    }, 10)
   }
 
   const insertLink = () => {
