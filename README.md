@@ -1,6 +1,6 @@
 # Simple Colorful Emoji-Enhanced Task List App
 
-![a picture of this app](image-url https://github.com/Geph/v0-task-management-app/blob/main/preview-image.jpg)
+![a picture of this app]([image-url](https://github.com/Geph/v0-task-management-app/blob/main/preview-image.jpg))
 
 I decided I would vibe code a replacement to ClickUp that had better colors, fun emojis and was free to use. 
 
