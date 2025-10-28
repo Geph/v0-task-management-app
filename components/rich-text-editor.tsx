@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bold, Italic, Link, List, ListOrdered, Strikethrough, Code, Quote, RotateCcw } from "lucide-react"
+import { Bold, Italic, Link, Strikethrough, Code, Quote, RotateCcw } from "lucide-react"
 
 interface RichTextEditorProps {
   value: string
@@ -200,24 +200,6 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         <Button type="button" variant="ghost" size="sm" onClick={insertLink} className="h-8 w-8 p-0">
           <Link className="w-4 h-4" />
         </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => execCommand("insertUnorderedList")}
-          className="h-8 w-8 p-0"
-        >
-          <List className="w-4 h-4" />
-        </Button>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          onClick={() => execCommand("insertOrderedList")}
-          className="h-8 w-8 p-0"
-        >
-          <ListOrdered className="w-4 h-4" />
-        </Button>
       </div>
       <div
         ref={editorRef}
@@ -234,20 +216,6 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           content: attr(data-placeholder);
           color: #9ca3af;
           pointer-events: none;
-        }
-        /* Added styles for lists to display properly */
-        [contenteditable] ul {
-          list-style-type: disc;
-          padding-left: 1.5rem;
-          margin: 0.5rem 0;
-        }
-        [contenteditable] ol {
-          list-style-type: decimal;
-          padding-left: 1.5rem;
-          margin: 0.5rem 0;
-        }
-        [contenteditable] li {
-          margin: 0.25rem 0;
         }
         /* Added styles for links to make them visible and clickable */
         [contenteditable] a {

@@ -13,7 +13,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
 import { Download, Upload } from "lucide-react"
 
 interface Task {
@@ -49,7 +48,7 @@ export function ExportImportDialog({
   onImport,
   children,
 }: ExportImportDialogProps) {
-  const [importData, setImportData] = useState("")
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null)
   const [isOpen, setIsOpen] = useState(false)
   const [importUrl, setImportUrl] = useState("")
   const [isLoadingUrl, setIsLoadingUrl] = useState(false)
@@ -164,9 +163,11 @@ export function ExportImportDialog({
         throw new Error(`HTTP error! status: ${response.status}`)
       }
       const data = await response.text()
-      setImportData(data)
+      const blob = new Blob([data], { type: "application/xml" })
+      const file = new File([blob], "imported-config.xml", { type: "application/xml" })
+      setUploadedFile(file)
       setImportUrl("")
-      alert("Data loaded from URL successfully. Review and click Import Configuration to apply.")
+      alert("Data loaded from URL successfully. Click Import Configuration to apply.")
     } catch (error) {
       alert(`Error loading data from URL: ${error instanceof Error ? error.message : String(error)}`)
     } finally {
@@ -174,10 +175,16 @@ export function ExportImportDialog({
     }
   }
 
-  const handleImport = () => {
+  const handleImport = async () => {
+    if (!uploadedFile) {
+      alert("Please upload an XML file first")
+      return
+    }
+
     try {
+      const fileContent = await uploadedFile.text()
       const parser = new DOMParser()
-      const xmlDoc = parser.parseFromString(importData, "application/xml")
+      const xmlDoc = parser.parseFromString(fileContent, "application/xml")
 
       const sections = Array.from(xmlDoc.querySelectorAll("section")).map((section) => {
         const tasks = Array.from(section.querySelectorAll("task")).map((task) => {
@@ -195,7 +202,7 @@ export function ExportImportDialog({
             dueDate: dueDateStr ? new Date(dueDateStr) : null,
             assignedTo: unescapeXml(task.getAttribute("assignedTo") || ""),
             notes: notesElement ? unescapeXml(notesElement.textContent || "") : "",
-            attachments: [], // Attachments are not exported/imported as they contain file data
+            attachments: [],
           }
         })
 
@@ -219,10 +226,22 @@ export function ExportImportDialog({
       }))
 
       onImport({ sections, statusOptions, priorityOptions })
-      setImportData("")
+      setUploadedFile(null)
       setIsOpen(false)
     } catch (error) {
-      alert("Error parsing import data. Please check the format.")
+      alert("Error parsing import data. Please check the file format.")
+    }
+  }
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (file) {
+      if (file.type === "application/xml" || file.type === "text/xml" || file.name.endsWith(".xml")) {
+        setUploadedFile(file)
+      } else {
+        alert("Please upload a valid XML file")
+        e.target.value = ""
+      }
     }
   }
 
@@ -234,7 +253,7 @@ export function ExportImportDialog({
           <DialogTitle>Export / Import Configuration</DialogTitle>
           <DialogDescription>
             Export your current configuration including tasks, sections, status options, and priority options to share
-            with others or import a configuration from XML data or URL.
+            with others or import a configuration from XML file or URL.
           </DialogDescription>
         </DialogHeader>
         <div className="space-y-6">
@@ -253,9 +272,7 @@ export function ExportImportDialog({
             <Label htmlFor="import-data" className="text-base font-medium">
               Import Configuration
             </Label>
-            <p className="text-sm text-muted-foreground mb-3">
-              Import configuration from a URL or paste XML data directly.
-            </p>
+            <p className="text-sm text-muted-foreground mb-3">Import configuration from a URL or upload an XML file.</p>
 
             <div className="space-y-3 mb-4">
               <Label htmlFor="import-url">Import from URL</Label>
@@ -274,22 +291,27 @@ export function ExportImportDialog({
             </div>
 
             <div className="space-y-3">
-              <Label htmlFor="import-data">Or paste XML data</Label>
-              <Textarea
-                id="import-data"
-                placeholder="Paste XML configuration data here..."
-                value={importData}
-                onChange={(e) => setImportData(e.target.value)}
-                className="min-h-[200px] font-mono text-sm"
+              <Label htmlFor="import-file">Or upload XML file</Label>
+              <Input
+                id="import-file"
+                type="file"
+                accept=".xml,application/xml,text/xml"
+                onChange={handleFileChange}
+                className="cursor-pointer"
               />
+              {uploadedFile && (
+                <p className="text-sm text-muted-foreground">
+                  Selected file: <span className="font-medium">{uploadedFile.name}</span>
+                </p>
+              )}
             </div>
 
             <div className="flex gap-2 mt-3">
-              <Button onClick={handleImport} disabled={!importData.trim()} className="gap-2">
+              <Button onClick={handleImport} disabled={!uploadedFile} className="gap-2">
                 <Upload className="w-4 h-4" />
                 Import Configuration
               </Button>
-              <Button variant="outline" onClick={() => setImportData("")}>
+              <Button variant="outline" onClick={() => setUploadedFile(null)}>
                 Clear
               </Button>
             </div>
