@@ -15,6 +15,7 @@ interface TaskDetailsDialogProps {
   taskName: string
   taskNotes: string
   taskEmoji?: string
+  isCompleted?: boolean
   onUpdateNotes: (notes: string) => void
   onRenameTask: (newName: string) => void
   onDuplicateTask: () => void
@@ -26,6 +27,7 @@ export function TaskDetailsDialog({
   taskName,
   taskNotes,
   taskEmoji = "📝",
+  isCompleted = false,
   onUpdateNotes,
   onRenameTask,
   onDuplicateTask,
@@ -126,10 +128,12 @@ export function TaskDetailsDialog({
               </Button>
               <Button
                 onClick={handleMarkCompleted}
-                className={`flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white ${isMobile ? "w-full" : ""}`}
+                className={`flex items-center gap-2 ${
+                  isCompleted ? "bg-red-600 hover:bg-red-700 text-white" : "bg-green-600 hover:bg-green-700 text-white"
+                } ${isMobile ? "w-full" : ""}`}
               >
                 <CheckCircle className="w-4 h-4" />
-                Complete
+                {isCompleted ? "Set to Incomplete" : "Complete"}
               </Button>
             </div>
             <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>

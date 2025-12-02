@@ -50,6 +50,7 @@ interface Task {
   progress: number
   dueDate: Date | null
   assignedTo: string
+  sectionId?: string // Added to track original section for completed tasks
 }
 
 interface TaskSection {
@@ -370,6 +371,8 @@ export function TaskList() {
     "due",
     "who",
   ])
+
+  const [isCompletedCollapsed, setIsCompletedCollapsed] = useState(false)
 
   // const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   // const [sectionToRename, setSectionToRename] = useState<{ id: string; name: string } | null>(null)
@@ -855,7 +858,7 @@ export function TaskList() {
     sections.forEach((section) => {
       section.tasks.forEach((task) => {
         if (selectedTasks.has(task.id)) {
-          tasksToComplete.push({ ...task, completed: true })
+          tasksToComplete.push({ ...task, completed: true, sectionId: section.id }) // Store sectionId
         }
       })
     })
@@ -876,7 +879,7 @@ export function TaskList() {
     const task = section?.tasks.find((t) => t.id === taskId)
 
     if (task) {
-      const completedTask = { ...task, completed: true }
+      const completedTask = { ...task, completed: true, sectionId: sectionId } // Store sectionId
 
       setSections(
         sections.map((section) =>
@@ -885,6 +888,25 @@ export function TaskList() {
       )
 
       setCompletedTasks([...completedTasks, completedTask])
+    }
+  }
+
+  const markTaskAsIncomplete = (taskId: string) => {
+    const task = completedTasks.find((t) => t.id === taskId)
+
+    if (task) {
+      // Find the original section or add to the first section
+      const targetSectionId = task.sectionId || sections[0]?.id
+      // Reset status to a default or previously known status if available, otherwise empty
+      const incompletedTask = { ...task, completed: false, status: task.status || "" }
+
+      setSections(
+        sections.map((section) =>
+          section.id === targetSectionId ? { ...section, tasks: [incompletedTask, ...section.tasks] } : section,
+        ),
+      )
+
+      setCompletedTasks(completedTasks.filter((t) => t.id !== taskId))
     }
   }
 
@@ -1827,86 +1849,132 @@ export function TaskList() {
           </div>
         ))}
 
+        {/* Update completed tasks section to be collapsible and clickable */}
         {completedTasks.length > 0 && (
           <div className="mb-6">
-            <div className="flex items-center gap-2 mb-4">
+            <div
+              className="flex items-center gap-2 mb-4 cursor-pointer hover:opacity-80 transition-opacity"
+              onClick={() => setIsCompletedCollapsed(!isCompletedCollapsed)}
+            >
               <div className="bg-green-600 text-white px-3 py-1 rounded text-sm font-medium flex items-center gap-2">
+                <span>{isCompletedCollapsed ? "▶" : "▼"}</span>
                 <span>COMPLETED</span>
                 <span className="bg-white/20 px-2 py-0.5 rounded text-xs">{completedTasks.length}</span>
               </div>
             </div>
 
-            {isMobile ? (
-              // Mobile completed tasks
-              <div className="space-y-1">
-                {completedTasks.map((task) => (
-                  <div key={task.id} className="p-3 hover:bg-muted/50 border-b border-border/50 opacity-60">
-                    <div className="flex items-center gap-3">
-                      <Checkbox checked={true} disabled />
-                      <span className="text-2xl">{task.emoji}</span>
-                      <span className="text-sm line-through flex-1">{task.name}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              // Desktop completed tasks
+            {!isCompletedCollapsed && (
               <>
-                <div className="flex gap-1 px-4 py-2 text-sm text-muted-foreground border-b border-border overflow-x-auto">
-                  <div style={{ width: columnWidths.checkbox }}>☑️</div>
-                  <div style={{ width: columnWidths.emoji }}>😀</div>
-                  <div style={{ width: columnWidths.name }}>Name</div>
-                  <div style={{ width: columnWidths.attachments }}>📎</div>
-                  <div style={{ width: columnWidths.status }}>Status</div>
-                  <div style={{ width: columnWidths.priority }}>Priority</div>
-                  {columnVisibility.progress && <div style={{ width: columnWidths.progress }}>Progress</div>}
-                  {columnVisibility.due && <div style={{ width: columnWidths.due }}>Due</div>}
-                  {columnVisibility.who && <div style={{ width: columnWidths.who }}>Who</div>}
-                </div>
-
-                {completedTasks.map((task) => (
-                  <div
-                    key={task.id}
-                    className="flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 opacity-60 overflow-x-auto"
-                    style={{ minHeight: "32px" }}
-                  >
-                    <div className="flex items-center" style={{ width: columnWidths.checkbox }}>
-                      <Checkbox checked={true} disabled />
-                    </div>
-                    <div className="flex items-center" style={{ width: columnWidths.emoji }}>
-                      <span>{task.emoji}</span>
-                    </div>
-                    <div className="flex items-center" style={{ width: columnWidths.name }}>
-                      <span className="text-sm line-through">{task.name}</span>
-                    </div>
-                    <div style={{ width: columnWidths.attachments }}></div>
-                    <div className="flex items-stretch" style={{ width: columnWidths.status }}>
-                      <div className="w-full">
-                        <StatusDropdown
-                          value={task.status}
-                          onChange={() => {}}
-                          options={statusOptions}
-                          onUpdateOptions={setStatusOptions}
-                          fullWidth
-                        />
-                      </div>
-                    </div>
-                    <div className="flex items-stretch" style={{ width: columnWidths.priority }}>
-                      <div className="w-full">
-                        <PriorityDropdown
-                          value={task.priority}
-                          onChange={() => {}}
-                          options={priorityOptions}
-                          onUpdateOptions={setPriorityOptions}
-                          fullWidth
-                        />
-                      </div>
-                    </div>
-                    {columnVisibility.progress && <div style={{ width: columnWidths.progress }}></div>}
-                    {columnVisibility.due && <div style={{ width: columnWidths.due }}></div>}
-                    {columnVisibility.who && <div style={{ width: columnWidths.who }}></div>}
+                {isMobile ? (
+                  // Mobile completed tasks
+                  <div className="space-y-1">
+                    {completedTasks.map((task) => (
+                      <TaskDetailsDialog
+                        key={task.id}
+                        taskName={task.name}
+                        taskNotes={task.notes}
+                        taskEmoji={task.emoji}
+                        isCompleted={true}
+                        onUpdateNotes={(notes) => {
+                          setCompletedTasks(completedTasks.map((t) => (t.id === task.id ? { ...t, notes } : t)))
+                        }}
+                        onRenameTask={(newName) => {
+                          setCompletedTasks(completedTasks.map((t) => (t.id === task.id ? { ...t, name: newName } : t)))
+                        }}
+                        onDuplicateTask={() => {
+                          const newTask = { ...task, id: Date.now().toString(), name: `${task.name} (copy)` }
+                          setCompletedTasks([...completedTasks, newTask])
+                        }}
+                        onMarkCompleted={() => markTaskAsIncomplete(task.id)} // Changed to markTaskAsIncomplete
+                      >
+                        <div className="p-3 hover:bg-muted/50 border-b border-border/50 opacity-60 cursor-pointer">
+                          <div className="flex items-center gap-3">
+                            <Checkbox checked={true} disabled />
+                            <span className="text-2xl">{task.emoji}</span>
+                            <span className="text-sm line-through flex-1">{task.name}</span>
+                          </div>
+                        </div>
+                      </TaskDetailsDialog>
+                    ))}
                   </div>
-                ))}
+                ) : (
+                  // Desktop completed tasks
+                  <>
+                    <div className="flex gap-1 px-4 py-2 text-sm text-muted-foreground border-b border-border overflow-x-auto">
+                      <div style={{ width: columnWidths.checkbox }}>☑️</div>
+                      <div style={{ width: columnWidths.emoji }}>😀</div>
+                      <div style={{ width: columnWidths.name }}>Name</div>
+                      <div style={{ width: columnWidths.attachments }}>📎</div>
+                      <div style={{ width: columnWidths.status }}>Status</div>
+                      <div style={{ width: columnWidths.priority }}>Priority</div>
+                      {columnVisibility.progress && <div style={{ width: columnWidths.progress }}>Progress</div>}
+                      {columnVisibility.due && <div style={{ width: columnWidths.due }}>Due</div>}
+                      {columnVisibility.who && <div style={{ width: columnWidths.who }}>Who</div>}
+                    </div>
+
+                    {completedTasks.map((task) => (
+                      <TaskDetailsDialog
+                        key={task.id}
+                        taskName={task.name}
+                        taskNotes={task.notes}
+                        taskEmoji={task.emoji}
+                        isCompleted={true}
+                        onUpdateNotes={(notes) => {
+                          setCompletedTasks(completedTasks.map((t) => (t.id === task.id ? { ...t, notes } : t)))
+                        }}
+                        onRenameTask={(newName) => {
+                          setCompletedTasks(completedTasks.map((t) => (t.id === task.id ? { ...t, name: newName } : t)))
+                        }}
+                        onDuplicateTask={() => {
+                          const newTask = { ...task, id: Date.now().toString(), name: `${task.name} (copy)` }
+                          setCompletedTasks([...completedTasks, newTask])
+                        }}
+                        onMarkCompleted={() => markTaskAsIncomplete(task.id)} // Changed to markTaskAsIncomplete
+                      >
+                        <div
+                          className="flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 opacity-60 overflow-x-auto cursor-pointer"
+                          style={{ minHeight: "32px" }}
+                        >
+                          <div className="flex items-center" style={{ width: columnWidths.checkbox }}>
+                            <Checkbox checked={true} disabled />
+                          </div>
+                          <div className="flex items-center" style={{ width: columnWidths.emoji }}>
+                            <span>{task.emoji}</span>
+                          </div>
+                          <div className="flex items-center" style={{ width: columnWidths.name }}>
+                            <span className="text-sm line-through">{task.name}</span>
+                          </div>
+                          <div style={{ width: columnWidths.attachments }}></div>
+                          <div className="flex items-stretch" style={{ width: columnWidths.status }}>
+                            <div className="w-full">
+                              <StatusDropdown
+                                value={task.status}
+                                onChange={() => {}} // No-op for completed tasks
+                                options={statusOptions}
+                                onUpdateOptions={setStatusOptions}
+                                fullWidth
+                              />
+                            </div>
+                          </div>
+                          <div className="flex items-stretch" style={{ width: columnWidths.priority }}>
+                            <div className="w-full">
+                              <PriorityDropdown
+                                value={task.priority}
+                                onChange={() => {}} // No-op for completed tasks
+                                options={priorityOptions}
+                                onUpdateOptions={setPriorityOptions}
+                                fullWidth
+                              />
+                            </div>
+                          </div>
+                          {columnVisibility.progress && <div style={{ width: columnWidths.progress }}></div>}
+                          {columnVisibility.due && <div style={{ width: columnWidths.due }}></div>}
+                          {columnVisibility.who && <div style={{ width: columnWidths.who }}></div>}
+                        </div>
+                      </TaskDetailsDialog>
+                    ))}
+                  </>
+                )}
               </>
             )}
           </div>
