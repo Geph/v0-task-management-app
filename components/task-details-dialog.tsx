@@ -40,10 +40,15 @@ export function TaskDetailsDialog({
 
   const isMobile = useIsMobile()
 
+  useState(() => {
+    setNewTaskName(taskName)
+  })
+
   const handleSave = () => {
     onUpdateNotes(notes)
-    if (isRenaming && newTaskName.trim() !== taskName) {
-      onRenameTask(newTaskName.trim())
+    const trimmedName = newTaskName.trim()
+    if (trimmedName && trimmedName !== taskName) {
+      onRenameTask(trimmedName)
     }
     setIsOpen(false)
     setIsRenaming(false)
@@ -104,12 +109,7 @@ export function TaskDetailsDialog({
         </DialogHeader>
         <div className="space-y-4">
           <div className="space-y-2">
-            <RichTextEditor
-              value={notes}
-              onChange={setNotes}
-              placeholder="Add notes for this task..."
-              className="mt-1"
-            />
+            <RichTextEditor value={notes} onChange={setNotes} placeholder="Add notes for this task..." className="-1" />
           </div>
 
           <div className={`flex ${isMobile ? "flex-col gap-3" : "justify-between items-center"}`}>
