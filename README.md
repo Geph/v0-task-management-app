@@ -63,7 +63,7 @@ This repository will stay in sync with your deployed chats on [v0.app](https://v
 
 May require modification to your specific server directory and settings. `next.config.mjs` will likely need to be changed. Here's an example:
 
-\`\`\`js
+```js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',        // produce /out for static hosting
@@ -76,7 +76,29 @@ const nextConfig = {
 };
 
 export default nextConfig;
-\`\`\`
+```
+
+### Build and Run Instructions
+
+**Development:**
+```bash
+npm install
+npm run dev
+```
+
+Visit `http://localhost:3000` to view the app in development mode.
+
+**Production Build:**
+```bash
+npm run build
+npm start
+```
+
+For static export (when using `output: 'export'`):
+```bash
+npm run build
+# The static files will be in the /out directory
+```
 
 ---
 
