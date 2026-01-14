@@ -5,7 +5,7 @@ import type React from "react"
 import { useState, useRef, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Bold, Italic, Link, Strikethrough, Code, Quote, RotateCcw } from "lucide-react"
+import { Bold, Italic, Link, Strikethrough, Code, Quote, Eraser, List, ListOrdered } from "lucide-react"
 
 interface RichTextEditorProps {
   value: string
@@ -17,6 +17,7 @@ interface RichTextEditorProps {
 export function RichTextEditor({ value, onChange, placeholder, className }: RichTextEditorProps) {
   const editorRef = useRef<HTMLDivElement>(null)
   const [isLinkDialogOpen, setIsLinkDialogOpen] = useState(false)
+  const [fontSize, setFontSize] = useState("16px")
 
   useEffect(() => {
     if (editorRef.current && editorRef.current.innerHTML !== value) {
@@ -67,6 +68,20 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
 
   const handleFontChange = (fontFamily: string) => {
     execCommand("fontName", fontFamily)
+  }
+
+  const handleFontSizeChange = (size: string) => {
+    setFontSize(size)
+    execCommand("fontSize", "7") // Use a base size
+    // Then apply the size with inline style
+    const selection = window.getSelection()
+    if (selection && selection.rangeCount > 0) {
+      const range = selection.getRangeAt(0)
+      const span = document.createElement("span")
+      span.style.fontSize = size
+      range.surroundContents(span)
+      handleInput()
+    }
   }
 
   const formatAsCode = () => {
@@ -158,6 +173,22 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           </SelectContent>
         </Select>
 
+        <Select onValueChange={handleFontSizeChange} defaultValue="16px">
+          <SelectTrigger className="w-20 h-8">
+            <SelectValue placeholder="Size" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="12px">12</SelectItem>
+            <SelectItem value="14px">14</SelectItem>
+            <SelectItem value="16px">16</SelectItem>
+            <SelectItem value="18px">18</SelectItem>
+            <SelectItem value="20px">20</SelectItem>
+            <SelectItem value="24px">24</SelectItem>
+            <SelectItem value="28px">28</SelectItem>
+            <SelectItem value="32px">32</SelectItem>
+          </SelectContent>
+        </Select>
+
         <div className="w-px h-6 bg-border mx-1" />
 
         <Button type="button" variant="ghost" size="sm" onClick={() => execCommand("bold")} className="h-8 w-8 p-0">
@@ -188,11 +219,34 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
           type="button"
           variant="ghost"
           size="sm"
+          onClick={() => execCommand("insertUnorderedList")}
+          className="h-8 w-8 p-0"
+          title="Bulleted list"
+        >
+          <List className="w-4 h-4" />
+        </Button>
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
+          onClick={() => execCommand("insertOrderedList")}
+          className="h-8 w-8 p-0"
+          title="Numbered list"
+        >
+          <ListOrdered className="w-4 h-4" />
+        </Button>
+
+        <div className="w-px h-6 bg-border mx-1" />
+
+        <Button
+          type="button"
+          variant="ghost"
+          size="sm"
           onClick={clearFormatting}
           className="h-8 w-8 p-0"
           title="Clear formatting"
         >
-          <RotateCcw className="w-4 h-4" />
+          <Eraser className="w-4 h-4" />
         </Button>
 
         <div className="w-px h-6 bg-border mx-1" />
@@ -226,6 +280,20 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Rich
         [contenteditable] a:hover {
           color: #2563eb;
           text-decoration: underline;
+        }
+        /* Added list styling */
+        [contenteditable] ul {
+          list-style-type: disc;
+          margin-left: 20px;
+          padding-left: 10px;
+        }
+        [contenteditable] ol {
+          list-style-type: decimal;
+          margin-left: 20px;
+          padding-left: 10px;
+        }
+        [contenteditable] li {
+          margin: 4px 0;
         }
       `}</style>
     </div>

@@ -703,16 +703,18 @@ export function TaskList() {
   }
 
   const renameTask = (sectionId: string, taskId: string, newName: string) => {
-    setSections(
-      sections.map((section) =>
+    const trimmedName = newName.trim()
+
+    setSections((prevSections) =>
+      prevSections.map((section) =>
         section.id === sectionId
           ? {
               ...section,
               tasks: section.tasks.map((task) => {
                 if (task.id === taskId) {
-                  const updatedTask = { ...task, name: newName }
-                  if (!task.emoji && newName.trim()) {
-                    updatedTask.emoji = suggestEmoji(newName)
+                  const updatedTask = { ...task, name: trimmedName }
+                  if (!task.emoji && trimmedName) {
+                    updatedTask.emoji = suggestEmoji(trimmedName)
                   }
                   return updatedTask
                 }

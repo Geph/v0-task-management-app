@@ -63,7 +63,7 @@ This repository will stay in sync with your deployed chats on [v0.app](https://v
 
 May require modification to your specific server directory and settings. `next.config.mjs` will likely need to be changed. Here's an example:
 
-```js
+\`\`\`js
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   output: 'export',        // produce /out for static hosting
@@ -76,7 +76,7 @@ const nextConfig = {
 };
 
 export default nextConfig;
-```
+\`\`\`
 
 ---
 

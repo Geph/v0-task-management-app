@@ -5,7 +5,6 @@ import type React from "react"
 import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
-import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { RichTextEditor } from "@/components/rich-text-editor"
 import { Copy, Edit3, CheckCircle } from "lucide-react"
@@ -71,13 +70,10 @@ export function TaskDetailsDialog({
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent
-        className={`${isMobile ? "max-w-[95vw] w-full mx-2" : "max-w-2xl"} max-h-[90vh] overflow-y-auto`}
-        hideClose
+        className="max-w-[95vw] w-full sm:w-[75vw] sm:max-w-[1200px] max-h-[90vh] sm:max-h-[95vh] overflow-y-auto"
+        showCloseButton={false}
       >
-        <div className="absolute top-4 left-4 z-10">
-          <Label className="text-xs text-muted-foreground">Notes</Label>
-        </div>
-        <DialogHeader className="relative pt-6">
+        <DialogHeader className="relative">
           <div className="flex items-center gap-3">
             <div className="text-2xl">{taskEmoji}</div>
             {isRenaming ? (
