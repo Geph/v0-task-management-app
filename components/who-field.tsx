@@ -37,52 +37,29 @@ export function WhoField({ value, onChange, users, onAddUser }: WhoFieldProps) {
 
   return (
     <>
-      <DropdownMenu modal={false}>
+      <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button 
             variant="ghost" 
-            className="w-full h-6 p-1 justify-start text-left font-normal relative z-10"
-            onClick={(e) => {
-              console.log("[v0] WhoField button clicked", { value, usersCount: users.length })
-              e.stopPropagation()
-            }}
+            className="w-full h-6 p-1 justify-start text-left font-normal"
           >
             <User className="mr-1 h-3 w-3" />
             <span className="truncate">{value || "Unassigned"}</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48 z-[100]" sideOffset={5}>
-          <DropdownMenuItem 
-            onClick={(e) => {
-              console.log("[v0] Unassigned clicked")
-              e.stopPropagation()
-              onChange("")
-            }}
-          >
+        <DropdownMenuContent align="start" className="w-48" sideOffset={5}>
+          <DropdownMenuItem onClick={() => onChange("")}>
             <span className="text-muted-foreground italic">Unassigned</span>
           </DropdownMenuItem>
           {users.length > 0 && <DropdownMenuSeparator />}
           {users.map((user) => (
-            <DropdownMenuItem 
-              key={user} 
-              onClick={(e) => {
-                console.log("[v0] User selected:", user)
-                e.stopPropagation()
-                onChange(user)
-              }}
-            >
+            <DropdownMenuItem key={user} onClick={() => onChange(user)}>
               <User className="mr-2 h-4 w-4" />
               {user}
             </DropdownMenuItem>
           ))}
           {users.length > 0 && <DropdownMenuSeparator />}
-          <DropdownMenuItem 
-            onClick={(e) => {
-              console.log("[v0] Add new user clicked")
-              e.stopPropagation()
-              setIsAddingUser(true)
-            }}
-          >
+          <DropdownMenuItem onClick={() => setIsAddingUser(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Add New User
           </DropdownMenuItem>
