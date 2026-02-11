@@ -39,13 +39,13 @@ export function WhoField({ value, onChange, users, onAddUser }: WhoFieldProps) {
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button 
-            variant="ghost" 
-            className="w-full h-6 p-1 justify-start text-left font-normal"
+          <button
+            type="button"
+            className="w-full h-6 p-1 justify-start text-left font-normal inline-flex items-center rounded-md text-sm transition-colors hover:bg-accent hover:text-accent-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
           >
-            <User className="mr-1 h-3 w-3" />
+            <User className="mr-1 h-3 w-3 flex-shrink-0" />
             <span className="truncate">{value || "Unassigned"}</span>
-          </Button>
+          </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-48" sideOffset={5}>
           <DropdownMenuItem onClick={() => onChange("")}>
