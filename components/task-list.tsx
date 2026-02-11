@@ -1080,7 +1080,7 @@ export function TaskList() {
         </div>
       ) : null,
       who: columnVisibility.who ? (
-        <div className="flex items-center" style={{ width: columnWidths.who }}>
+        <div className="flex items-center relative z-10" style={{ width: columnWidths.who }}>
           <WhoField
             value={task.assignedTo}
             onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
