@@ -37,25 +37,25 @@ export function WhoField({ value, onChange, users, onAddUser }: WhoFieldProps) {
 
   return (
     <>
-      <DropdownMenu>
+      <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button variant="ghost" className="w-full h-6 p-1 justify-start text-left font-normal">
             <User className="mr-1 h-3 w-3" />
             <span className="truncate">{value || "Unassigned"}</span>
           </Button>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="start" className="w-48">
+        <DropdownMenuContent align="start" className="w-48 z-50" sideOffset={5}>
           <DropdownMenuItem onClick={() => onChange("")}>
             <span className="text-muted-foreground italic">Unassigned</span>
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          {users.length > 0 && <DropdownMenuSeparator />}
           {users.map((user) => (
             <DropdownMenuItem key={user} onClick={() => onChange(user)}>
               <User className="mr-2 h-4 w-4" />
               {user}
             </DropdownMenuItem>
           ))}
-          <DropdownMenuSeparator />
+          {users.length > 0 && <DropdownMenuSeparator />}
           <DropdownMenuItem onClick={() => setIsAddingUser(true)}>
             <Plus className="mr-2 h-4 w-4" />
             Add New User
