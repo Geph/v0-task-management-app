@@ -277,7 +277,7 @@ export function TaskList() {
     const baseColumns = {
       checkbox: "5%",
       emoji: "8%",
-      name: "50%", // Increased from 35% to 50%
+      name: "40%", // Reduced from 50% to 40% to give more space to columns
     }
 
     const visibleColumns = columnOrder.filter((columnId) => {
@@ -299,48 +299,93 @@ export function TaskList() {
       }
     })
 
-    // Calculate remaining width after base columns (37% remaining instead of 52%)
-    const remainingWidth = 37
+    // Calculate remaining width after base columns (47% remaining)
+    const remainingWidth = 47
 
     // If no dynamic columns are visible, give all remaining space to name
     if (visibleColumns.length === 0) {
       return {
         ...baseColumns,
-        name: "87%", // 50% + 37% = 87%
+        name: "87%", // 40% + 47% = 87%
       }
     }
 
-    // Distribute remaining width evenly among visible columns
-    const columnWidth = Math.floor(remainingWidth / visibleColumns.length)
-    const remainder = remainingWidth - columnWidth * visibleColumns.length
+    // Define minimum widths for specific columns
+    const columnMinWidths: Record<string, number> = {
+      attachments: 6,
+      status: 10, // Increased minimum for status
+      priority: 10, // Increased minimum for priority
+      progress: 7,
+      due: 9,
+      who: 10, // Increased minimum for who
+    }
 
     const dynamicColumns: Record<string, string> = {}
 
-    visibleColumns.forEach((columnId, index) => {
-      // Add remainder to the last column to ensure we reach exactly 100%
-      const width = columnWidth + (index === visibleColumns.length - 1 ? remainder : 0)
+    // Calculate total minimum width needed
+    const totalMinWidth = visibleColumns.reduce((sum, col) => sum + (columnMinWidths[col] || 6), 0)
 
-      switch (columnId) {
-        case "attachments":
-          if (columnVisibility.attachments) dynamicColumns.attachments = `${width}%`
-          break
-        case "status":
-          if (columnVisibility.status) dynamicColumns.status = `${width}%`
-          break
-        case "priority":
-          if (columnVisibility.priority) dynamicColumns.priority = `${width}%`
-          break
-        case "progress":
-          if (columnVisibility.progress) dynamicColumns.progress = `${width}%`
-          break
-        case "due":
-          if (columnVisibility.due) dynamicColumns.due = `${width}%`
-          break
-        case "who":
-          if (columnVisibility.who) dynamicColumns.who = `${width}%`
-          break
-      }
-    })
+    // If we have enough space, use minimum widths plus distribute extra space
+    if (totalMinWidth <= remainingWidth) {
+      const extraSpace = remainingWidth - totalMinWidth
+      const extraPerColumn = Math.floor(extraSpace / visibleColumns.length)
+      const remainder = extraSpace - extraPerColumn * visibleColumns.length
+
+      visibleColumns.forEach((columnId, index) => {
+        const minWidth = columnMinWidths[columnId] || 6
+        const width = minWidth + extraPerColumn + (index === visibleColumns.length - 1 ? remainder : 0)
+
+        switch (columnId) {
+          case "attachments":
+            if (columnVisibility.attachments) dynamicColumns.attachments = `${width}%`
+            break
+          case "status":
+            if (columnVisibility.status) dynamicColumns.status = `${width}%`
+            break
+          case "priority":
+            if (columnVisibility.priority) dynamicColumns.priority = `${width}%`
+            break
+          case "progress":
+            if (columnVisibility.progress) dynamicColumns.progress = `${width}%`
+            break
+          case "due":
+            if (columnVisibility.due) dynamicColumns.due = `${width}%`
+            break
+          case "who":
+            if (columnVisibility.who) dynamicColumns.who = `${width}%`
+            break
+        }
+      })
+    } else {
+      // Fallback: distribute evenly if minimum widths exceed available space
+      const columnWidth = Math.floor(remainingWidth / visibleColumns.length)
+      const remainder = remainingWidth - columnWidth * visibleColumns.length
+
+      visibleColumns.forEach((columnId, index) => {
+        const width = columnWidth + (index === visibleColumns.length - 1 ? remainder : 0)
+
+        switch (columnId) {
+          case "attachments":
+            if (columnVisibility.attachments) dynamicColumns.attachments = `${width}%`
+            break
+          case "status":
+            if (columnVisibility.status) dynamicColumns.status = `${width}%`
+            break
+          case "priority":
+            if (columnVisibility.priority) dynamicColumns.priority = `${width}%`
+            break
+          case "progress":
+            if (columnVisibility.progress) dynamicColumns.progress = `${width}%`
+            break
+          case "due":
+            if (columnVisibility.due) dynamicColumns.due = `${width}%`
+            break
+          case "who":
+            if (columnVisibility.who) dynamicColumns.who = `${width}%`
+            break
+        }
+      })
+    }
 
     return { ...baseColumns, ...dynamicColumns }
   }
