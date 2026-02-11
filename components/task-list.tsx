@@ -94,18 +94,18 @@ export function TaskList() {
 
   const [sections, setSections] = useState<TaskSection[]>([
     {
-      id: "research",
-      name: "RESEARCH+EDUCATION",
+      id: "group1",
+      name: "EXAMPLE GROUP 1",
       expanded: true,
       tasks: [
         {
           id: "1",
-          name: "QRF/WHIMC",
+          name: "Example Task 1",
           status: "ongoing",
           priority: "medium",
           completed: false,
           notes: "",
-          emoji: "🚀",
+          emoji: "📝",
           attachments: [],
           progress: 0,
           dueDate: null,
@@ -113,168 +113,12 @@ export function TaskList() {
         },
         {
           id: "2",
-          name: "Call Adam, confirm Nina/Versant",
-          status: "waiting",
-          priority: "high",
-          completed: false,
-          notes: "",
-          emoji: "📞",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "3",
-          name: "Confirm Amanda Block Choices",
+          name: "Example Task 2",
           status: "not-yet",
           priority: "high",
           completed: false,
           notes: "",
-          emoji: "✅",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "4",
-          name: "Update WHIMC website for continued play, downloads, server and ML-API on Github, update methods section, QRF section, WHIMC platform usefulness, Mars setup page",
-          status: "working",
-          priority: "medium",
-          completed: false,
-          notes: "",
-          emoji: "🌐",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "5",
-          name: "Email past/present camp parents",
-          status: "not-yet",
-          priority: "medium",
-          completed: false,
-          notes: "",
-          emoji: "✉️",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "6",
-          name: "Return some findings back to UNCC, WCA",
-          status: "working",
-          priority: "medium",
-          completed: false,
-          notes: "",
-          emoji: "📊",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "7",
-          name: "WHIMC website redirect problems",
-          status: "not-yet",
-          priority: "low",
-          completed: false,
-          notes: "",
-          emoji: "⚠️",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "8",
-          name: "Maryville post-camp",
-          status: "delegated",
-          priority: "low",
-          completed: false,
-          notes: "",
-          emoji: "🧑‍🏫",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "9",
-          name: "Update server documentation",
-          status: "working",
-          priority: "low",
-          completed: false,
-          notes: "",
-          emoji: "📚",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "10",
-          name: "Update WHIMC plugins to use new holograms",
-          status: "waiting",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "✨",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "11",
-          name: "Redo Two Moons geography",
-          status: "not-yet",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "🗺️",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "12",
-          name: "Region naming conventions (POI)",
-          status: "not-yet",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "📍",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "13",
-          name: "Fix/replace Image To Map",
-          status: "stuck",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "🛠️",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "14",
-          name: "Update to 1.21.x",
-          status: "working",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "⬆️",
+          emoji: "📝",
           attachments: [],
           progress: 0,
           dueDate: null,
@@ -283,57 +127,18 @@ export function TaskList() {
       ],
     },
     {
-      id: "invite",
-      name: "INVITE / Barrelbot",
+      id: "group2",
+      name: "EXAMPLE GROUP 2",
       expanded: true,
       tasks: [
         {
-          id: "15",
-          name: "Update Readme, add Github to website",
+          id: "3",
+          name: "Example Task 3",
           status: "working",
           priority: "low",
           completed: false,
           notes: "",
-          emoji: "📄",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "16",
-          name: "Dedicated server (version update; Github)",
-          status: "stuck",
-          priority: "low",
-          completed: false,
-          notes: "",
-          emoji: "💻",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "17",
-          name: "New player lane template w/new loop and conditional blocks, more practice puzzles, fix holes and roof on final open-build puzzle, black box spawn region as adventure mode",
-          status: "not-yet",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "🎮",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "18",
-          name: "Update showcase video",
-          status: "not-yet",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "🎬",
+          emoji: "📝",
           attachments: [],
           progress: 0,
           dueDate: null,
@@ -351,17 +156,17 @@ export function TaskList() {
 
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
 
-  const [appName, setAppName] = useState("Geph's Task Management")
+  const [appName, setAppName] = useState("Your Name's Task Management")
   const [appIcon, setAppIcon] = useState("")
   const [hasPIN, setHasPIN] = useState(false)
   const [userPIN, setUserPIN] = useState("")
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
-    attachments: false, // Changed from true to false to hide empty attachments column by default
-    status: true, // Added default visibility for status
-    priority: true, // Added default visibility for priority
-    progress: false,
-    due: false,
-    who: false,
+    attachments: true,
+    status: true,
+    priority: true,
+    progress: true,
+    due: true,
+    who: true,
   })
   const [columnOrder, setColumnOrder] = useState<string[]>([
     "attachments",
@@ -373,6 +178,7 @@ export function TaskList() {
   ])
 
   const [isCompletedCollapsed, setIsCompletedCollapsed] = useState(false)
+  const [users, setUsers] = useState<string[]>([])
 
   // const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   // const [sectionToRename, setSectionToRename] = useState<{ id: string; name: string } | null>(null)
@@ -394,6 +200,7 @@ export function TaskList() {
       const storedCompletedTasks = localStorage.getItem("completedTasks")
       const storedStatusOptions = localStorage.getItem("statusOptions")
       const storedPriorityOptions = localStorage.getItem("priorityOptions")
+      const storedUsers = localStorage.getItem("users")
 
       if (storedAppName) setAppName(storedAppName)
       if (storedAppIcon) setAppIcon(storedAppIcon)
@@ -418,6 +225,9 @@ export function TaskList() {
       }
       if (storedPriorityOptions) {
         setPriorityOptions(JSON.parse(storedPriorityOptions))
+      }
+      if (storedUsers) {
+        setUsers(JSON.parse(storedUsers))
       }
     }
   }, [])
@@ -445,6 +255,12 @@ export function TaskList() {
       localStorage.setItem("priorityOptions", JSON.stringify(priorityOptions))
     }
   }, [priorityOptions])
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("users", JSON.stringify(users))
+    }
+  }, [users])
 
   const isMobile = useIsMobile()
 
@@ -983,6 +799,9 @@ export function TaskList() {
     sections: Array<{ id: string; name: string; tasks?: Task[] }> // Added tasks to import type
     statusOptions: Array<{ key: string; label: string; color: string }>
     priorityOptions: Array<{ key: string; label: string; color: string }>
+    columnVisibility?: ColumnVisibility
+    columnOrder?: string[]
+    users?: string[]
   }) => {
     if (data.sections && data.sections.length > 0) {
       setSections(
@@ -996,6 +815,15 @@ export function TaskList() {
     }
     setStatusOptions(data.statusOptions)
     setPriorityOptions(data.priorityOptions)
+    if (data.columnVisibility) {
+      setColumnVisibility(data.columnVisibility)
+    }
+    if (data.columnOrder && data.columnOrder.length > 0) {
+      setColumnOrder(data.columnOrder)
+    }
+    if (data.users) {
+      setUsers(data.users)
+    }
   }
 
   const mergeSelectedTasks = (newTaskName: string) => {
@@ -1150,6 +978,12 @@ export function TaskList() {
     }
   }
 
+  const handleAddUser = (user: string) => {
+    if (!users.includes(user)) {
+      setUsers([...users, user])
+    }
+  }
+
   const renderTaskColumns = (task: Task, section: { id: string }) => {
     const columnComponents: Record<string, React.JSX.Element> = {
       attachments: columnVisibility.attachments ? ( // Added visibility check for attachments
@@ -1205,6 +1039,8 @@ export function TaskList() {
           <WhoField
             value={task.assignedTo}
             onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
+            users={users}
+            onAddUser={handleAddUser}
           />
         </div>
       ) : null,
@@ -1451,6 +1287,8 @@ export function TaskList() {
                           <WhoField
                             value={task.assignedTo}
                             onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
+                            users={users}
+                            onAddUser={handleAddUser}
                           />
                         </div>
                       </div>
@@ -1521,6 +1359,7 @@ export function TaskList() {
                 onUpdateColumnVisibility={handleUpdateColumnVisibility}
                 columnOrder={columnOrder}
                 onUpdateColumnOrder={handleUpdateColumnOrder}
+                users={users}
               >
                 <Button
                   variant="outline"
