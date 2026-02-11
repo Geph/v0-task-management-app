@@ -101,6 +101,7 @@ export function FileAttachmentComponent({ attachments, onAddAttachment, onRemove
           </div>
 
           <input ref={fileInputRef} type="file" onChange={handleFileSelect} className="hidden" accept="*/*" />
+          <p className="text-xs text-muted-foreground">Note: Files are only saved locally in your browser.</p>
 
           {attachments.length === 0 ? (
             <p className="text-sm text-muted-foreground">No files attached</p>
