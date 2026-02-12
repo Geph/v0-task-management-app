@@ -1029,6 +1029,30 @@ export function TaskList() {
     }
   }
 
+  const handleRemoveUser = (user: string) => {
+    setUsers(users.filter((u) => u !== user))
+    // Unassign any tasks assigned to this user
+    setSections(
+      sections.map((section) => ({
+        ...section,
+        tasks: section.tasks.map((task) => (task.assignedTo === user ? { ...task, assignedTo: "" } : task)),
+      })),
+    )
+  }
+
+  const handleRenameUser = (oldName: string, newName: string) => {
+    if (newName.trim() && !users.includes(newName) && users.includes(oldName)) {
+      setUsers(users.map((u) => (u === oldName ? newName : u)))
+      // Update all tasks assigned to this user
+      setSections(
+        sections.map((section) => ({
+          ...section,
+          tasks: section.tasks.map((task) => (task.assignedTo === oldName ? { ...task, assignedTo: newName } : task)),
+        })),
+      )
+    }
+  }
+
   const renderTaskColumns = (task: Task, section: { id: string }) => {
     const columnComponents: Record<string, React.JSX.Element> = {
       attachments: columnVisibility.attachments ? ( // Added visibility check for attachments
@@ -1086,6 +1110,8 @@ export function TaskList() {
             onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
             users={users}
             onAddUser={handleAddUser}
+            onRemoveUser={handleRemoveUser}
+            onRenameUser={handleRenameUser}
           />
         </div>
       ) : null,
@@ -1334,6 +1360,8 @@ export function TaskList() {
                             onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
                             users={users}
                             onAddUser={handleAddUser}
+                            onRemoveUser={handleRemoveUser}
+                            onRenameUser={handleRenameUser}
                           />
                         </div>
                       </div>
