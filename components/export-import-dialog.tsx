@@ -29,14 +29,29 @@ interface Task {
   assignedTo: string
 }
 
+interface ColumnVisibility {
+  attachments: boolean
+  status: boolean
+  priority: boolean
+  progress: boolean
+  due: boolean
+  who: boolean
+}
+
 interface ExportImportDialogProps {
   sections: Array<{ id: string; name: string; tasks?: Task[] }> // Added tasks to sections
   statusOptions: Array<{ key: string; label: string; color: string }>
   priorityOptions: Array<{ key: string; label: string; color: string }>
+  columnVisibility: ColumnVisibility
+  columnOrder: string[]
+  users: string[]
   onImport: (data: {
     sections: Array<{ id: string; name: string; tasks?: Task[] }> // Added tasks to import
     statusOptions: Array<{ key: string; label: string; color: string }>
     priorityOptions: Array<{ key: string; label: string; color: string }>
+    columnVisibility?: ColumnVisibility
+    columnOrder?: string[]
+    users?: string[]
   }) => void
   children: React.ReactNode
 }
@@ -45,6 +60,9 @@ export function ExportImportDialog({
   sections,
   statusOptions,
   priorityOptions,
+  columnVisibility,
+  columnOrder,
+  users,
   onImport,
   children,
 }: ExportImportDialogProps) {
@@ -91,6 +109,9 @@ export function ExportImportDialog({
         color: option.color,
         order: index,
       })),
+      columnVisibility,
+      columnOrder,
+      users,
       exportDate: new Date().toISOString(),
       version: "1.0",
     }
@@ -137,6 +158,13 @@ export function ExportImportDialog({
       )
       .join("\n")}
   </priorityOptions>
+  <columnVisibility attachments="${data.columnVisibility.attachments}" status="${data.columnVisibility.status}" priority="${data.columnVisibility.priority}" progress="${data.columnVisibility.progress}" due="${data.columnVisibility.due}" who="${data.columnVisibility.who}" />
+  <columnOrder>
+    ${data.columnOrder.map((col) => `    <column>${col}</column>`).join("\n")}
+  </columnOrder>
+  <users>
+    ${data.users.map((user) => `    <user>${escapeXml(user)}</user>`).join("\n")}
+  </users>
 </taskManagementConfig>`
 
     const blob = new Blob([xmlData], { type: "application/xml" })
@@ -225,7 +253,23 @@ export function ExportImportDialog({
         color: priority.getAttribute("color") || "",
       }))
 
-      onImport({ sections, statusOptions, priorityOptions })
+      const columnVisibilityElement = xmlDoc.querySelector("columnVisibility")
+      const columnVisibility = columnVisibilityElement
+        ? {
+            attachments: columnVisibilityElement.getAttribute("attachments") === "true",
+            status: columnVisibilityElement.getAttribute("status") === "true",
+            priority: columnVisibilityElement.getAttribute("priority") === "true",
+            progress: columnVisibilityElement.getAttribute("progress") === "true",
+            due: columnVisibilityElement.getAttribute("due") === "true",
+            who: columnVisibilityElement.getAttribute("who") === "true",
+          }
+        : undefined
+
+      const columnOrder = Array.from(xmlDoc.querySelectorAll("columnOrder > column")).map((col) => col.textContent || "")
+
+      const users = Array.from(xmlDoc.querySelectorAll("users > user")).map((user) => unescapeXml(user.textContent || ""))
+
+      onImport({ sections, statusOptions, priorityOptions, columnVisibility, columnOrder, users })
       setUploadedFile(null)
       setIsOpen(false)
     } catch (error) {

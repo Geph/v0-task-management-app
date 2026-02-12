@@ -46,6 +46,7 @@ interface SettingsDialogProps {
   onUpdateColumnVisibility: (visibility: ColumnVisibility) => void
   columnOrder: string[]
   onUpdateColumnOrder: (order: string[]) => void
+  users: string[]
 }
 
 export function SettingsDialog({
@@ -65,6 +66,7 @@ export function SettingsDialog({
   onUpdateColumnVisibility,
   columnOrder,
   onUpdateColumnOrder,
+  users,
 }: SettingsDialogProps) {
   const [open, setOpen] = useState(false)
   const [tempAppName, setTempAppName] = useState(appName)
@@ -184,7 +186,7 @@ export function SettingsDialog({
             <div className="pt-4 border-t mt-6">
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span>App Version</span>
-                <span className="font-mono">v0.1.0</span>
+                <span className="font-mono">v0.2.0</span>
               </div>
             </div>
           </TabsContent>
@@ -259,6 +261,9 @@ export function SettingsDialog({
                   sections={sections}
                   statusOptions={statusOptions}
                   priorityOptions={priorityOptions}
+                  columnVisibility={columnVisibility}
+                  columnOrder={columnOrder}
+                  users={users}
                   onImport={onImport}
                 >
                   <Button variant="outline" className="w-full bg-transparent">

@@ -7,7 +7,7 @@ import { PinEntryPage } from "@/components/pin-entry-page"
 export default function Home() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [hasPIN, setHasPIN] = useState(false)
-  const [appName, setAppName] = useState("Geph's Task Management")
+  const [appName, setAppName] = useState("Your Name's Task Management")
   const [appIcon, setAppIcon] = useState("")
   const [isLoading, setIsLoading] = useState(true) // Added loading state to prevent hydration issues
 

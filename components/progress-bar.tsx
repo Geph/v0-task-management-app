@@ -2,8 +2,8 @@
 
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog"
+import { Slider } from "@/components/ui/slider"
 
 interface ProgressBarProps {
   value: number
@@ -12,11 +12,10 @@ interface ProgressBarProps {
 
 export function ProgressBar({ value, onChange }: ProgressBarProps) {
   const [open, setOpen] = useState(false)
-  const [tempValue, setTempValue] = useState(value.toString())
+  const [tempValue, setTempValue] = useState(value)
 
   const handleSave = () => {
-    const numValue = Math.max(0, Math.min(100, Number.parseInt(tempValue) || 0))
-    onChange(numValue)
+    onChange(tempValue)
     setOpen(false)
   }
 
@@ -28,6 +27,16 @@ export function ProgressBar({ value, onChange }: ProgressBarProps) {
     return "bg-green-500"
   }
 
+  const getProgressEmoji = (progress: number) => {
+    if (progress === 0) return "😐"
+    if (progress < 20) return "😕"
+    if (progress < 40) return "🙂"
+    if (progress < 60) return "😊"
+    if (progress < 80) return "😄"
+    if (progress < 100) return "😁"
+    return "🎉"
+  }
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
@@ -35,7 +44,7 @@ export function ProgressBar({ value, onChange }: ProgressBarProps) {
           variant="ghost"
           className="w-full h-6 p-0 justify-start"
           onClick={() => {
-            setTempValue(value.toString())
+            setTempValue(value)
             setOpen(true)
           }}
         >
@@ -54,19 +63,23 @@ export function ProgressBar({ value, onChange }: ProgressBarProps) {
         <DialogHeader>
           <DialogTitle>Set Progress</DialogTitle>
         </DialogHeader>
-        <div className="space-y-4">
+        <div className="space-y-6">
+          <div className="flex flex-col items-center justify-center space-y-4">
+            <div className="text-6xl transition-all duration-300">
+              {getProgressEmoji(tempValue)}
+            </div>
+            <div className="text-3xl font-bold">
+              {tempValue}%
+            </div>
+          </div>
           <div className="space-y-2">
-            <label htmlFor="progress" className="text-sm font-medium">
-              Progress Percentage (0-100)
-            </label>
-            <Input
-              id="progress"
-              type="number"
-              min="0"
-              max="100"
-              value={tempValue}
-              onChange={(e) => setTempValue(e.target.value)}
-              placeholder="Enter percentage"
+            <Slider
+              value={[tempValue]}
+              onValueChange={(values) => setTempValue(values[0])}
+              max={100}
+              min={0}
+              step={1}
+              className="w-full"
             />
           </div>
           <div className="flex justify-end gap-2">

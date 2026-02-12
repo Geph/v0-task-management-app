@@ -94,18 +94,18 @@ export function TaskList() {
 
   const [sections, setSections] = useState<TaskSection[]>([
     {
-      id: "research",
-      name: "RESEARCH+EDUCATION",
+      id: "group1",
+      name: "EXAMPLE GROUP 1",
       expanded: true,
       tasks: [
         {
           id: "1",
-          name: "QRF/WHIMC",
+          name: "Example Task 1",
           status: "ongoing",
           priority: "medium",
           completed: false,
           notes: "",
-          emoji: "🚀",
+          emoji: "📝",
           attachments: [],
           progress: 0,
           dueDate: null,
@@ -113,168 +113,12 @@ export function TaskList() {
         },
         {
           id: "2",
-          name: "Call Adam, confirm Nina/Versant",
-          status: "waiting",
-          priority: "high",
-          completed: false,
-          notes: "",
-          emoji: "📞",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "3",
-          name: "Confirm Amanda Block Choices",
+          name: "Example Task 2",
           status: "not-yet",
           priority: "high",
           completed: false,
           notes: "",
-          emoji: "✅",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "4",
-          name: "Update WHIMC website for continued play, downloads, server and ML-API on Github, update methods section, QRF section, WHIMC platform usefulness, Mars setup page",
-          status: "working",
-          priority: "medium",
-          completed: false,
-          notes: "",
-          emoji: "🌐",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "5",
-          name: "Email past/present camp parents",
-          status: "not-yet",
-          priority: "medium",
-          completed: false,
-          notes: "",
-          emoji: "✉️",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "6",
-          name: "Return some findings back to UNCC, WCA",
-          status: "working",
-          priority: "medium",
-          completed: false,
-          notes: "",
-          emoji: "📊",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "7",
-          name: "WHIMC website redirect problems",
-          status: "not-yet",
-          priority: "low",
-          completed: false,
-          notes: "",
-          emoji: "⚠️",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "8",
-          name: "Maryville post-camp",
-          status: "delegated",
-          priority: "low",
-          completed: false,
-          notes: "",
-          emoji: "🧑‍🏫",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "9",
-          name: "Update server documentation",
-          status: "working",
-          priority: "low",
-          completed: false,
-          notes: "",
-          emoji: "📚",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "10",
-          name: "Update WHIMC plugins to use new holograms",
-          status: "waiting",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "✨",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "11",
-          name: "Redo Two Moons geography",
-          status: "not-yet",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "🗺️",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "12",
-          name: "Region naming conventions (POI)",
-          status: "not-yet",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "📍",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "13",
-          name: "Fix/replace Image To Map",
-          status: "stuck",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "🛠️",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "14",
-          name: "Update to 1.21.x",
-          status: "working",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "⬆️",
+          emoji: "📝",
           attachments: [],
           progress: 0,
           dueDate: null,
@@ -283,57 +127,18 @@ export function TaskList() {
       ],
     },
     {
-      id: "invite",
-      name: "INVITE / Barrelbot",
+      id: "group2",
+      name: "EXAMPLE GROUP 2",
       expanded: true,
       tasks: [
         {
-          id: "15",
-          name: "Update Readme, add Github to website",
+          id: "3",
+          name: "Example Task 3",
           status: "working",
           priority: "low",
           completed: false,
           notes: "",
-          emoji: "📄",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "16",
-          name: "Dedicated server (version update; Github)",
-          status: "stuck",
-          priority: "low",
-          completed: false,
-          notes: "",
-          emoji: "💻",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "17",
-          name: "New player lane template w/new loop and conditional blocks, more practice puzzles, fix holes and roof on final open-build puzzle, black box spawn region as adventure mode",
-          status: "not-yet",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "🎮",
-          attachments: [],
-          progress: 0,
-          dueDate: null,
-          assignedTo: "",
-        },
-        {
-          id: "18",
-          name: "Update showcase video",
-          status: "not-yet",
-          priority: "someday",
-          completed: false,
-          notes: "",
-          emoji: "🎬",
+          emoji: "📝",
           attachments: [],
           progress: 0,
           dueDate: null,
@@ -351,17 +156,17 @@ export function TaskList() {
 
   const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
 
-  const [appName, setAppName] = useState("Geph's Task Management")
+  const [appName, setAppName] = useState("Your Name's Task Management")
   const [appIcon, setAppIcon] = useState("")
   const [hasPIN, setHasPIN] = useState(false)
   const [userPIN, setUserPIN] = useState("")
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
-    attachments: false, // Changed from true to false to hide empty attachments column by default
-    status: true, // Added default visibility for status
-    priority: true, // Added default visibility for priority
-    progress: false,
-    due: false,
-    who: false,
+    attachments: true,
+    status: true,
+    priority: true,
+    progress: true,
+    due: true,
+    who: true,
   })
   const [columnOrder, setColumnOrder] = useState<string[]>([
     "attachments",
@@ -373,6 +178,7 @@ export function TaskList() {
   ])
 
   const [isCompletedCollapsed, setIsCompletedCollapsed] = useState(false)
+  const [users, setUsers] = useState<string[]>([])
 
   // const [renameDialogOpen, setRenameDialogOpen] = useState(false)
   // const [sectionToRename, setSectionToRename] = useState<{ id: string; name: string } | null>(null)
@@ -394,6 +200,7 @@ export function TaskList() {
       const storedCompletedTasks = localStorage.getItem("completedTasks")
       const storedStatusOptions = localStorage.getItem("statusOptions")
       const storedPriorityOptions = localStorage.getItem("priorityOptions")
+      const storedUsers = localStorage.getItem("users")
 
       if (storedAppName) setAppName(storedAppName)
       if (storedAppIcon) setAppIcon(storedAppIcon)
@@ -418,6 +225,9 @@ export function TaskList() {
       }
       if (storedPriorityOptions) {
         setPriorityOptions(JSON.parse(storedPriorityOptions))
+      }
+      if (storedUsers) {
+        setUsers(JSON.parse(storedUsers))
       }
     }
   }, [])
@@ -446,6 +256,12 @@ export function TaskList() {
     }
   }, [priorityOptions])
 
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("users", JSON.stringify(users))
+    }
+  }, [users])
+
   const isMobile = useIsMobile()
 
   const calculateColumnWidths = () => {
@@ -461,7 +277,7 @@ export function TaskList() {
     const baseColumns = {
       checkbox: "5%",
       emoji: "8%",
-      name: "50%", // Increased from 35% to 50%
+      name: "40%", // Reduced from 50% to 40% to give more space to columns
     }
 
     const visibleColumns = columnOrder.filter((columnId) => {
@@ -483,48 +299,93 @@ export function TaskList() {
       }
     })
 
-    // Calculate remaining width after base columns (37% remaining instead of 52%)
-    const remainingWidth = 37
+    // Calculate remaining width after base columns (47% remaining)
+    const remainingWidth = 47
 
     // If no dynamic columns are visible, give all remaining space to name
     if (visibleColumns.length === 0) {
       return {
         ...baseColumns,
-        name: "87%", // 50% + 37% = 87%
+        name: "87%", // 40% + 47% = 87%
       }
     }
 
-    // Distribute remaining width evenly among visible columns
-    const columnWidth = Math.floor(remainingWidth / visibleColumns.length)
-    const remainder = remainingWidth - columnWidth * visibleColumns.length
+    // Define minimum widths for specific columns
+    const columnMinWidths: Record<string, number> = {
+      attachments: 6,
+      status: 10, // Increased minimum for status
+      priority: 10, // Increased minimum for priority
+      progress: 7,
+      due: 9,
+      who: 10, // Increased minimum for who
+    }
 
     const dynamicColumns: Record<string, string> = {}
 
-    visibleColumns.forEach((columnId, index) => {
-      // Add remainder to the last column to ensure we reach exactly 100%
-      const width = columnWidth + (index === visibleColumns.length - 1 ? remainder : 0)
+    // Calculate total minimum width needed
+    const totalMinWidth = visibleColumns.reduce((sum, col) => sum + (columnMinWidths[col] || 6), 0)
 
-      switch (columnId) {
-        case "attachments":
-          if (columnVisibility.attachments) dynamicColumns.attachments = `${width}%`
-          break
-        case "status":
-          if (columnVisibility.status) dynamicColumns.status = `${width}%`
-          break
-        case "priority":
-          if (columnVisibility.priority) dynamicColumns.priority = `${width}%`
-          break
-        case "progress":
-          if (columnVisibility.progress) dynamicColumns.progress = `${width}%`
-          break
-        case "due":
-          if (columnVisibility.due) dynamicColumns.due = `${width}%`
-          break
-        case "who":
-          if (columnVisibility.who) dynamicColumns.who = `${width}%`
-          break
-      }
-    })
+    // If we have enough space, use minimum widths plus distribute extra space
+    if (totalMinWidth <= remainingWidth) {
+      const extraSpace = remainingWidth - totalMinWidth
+      const extraPerColumn = Math.floor(extraSpace / visibleColumns.length)
+      const remainder = extraSpace - extraPerColumn * visibleColumns.length
+
+      visibleColumns.forEach((columnId, index) => {
+        const minWidth = columnMinWidths[columnId] || 6
+        const width = minWidth + extraPerColumn + (index === visibleColumns.length - 1 ? remainder : 0)
+
+        switch (columnId) {
+          case "attachments":
+            if (columnVisibility.attachments) dynamicColumns.attachments = `${width}%`
+            break
+          case "status":
+            if (columnVisibility.status) dynamicColumns.status = `${width}%`
+            break
+          case "priority":
+            if (columnVisibility.priority) dynamicColumns.priority = `${width}%`
+            break
+          case "progress":
+            if (columnVisibility.progress) dynamicColumns.progress = `${width}%`
+            break
+          case "due":
+            if (columnVisibility.due) dynamicColumns.due = `${width}%`
+            break
+          case "who":
+            if (columnVisibility.who) dynamicColumns.who = `${width}%`
+            break
+        }
+      })
+    } else {
+      // Fallback: distribute evenly if minimum widths exceed available space
+      const columnWidth = Math.floor(remainingWidth / visibleColumns.length)
+      const remainder = remainingWidth - columnWidth * visibleColumns.length
+
+      visibleColumns.forEach((columnId, index) => {
+        const width = columnWidth + (index === visibleColumns.length - 1 ? remainder : 0)
+
+        switch (columnId) {
+          case "attachments":
+            if (columnVisibility.attachments) dynamicColumns.attachments = `${width}%`
+            break
+          case "status":
+            if (columnVisibility.status) dynamicColumns.status = `${width}%`
+            break
+          case "priority":
+            if (columnVisibility.priority) dynamicColumns.priority = `${width}%`
+            break
+          case "progress":
+            if (columnVisibility.progress) dynamicColumns.progress = `${width}%`
+            break
+          case "due":
+            if (columnVisibility.due) dynamicColumns.due = `${width}%`
+            break
+          case "who":
+            if (columnVisibility.who) dynamicColumns.who = `${width}%`
+            break
+        }
+      })
+    }
 
     return { ...baseColumns, ...dynamicColumns }
   }
@@ -983,6 +844,9 @@ export function TaskList() {
     sections: Array<{ id: string; name: string; tasks?: Task[] }> // Added tasks to import type
     statusOptions: Array<{ key: string; label: string; color: string }>
     priorityOptions: Array<{ key: string; label: string; color: string }>
+    columnVisibility?: ColumnVisibility
+    columnOrder?: string[]
+    users?: string[]
   }) => {
     if (data.sections && data.sections.length > 0) {
       setSections(
@@ -996,6 +860,15 @@ export function TaskList() {
     }
     setStatusOptions(data.statusOptions)
     setPriorityOptions(data.priorityOptions)
+    if (data.columnVisibility) {
+      setColumnVisibility(data.columnVisibility)
+    }
+    if (data.columnOrder && data.columnOrder.length > 0) {
+      setColumnOrder(data.columnOrder)
+    }
+    if (data.users) {
+      setUsers(data.users)
+    }
   }
 
   const mergeSelectedTasks = (newTaskName: string) => {
@@ -1150,6 +1023,36 @@ export function TaskList() {
     }
   }
 
+  const handleAddUser = (user: string) => {
+    if (!users.includes(user)) {
+      setUsers([...users, user])
+    }
+  }
+
+  const handleRemoveUser = (user: string) => {
+    setUsers(users.filter((u) => u !== user))
+    // Unassign any tasks assigned to this user
+    setSections(
+      sections.map((section) => ({
+        ...section,
+        tasks: section.tasks.map((task) => (task.assignedTo === user ? { ...task, assignedTo: "" } : task)),
+      })),
+    )
+  }
+
+  const handleRenameUser = (oldName: string, newName: string) => {
+    if (newName.trim() && !users.includes(newName) && users.includes(oldName)) {
+      setUsers(users.map((u) => (u === oldName ? newName : u)))
+      // Update all tasks assigned to this user
+      setSections(
+        sections.map((section) => ({
+          ...section,
+          tasks: section.tasks.map((task) => (task.assignedTo === oldName ? { ...task, assignedTo: newName } : task)),
+        })),
+      )
+    }
+  }
+
   const renderTaskColumns = (task: Task, section: { id: string }) => {
     const columnComponents: Record<string, React.JSX.Element> = {
       attachments: columnVisibility.attachments ? ( // Added visibility check for attachments
@@ -1201,10 +1104,14 @@ export function TaskList() {
         </div>
       ) : null,
       who: columnVisibility.who ? (
-        <div className="flex items-center" style={{ width: columnWidths.who }}>
+        <div className="flex items-center relative z-10" style={{ width: columnWidths.who }}>
           <WhoField
             value={task.assignedTo}
             onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
+            users={users}
+            onAddUser={handleAddUser}
+            onRemoveUser={handleRemoveUser}
+            onRenameUser={handleRenameUser}
           />
         </div>
       ) : null,
@@ -1451,6 +1358,10 @@ export function TaskList() {
                           <WhoField
                             value={task.assignedTo}
                             onChange={(assignedTo) => updateTaskAssignedTo(section.id, task.id, assignedTo)}
+                            users={users}
+                            onAddUser={handleAddUser}
+                            onRemoveUser={handleRemoveUser}
+                            onRenameUser={handleRenameUser}
                           />
                         </div>
                       </div>
@@ -1521,6 +1432,7 @@ export function TaskList() {
                 onUpdateColumnVisibility={handleUpdateColumnVisibility}
                 columnOrder={columnOrder}
                 onUpdateColumnOrder={handleUpdateColumnOrder}
+                users={users}
               >
                 <Button
                   variant="outline"
