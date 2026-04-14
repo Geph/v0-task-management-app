@@ -37,6 +37,7 @@ import { ProgressBar } from "@/components/progress-bar"
 import { DueDatePicker } from "@/components/due-date-picker"
 import { WhoField } from "@/components/who-field"
 import { useIsMobile } from "@/hooks/use-mobile" // Added mobile hook import
+import { DbStatusIndicator } from "@/components/db-status-indicator"
 
 interface Task {
   id: string
@@ -1392,15 +1393,18 @@ export function TaskList() {
           </div>
 
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            {/* Search box - always visible */}
-            <div className="relative order-1 sm:order-2">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search..."
-                className="pl-10 w-full sm:w-64 bg-white/10 border-white/20 text-white placeholder:text-white/60"
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
+            {/* Search box + DB status indicator */}
+            <div className="flex items-center gap-2 order-1 sm:order-2">
+              <div className="relative flex-1 sm:flex-none">
+                <Search className="w-4 h-4 absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search..."
+                  className="pl-10 w-full sm:w-64 bg-white/10 border-white/20 text-white placeholder:text-white/60"
+                  value={searchTerm}
+                  onChange={(e) => setSearchTerm(e.target.value)}
+                />
+              </div>
+              <DbStatusIndicator />
             </div>
 
             {/* Buttons container - moves below search on small screens */}
