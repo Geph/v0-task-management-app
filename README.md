@@ -102,6 +102,20 @@ npm run build
 
 ---
 
+## MySQL Analytics Database
+
+The app supports optional long-term analytics storage via a MySQL database hosted on the same cPanel server (e.g. Dreamhost). Events are sent from the browser to a lightweight PHP endpoint, which writes rows to a single `analytics_events` table.
+
+See **[DATABASE.md](DATABASE.md)** for the full setup guide, including:
+- Database name, user, and host configuration
+- Complete SQL schema (`analytics_events` table)
+- Full event reference with all tracked properties
+- Sample PHP endpoint (`api/track.php`)
+- Environment variable setup (`NEXT_PUBLIC_ANALYTICS_ENDPOINT`)
+- Useful phpMyAdmin queries for each metric
+
+---
+
 ## Tech Stack
 
 - **Framework**: Next.js 14 with React 18
