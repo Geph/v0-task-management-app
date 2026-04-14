@@ -78,6 +78,39 @@ const nextConfig = {
 export default nextConfig;
 ```
 
+### Environment Variables
+
+The analytics endpoint must be set before running a build so Next.js can inline it at compile time.
+
+**Option 1 — `.env.local` file (recommended for local dev)**
+
+Create a file named `.env.local` in the project root and add:
+
+```
+NEXT_PUBLIC_ANALYTICS_ENDPOINT=https://yourdomain.com/task/api/track.php
+```
+
+**Option 2 — Set inline before the build command**
+
+*macOS / Linux (bash or zsh):*
+```bash
+NEXT_PUBLIC_ANALYTICS_ENDPOINT=https://yourdomain.com/task/api/track.php npm run build
+```
+
+*Windows PowerShell:*
+```powershell
+$env:NEXT_PUBLIC_ANALYTICS_ENDPOINT="https://yourdomain.com/task/api/track.php"; npm run build
+```
+
+*Windows Command Prompt (cmd):*
+```cmd
+set NEXT_PUBLIC_ANALYTICS_ENDPOINT=https://yourdomain.com/task/api/track.php && npm run build
+```
+
+> PowerShell uses `$env:VAR="value"` with a semicolon to chain commands. bash/zsh prefix the variable directly before the command with no semicolon. The `.env.local` file approach works the same on all platforms.
+
+---
+
 ### Build and Run Instructions
 
 **Development:**
@@ -89,7 +122,15 @@ npm run dev
 Visit `http://localhost:3000` to view the app in development mode.
 
 **Production Build:**
+
+*bash / zsh (macOS, Linux):*
 ```bash
+npm run build
+npm start
+```
+
+*PowerShell (Windows):*
+```powershell
 npm run build
 npm start
 ```
