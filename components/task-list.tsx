@@ -38,6 +38,7 @@ import { DueDatePicker } from "@/components/due-date-picker"
 import { WhoField } from "@/components/who-field"
 import { useIsMobile } from "@/hooks/use-mobile" // Added mobile hook import
 import { DbStatusIndicator } from "@/components/db-status-indicator"
+import { useAnalytics } from "@/hooks/use-analytics"
 
 interface Task {
   id: string
@@ -74,6 +75,8 @@ interface ColumnVisibility {
 }
 
 export function TaskList() {
+  const { track } = useAnalytics()
+
   const [statusOptions, setStatusOptions] = useState([
     { key: "ongoing", label: "On-going", color: "#81b1ff" },
     { key: "waiting", label: "Waiting / review", color: "#06b6d4" },
@@ -401,13 +404,14 @@ export function TaskList() {
   }
 
   const handleSort = (field: SortField) => {
-    console.log("[v0] Sort clicked:", field, "current direction:", sortDirection)
+    const newDirection = sortField === field ? (sortDirection === "asc" ? "desc" : "asc") : "asc"
     if (sortField === field) {
-      setSortDirection((prevDirection) => (prevDirection === "asc" ? "desc" : "asc"))
+      setSortDirection(newDirection)
     } else {
       setSortField(field)
       setSortDirection("asc")
     }
+    track("filter_sort_applied", { sort_field: field, sort_direction: newDirection })
   }
 
   const sortTasks = (tasks: Task[]) => {
@@ -533,13 +537,12 @@ export function TaskList() {
       assignedTo: "",
     }
 
-    console.log("[v0] Adding new task to section:", sectionId)
     setSections(
       sections.map((section) =>
         section.id === sectionId ? { ...section, tasks: [newTask, ...section.tasks] } : section,
       ),
     )
-
+    track("task_added", { task_id: newTask.id, section_id: sectionId })
     setEditingTaskId(newTask.id)
   }
 
@@ -590,6 +593,7 @@ export function TaskList() {
   }
 
   const updateTaskStatus = (sectionId: string, taskId: string, status: StatusType) => {
+    const prev = sections.find((s) => s.id === sectionId)?.tasks.find((t) => t.id === taskId)?.status
     setSections(
       sections.map((section) =>
         section.id === sectionId
@@ -600,9 +604,11 @@ export function TaskList() {
           : section,
       ),
     )
+    track("status_toggled", { task_id: taskId, section_id: sectionId, from_status: prev, to_status: status })
   }
 
   const updateTaskPriority = (sectionId: string, taskId: string, priority: PriorityType) => {
+    const prev = sections.find((s) => s.id === sectionId)?.tasks.find((t) => t.id === taskId)?.priority
     setSections(
       sections.map((section) =>
         section.id === sectionId
@@ -613,6 +619,7 @@ export function TaskList() {
           : section,
       ),
     )
+    track("priority_updated", { task_id: taskId, section_id: sectionId, from_priority: prev, to_priority: priority })
   }
 
   const updateTaskNotes = (sectionId: string, taskId: string, notes: string) => {
@@ -775,11 +782,13 @@ export function TaskList() {
   }
 
   const deleteTask = (sectionId: string, taskId: string) => {
+    const task = sections.find((s) => s.id === sectionId)?.tasks.find((t) => t.id === taskId)
     setSections(
       sections.map((section) =>
         section.id === sectionId ? { ...section, tasks: section.tasks.filter((t) => t.id !== taskId) } : section,
       ),
     )
+    track("task_deleted", { task_id: taskId, section_id: sectionId, task_name: task?.name ?? null })
   }
 
   const renameSection = (sectionId: string, newName: string) => {

@@ -43,18 +43,42 @@ CREATE TABLE IF NOT EXISTS `analytics_events` (
 
 ---
 
+## How Sessions and IDs Work
+
+### `anonymous_id`
+A random ID generated on the user's first visit and stored in **`localStorage`** under the key `analytics_anonymous_id`. It survives page reloads and browser restarts, so the same person across multiple visits always sends the same `anonymous_id`. It is reset only if the user clears their browser storage.
+
+### `session_id`
+A random ID generated at the start of each tab session and stored in **`sessionStorage`** under the key `analytics_session_id`. It is scoped to the browser tab — closing and reopening the tab creates a new session, but refreshing or navigating within the same tab keeps the same session ID.
+
+### When events are sent
+
+| Trigger | Event fired |
+|---|---|
+| App first loads (once per tab session) | `session_start` |
+| User clicks "+ Add task" | `task_added` |
+| User changes a task's status dropdown | `status_toggled` |
+| User changes a task's priority dropdown | `priority_updated` |
+| User deletes a task | `task_deleted` |
+| User clicks a sort column header | `filter_sort_applied` |
+| Every 5 minutes while the tab is visible | `inactivity_heartbeat` |
+
+> The health-check `connection_check` event you see in the database is sent by the green dot indicator at startup — it is separate from session tracking and is used only to test connectivity.
+
+---
+
 ## Event Reference
 
-Each event maps to a row in `analytics_events`. The `properties` JSON column holds the fields listed below.
+Each event maps to a row in `analytics_events`. The `properties` JSON column holds the fields listed below. All events include `session_id` inside `properties`.
 
 ### `session_start`
-**Metric informed:** Unique User Count
+**Metric informed:** Unique User Count, Sessions
 
 | Property       | Type   | Description                                              |
 |----------------|--------|----------------------------------------------------------|
-| `anonymous_id` | string | UUID generated on first visit and persisted in a cookie  |
+| `session_id`   | string | Random ID scoped to this browser tab session             |
+| `referrer`     | string | `document.referrer` — where the user came from (or null) |
 | `user_agent`   | string | Raw browser User-Agent string                            |
-| `screen_res`   | string | Screen resolution, e.g. `"1920x1080"`                   |
 
 ---
 
