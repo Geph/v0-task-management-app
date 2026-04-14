@@ -191,13 +191,88 @@ try {
 
 ## Environment Variable (`NEXT_PUBLIC_ANALYTICS_ENDPOINT`)
 
-The front end reads the endpoint URL from an environment variable so you do not hard-code a URL.
+The front end reads the endpoint URL from an environment variable so you do not hard-code a URL. Because `NEXT_PUBLIC_` variables are inlined at **build time**, the value must be set in whichever environment performs the `next build`.
 
-Add the following to your `.env.local` (development) and to your Vercel project environment variables (production):
+---
+
+### Local Development
+
+Add the following line to `.env.local` in the project root (create the file if it does not exist):
 
 ```
 NEXT_PUBLIC_ANALYTICS_ENDPOINT=https://yourdomain.com/task/api/track.php
 ```
+
+> `.env.local` is listed in `.gitignore` by default and will not be committed to source control.
+
+---
+
+### Production — cPanel / Shared Hosting (Dreamhost)
+
+This app is built on Vercel and the built files are served from there, but if you are self-hosting the Next.js build on cPanel instead, the variable must be available during the build that runs on the cPanel server. Because cPanel does not have a built-in environment variable UI like Vercel does, you set it one of two ways:
+
+#### Option A — `.env.production` file (recommended for cPanel)
+
+1. In the project root, create a file called `.env.production` with the following content:
+
+   ```
+   NEXT_PUBLIC_ANALYTICS_ENDPOINT=https://yourdomain.com/task/api/track.php
+   ```
+
+   Replace `yourdomain.com` with your actual domain and verify the path matches where you uploaded `track.php` (e.g. `public_html/task/api/track.php` → `https://yourdomain.com/task/api/track.php`).
+
+2. Commit and push this file to your repository **only if the URL is not sensitive** (it is a public endpoint by design). If you prefer not to commit it, upload it manually to the server root before running the build.
+
+3. SSH into your cPanel server and run the build:
+
+   ```bash
+   cd ~/public_html/task        # or wherever your Next.js project lives
+   npm install
+   npm run build
+   ```
+
+   Next.js will pick up `.env.production` automatically during `next build`.
+
+#### Option B — Inline the variable for a single build (no file needed)
+
+SSH into your server and prefix the build command with the variable:
+
+```bash
+cd ~/public_html/task
+NEXT_PUBLIC_ANALYTICS_ENDPOINT=https://yourdomain.com/task/api/track.php npm run build
+```
+
+This sets the variable only for that one build process and does not persist it to any file.
+
+---
+
+### Verifying the value was embedded correctly
+
+After building, search the generated `.next` output for the URL to confirm it was picked up:
+
+```bash
+grep -r "track.php" .next/static/ | head -5
+```
+
+If the URL appears in the output, the variable was successfully inlined. If the grep returns nothing, the build did not have access to the variable — re-check the steps above and rebuild.
+
+---
+
+### Where `track.php` must live on cPanel
+
+The URL value must point to the PHP file inside your **public web root**. A typical Dreamhost layout:
+
+```
+~/public_html/
+└── task/
+    ├── api/
+    │   └── track.php          ← upload this file here
+    └── ... (Next.js static export or Node.js app files)
+```
+
+This maps to the URL: `https://yourdomain.com/task/api/track.php`
+
+Adjust the subdirectory (`task/`) if you deploy the app to a different path.
 
 ---
 
@@ -257,5 +332,5 @@ WHERE event_name = 'inactivity_heartbeat';
 - [ ] Grant the user ALL PRIVILEGES on the database
 - [ ] Run the `CREATE TABLE` SQL above in phpMyAdmin
 - [ ] Upload `api/track.php` to your server with the correct credentials filled in
-- [ ] Set `NEXT_PUBLIC_ANALYTICS_ENDPOINT` in `.env.local` and in your Vercel project
+- [ ] Set `NEXT_PUBLIC_ANALYTICS_ENDPOINT` in `.env.local` (dev) and either `.env.production` or inline at build time (cPanel production)
 - [ ] Verify connectivity by sending a test POST request to the endpoint
