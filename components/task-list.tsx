@@ -926,20 +926,6 @@ export function TaskList() {
 
   // Removed sendTaskEmail and setTaskReminder functions
 
-  const deleteTask = (sectionId: string, taskId: string) => {
-    setSections(
-      sections.map((section) =>
-        section.id === sectionId
-          ? {
-              ...section,
-              tasks: section.tasks.filter((task) => task.id !== taskId),
-            }
-          : section,
-      ),
-    )
-    setCompletedTasks(completedTasks.filter((task) => task.id !== taskId))
-  }
-
   const updateTaskEmoji = (sectionId: string, taskId: string, emoji: string) => {
     setSections(
       sections.map((section) =>
