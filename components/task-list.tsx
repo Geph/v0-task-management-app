@@ -150,7 +150,7 @@ export function TaskList() {
 
   const [completedTasks, setCompletedTasks] = useState<Task[]>([])
   const [sortField, setSortField] = useState<SortField>("priority")
-  const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
+  const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -158,7 +158,7 @@ export function TaskList() {
 
   const [appName, setAppName] = useState("Your Name's Task Management")
   const [appIcon, setAppIcon] = useState("")
-  const [headerColor, setHeaderColor] = useState("#7b68ee")
+  const [headerColor, setHeaderColor] = useState("#5e1bda")
   const [hasPIN, setHasPIN] = useState(false)
   const [userPIN, setUserPIN] = useState("")
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
