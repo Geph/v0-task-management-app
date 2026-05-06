@@ -158,6 +158,7 @@ export function TaskList() {
 
   const [appName, setAppName] = useState("Your Name's Task Management")
   const [appIcon, setAppIcon] = useState("")
+  const [headerColor, setHeaderColor] = useState("#7b68ee")
   const [hasPIN, setHasPIN] = useState(false)
   const [userPIN, setUserPIN] = useState("")
   const [columnVisibility, setColumnVisibility] = useState<ColumnVisibility>({
@@ -201,9 +202,11 @@ export function TaskList() {
       const storedStatusOptions = localStorage.getItem("statusOptions")
       const storedPriorityOptions = localStorage.getItem("priorityOptions")
       const storedUsers = localStorage.getItem("users")
+      const storedHeaderColor = localStorage.getItem("headerColor")
 
       if (storedAppName) setAppName(storedAppName)
       if (storedAppIcon) setAppIcon(storedAppIcon)
+      if (storedHeaderColor) setHeaderColor(storedHeaderColor)
       if (storedUserPIN) {
         setUserPIN(storedUserPIN)
         setHasPIN(true)
@@ -1004,6 +1007,13 @@ export function TaskList() {
     }
   }
 
+  const handleUpdateHeaderColor = (color: string) => {
+    setHeaderColor(color)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("headerColor", color)
+    }
+  }
+
   const handleSetPIN = (pin: string) => {
     setUserPIN(pin)
     setHasPIN(true)
@@ -1394,7 +1404,7 @@ export function TaskList() {
 
   return (
     <div className="flex-1 bg-background">
-      <div className="border-b border-border p-6 bg-purple-900">
+      <div className="border-b border-border p-6" style={{ backgroundColor: headerColor }}>
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div className="flex items-center gap-3">
             {appIcon ? (
@@ -1433,6 +1443,8 @@ export function TaskList() {
               <SettingsDialog
                 appName={appName}
                 appIcon={appIcon}
+                headerColor={headerColor}
+                onUpdateHeaderColor={handleUpdateHeaderColor}
                 hasPIN={hasPIN}
                 onUpdateAppName={handleUpdateAppName}
                 onUpdateAppIcon={handleUpdateAppIcon}
