@@ -33,6 +33,8 @@ interface SettingsDialogProps {
   children: React.ReactNode
   appName: string
   appIcon: string
+  headerColor: string
+  onUpdateHeaderColor: (color: string) => void
   hasPIN: boolean
   onUpdateAppName: (name: string) => void
   onUpdateAppIcon: (icon: string) => void
@@ -53,6 +55,8 @@ export function SettingsDialog({
   children,
   appName,
   appIcon,
+  headerColor,
+  onUpdateHeaderColor,
   hasPIN,
   onUpdateAppName,
   onUpdateAppIcon,
@@ -181,12 +185,26 @@ export function SettingsDialog({
               </div>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="header-color">Header Color</Label>
+              <div className="flex items-center gap-3">
+                <Input
+                  id="header-color"
+                  type="color"
+                  value={headerColor}
+                  onChange={(e) => onUpdateHeaderColor(e.target.value)}
+                  className="w-20 h-10 p-1 cursor-pointer"
+                />
+                <span className="text-sm text-muted-foreground">{headerColor}</span>
+              </div>
+            </div>
+
             <ThemeSettings />
 
             <div className="pt-4 border-t mt-6">
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span>App Version</span>
-                <span className="font-mono">v0.2.0</span>
+                <span className="font-mono">v0.2.1</span>
               </div>
             </div>
           </TabsContent>

@@ -7,8 +7,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { RichTextEditor } from "@/components/rich-text-editor"
-import { Copy, Edit3, CheckCircle } from "lucide-react"
+import { Copy, Edit3, CheckCircle, Trash2 } from "lucide-react"
 import { useIsMobile } from "@/hooks/use-mobile"
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog"
 
 interface TaskDetailsDialogProps {
   taskName: string
@@ -19,6 +28,7 @@ interface TaskDetailsDialogProps {
   onRenameTask: (newName: string) => void
   onDuplicateTask: () => void
   onMarkCompleted: () => void
+  onDeleteTask: () => void
   children: React.ReactNode
 }
 
@@ -31,12 +41,14 @@ export function TaskDetailsDialog({
   onRenameTask,
   onDuplicateTask,
   onMarkCompleted,
+  onDeleteTask,
   children,
 }: TaskDetailsDialogProps) {
   const [notes, setNotes] = useState(taskNotes)
   const [isOpen, setIsOpen] = useState(false)
   const [isRenaming, setIsRenaming] = useState(false)
   const [newTaskName, setNewTaskName] = useState(taskName)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
 
   const isMobile = useIsMobile()
 
@@ -69,6 +81,12 @@ export function TaskDetailsDialog({
   const handleMarkCompleted = () => {
     onMarkCompleted()
     setIsOpen(false)
+  }
+
+  const handleDelete = () => {
+    onDeleteTask()
+    setIsOpen(false)
+    setShowDeleteConfirm(false)
   }
 
   return (
@@ -131,6 +149,14 @@ export function TaskDetailsDialog({
                 <CheckCircle className="w-4 h-4" />
                 {isCompleted ? "Set to Incomplete" : "Complete"}
               </Button>
+              <Button
+                variant="destructive"
+                onClick={() => setShowDeleteConfirm(true)}
+                className={`flex items-center gap-2 ${isMobile ? "w-full" : ""}`}
+              >
+                <Trash2 className="w-4 h-4" />
+                Delete
+              </Button>
             </div>
             <div className={`flex gap-2 ${isMobile ? "flex-col" : ""}`}>
               <Button onClick={handleSave} className={isMobile ? "w-full" : ""}>
@@ -143,6 +169,22 @@ export function TaskDetailsDialog({
           </div>
         </div>
       </DialogContent>
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Task</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete "{taskName}"? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <div className="flex gap-2 justify-end">
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive hover:bg-destructive/90 text-white">
+              Delete
+            </AlertDialogAction>
+          </div>
+        </AlertDialogContent>
+      </AlertDialog>
     </Dialog>
   )
 }
