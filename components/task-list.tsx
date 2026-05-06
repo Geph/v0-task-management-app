@@ -149,8 +149,8 @@ export function TaskList() {
   ])
 
   const [completedTasks, setCompletedTasks] = useState<Task[]>([])
-  const [sortField, setSortField] = useState<SortField>("name")
-  const [sortDirection, setSortDirection] = useState<SortDirection>("asc")
+  const [sortField, setSortField] = useState<SortField>("priority")
+  const [sortDirection, setSortDirection] = useState<SortDirection>("desc")
   const [selectedTasks, setSelectedTasks] = useState<Set<string>>(new Set())
   const [searchTerm, setSearchTerm] = useState("")
 
@@ -922,6 +922,20 @@ export function TaskList() {
   }
 
   // Removed sendTaskEmail and setTaskReminder functions
+
+  const deleteTask = (sectionId: string, taskId: string) => {
+    setSections(
+      sections.map((section) =>
+        section.id === sectionId
+          ? {
+              ...section,
+              tasks: section.tasks.filter((task) => task.id !== taskId),
+            }
+          : section,
+      ),
+    )
+    setCompletedTasks(completedTasks.filter((task) => task.id !== taskId))
+  }
 
   const updateTaskEmoji = (sectionId: string, taskId: string, emoji: string) => {
     setSections(
@@ -1800,6 +1814,7 @@ export function TaskList() {
                           setCompletedTasks([...completedTasks, newTask])
                         }}
                         onMarkCompleted={() => markTaskAsIncomplete(task.id)} // Changed to markTaskAsIncomplete
+                        onDeleteTask={() => setCompletedTasks(completedTasks.filter((t) => t.id !== task.id))}
                       >
                         <div className="p-3 hover:bg-muted/50 border-b border-border/50 opacity-60 cursor-pointer">
                           <div className="flex items-center gap-3">
@@ -1844,6 +1859,7 @@ export function TaskList() {
                           setCompletedTasks([...completedTasks, newTask])
                         }}
                         onMarkCompleted={() => markTaskAsIncomplete(task.id)} // Changed to markTaskAsIncomplete
+                        onDeleteTask={() => setCompletedTasks(completedTasks.filter((t) => t.id !== task.id))}
                       >
                         <div
                           className="flex gap-1 px-4 py-0.75 hover:bg-muted/50 border-b border-border/50 opacity-60 overflow-x-auto cursor-pointer"
