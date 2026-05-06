@@ -204,7 +204,7 @@ export function SettingsDialog({
             <div className="pt-4 border-t mt-6">
               <div className="flex items-center justify-between text-sm text-muted-foreground">
                 <span>App Version</span>
-                <span className="font-mono">v0.2.1</span>
+                <span className="font-mono">v0.2.2</span>
               </div>
             </div>
           </TabsContent>
